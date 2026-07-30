@@ -164,9 +164,20 @@
   const ttsSupported = "speechSynthesis" in window;
   let jaVoice = null;
 
+  // Preferred Japanese female voice, by name, in priority order. "Mizuki" (the
+  // requested voice) ships on some Windows/Android TTS engines but not on macOS
+  // or most iPhones, so this falls back to other known Japanese female voices,
+  // then to any Japanese voice, rather than silently going voiceless.
+  const VOICE_PRIORITY = ["mizuki", "kyoko", "nanami", "haruka", "ayumi", "o-ren"];
+
   function pickJaVoice() {
     const voices = window.speechSynthesis.getVoices();
-    jaVoice = voices.find((v) => v.lang && v.lang.toLowerCase().startsWith("ja")) || null;
+    const jaVoices = voices.filter((v) => v.lang && v.lang.toLowerCase().startsWith("ja"));
+    for (const name of VOICE_PRIORITY) {
+      const match = jaVoices.find((v) => v.name.toLowerCase().includes(name));
+      if (match) { jaVoice = match; return; }
+    }
+    jaVoice = jaVoices[0] || null;
   }
 
   if (ttsSupported) {
