@@ -170,14 +170,18 @@
   // then to any Japanese voice, rather than silently going voiceless.
   const VOICE_PRIORITY = ["mizuki", "kyoko", "nanami", "haruka", "ayumi", "o-ren"];
 
+  // Returns true once the OS/browser has actually reported its voice list —
+  // on many mobile browsers getVoices() is empty for a moment after page load.
   function pickJaVoice() {
     const voices = window.speechSynthesis.getVoices();
+    if (!voices.length) return false;
     const jaVoices = voices.filter((v) => v.lang && v.lang.toLowerCase().startsWith("ja"));
     for (const name of VOICE_PRIORITY) {
       const match = jaVoices.find((v) => v.name.toLowerCase().includes(name));
-      if (match) { jaVoice = match; return; }
+      if (match) { jaVoice = match; return true; }
     }
     jaVoice = jaVoices[0] || null;
+    return true;
   }
 
   if (ttsSupported) {
@@ -185,6 +189,13 @@
     if (window.speechSynthesis.onvoiceschanged !== undefined) {
       window.speechSynthesis.onvoiceschanged = pickJaVoice;
     }
+    // onvoiceschanged doesn't fire reliably on every mobile browser (notably
+    // iOS Safari), so also poll briefly right after load as a fallback.
+    let voicePollAttempts = 0;
+    const voicePoll = setInterval(() => {
+      voicePollAttempts++;
+      if (pickJaVoice() || voicePollAttempts > 15) clearInterval(voicePoll);
+    }, 300);
   } else {
     autoSpeak.disabled = true;
     autoSpeakLabel.textContent = "Auto-speak (unsupported in this browser)";
@@ -196,6 +207,7 @@
 
   function speak(text, btn) {
     if (!ttsSupported || !text) return;
+    if (!jaVoice) pickJaVoice();
     window.speechSynthesis.cancel();
     const utter = new SpeechSynthesisUtterance(text);
     utter.lang = "ja-JP";
