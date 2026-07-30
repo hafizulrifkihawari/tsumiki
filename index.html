@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>漢字 N4 — Flashcards</title>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#171a2e" />
+  <link rel="icon" href="icon-192.png" />
+  <link rel="apple-touch-icon" href="icon-apple-touch.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="漢字 N4" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-kanji">漢字</span>
+        <div class="brand-text">
+          <h1>N4 Flashcards</h1>
+          <p>40 words · 400 cards · shuffled</p>
+        </div>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-count"><span id="posNow">1</span> / <span id="posTotal">40</span></div>
+        <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+      </div>
+    </header>
+
+    <section class="controls">
+      <div class="control-group">
+        <label class="switch">
+          <input type="checkbox" id="hintForm" />
+          <span class="switch-track"><span class="switch-thumb"></span></span>
+          <span class="switch-label">Show form hint on front</span>
+        </label>
+        <label class="switch">
+          <input type="checkbox" id="clozeMode" />
+          <span class="switch-track"><span class="switch-thumb"></span></span>
+          <span class="switch-label">Blank word in sentence (cloze)</span>
+        </label>
+        <label class="switch">
+          <input type="checkbox" id="romajiMode" />
+          <span class="switch-track"><span class="switch-thumb"></span></span>
+          <span class="switch-label">Show romaji</span>
+        </label>
+        <label class="switch">
+          <input type="checkbox" id="autoSpeak" />
+          <span class="switch-track"><span class="switch-thumb"></span></span>
+          <span class="switch-label" id="autoSpeakLabel">Auto-speak (TTS)</span>
+        </label>
+      </div>
+
+      <div class="control-group">
+        <div class="segmented" id="filterSeg" role="tablist" aria-label="Filter by type">
+          <button class="seg-btn is-active" data-filter="all">All</button>
+          <button class="seg-btn" data-filter="verb">Verbs</button>
+          <button class="seg-btn" data-filter="adj">Adjectives</button>
+          <button class="seg-btn" data-filter="noun">Nouns</button>
+        </div>
+      </div>
+    </section>
+
+    <main class="stage">
+      <button class="nav-arrow" id="prevBtn" aria-label="Previous card">‹</button>
+
+      <div class="card-scene">
+        <div class="card" id="card">
+          <!-- FRONT -->
+          <div class="card-face card-front">
+            <div class="card-top">
+              <span class="badge badge-type" id="frontType">Noun</span>
+              <span class="badge badge-form" id="frontFormHint" hidden>Basic</span>
+            </div>
+            <div class="card-center">
+              <div class="word-display" id="frontWord">着物</div>
+              <div class="front-sentence" id="frontSentence"></div>
+              <div class="romaji-line" id="frontRomaji" hidden></div>
+              <div class="conjugate-note" id="frontNote"></div>
+              <button class="speak-btn" id="speakFrontBtn" type="button" aria-label="Play pronunciation" title="Play pronunciation (P)">🔊</button>
+            </div>
+            <div class="card-bottom">
+              <span class="hint-text">Tap card or press Space to flip</span>
+            </div>
+          </div>
+
+          <!-- BACK -->
+          <div class="card-face card-back">
+            <div class="card-top">
+              <span class="badge badge-type" id="backType">Noun</span>
+              <span class="badge badge-form" id="backForm">Basic</span>
+            </div>
+            <div class="card-center">
+              <div class="reading-row">
+                <span class="reading-shown" id="backReading">きもの</span>
+              </div>
+              <div class="romaji-line" id="backRomaji" hidden></div>
+              <div class="base-row" id="backBaseRow">
+                <span class="base-label">base</span>
+                <span class="base-word" id="backBaseWord">着物</span>
+                <span class="base-reading" id="backBaseReading">きもの</span>
+              </div>
+              <div class="meaning-row">
+                <span class="meaning-id" id="backMeaning">kimono</span>
+                <span class="meaning-en" id="backMeaningEn">kimono</span>
+              </div>
+              <div class="example" id="backExample">
+                <div class="example-jp" id="exJp"></div>
+                <div class="example-reading" id="exReading"></div>
+                <div class="example-romaji" id="exRomaji" hidden></div>
+                <div class="example-meaning" id="exMeaning"></div>
+              </div>
+              <button class="speak-btn" id="speakBackBtn" type="button" aria-label="Play pronunciation" title="Play pronunciation (P)">🔊</button>
+            </div>
+            <div class="card-bottom">
+              <span class="hint-text">Space to flip · ← → to move · S to shuffle</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button class="nav-arrow" id="nextBtn" aria-label="Next card">›</button>
+    </main>
+
+    <footer class="actionbar">
+      <button class="btn btn-ghost" id="shuffleBtn" title="Shuffle (S)">
+        <span class="btn-icon">⇄</span> Shuffle
+      </button>
+      <button class="btn btn-ghost" id="resetBtn" title="Study in order (un-shuffle)">
+        <span class="btn-icon">↺</span> In order
+      </button>
+      <div class="spacer"></div>
+      <button class="btn btn-flip" id="flipBtn">Flip card</button>
+    </footer>
+  </div>
+
+  <script src="conjugate.js"></script>
+  <script src="romaji.js"></script>
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("sw.js").catch(() => {});
+      });
+    }
+  </script>
+</body>
+</html>
