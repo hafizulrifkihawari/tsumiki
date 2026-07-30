@@ -196,16 +196,29 @@
       voicePollAttempts++;
       if (pickJaVoice() || voicePollAttempts > 15) clearInterval(voicePoll);
     }, 300);
-  } else {
-    autoSpeak.disabled = true;
-    autoSpeakLabel.textContent = "Auto-speak (unsupported in this browser)";
-    speakFrontBtn.disabled = true;
-    speakBackBtn.disabled = true;
-    speakFrontBtn.title = "Text-to-speech isn't supported in this browser";
-    speakBackBtn.title = "Text-to-speech isn't supported in this browser";
+  }
+  // Note: no hard "unsupported" disable here — pre-rendered <audio> playback
+  // (below) is the primary path and works in virtually every browser even
+  // when speechSynthesis doesn't; speechSynthesis is only a fallback.
+
+  // Plays a pre-rendered clip (scripts/generate-audio.js output). Falls back
+  // to the device's own Japanese voice if the clip is missing or fails to load.
+  let currentAudio = null;
+
+  function playPrerendered(audioFile, btn) {
+    return new Promise((resolve, reject) => {
+      if (currentAudio) { currentAudio.pause(); currentAudio = null; }
+      const audio = new Audio(`audio/${audioFile}`);
+      currentAudio = audio;
+      const cleanup = () => { if (btn) btn.classList.remove("is-speaking"); };
+      audio.addEventListener("ended", () => { cleanup(); resolve(); });
+      audio.addEventListener("error", () => { cleanup(); reject(new Error("audio load failed")); });
+      if (btn) btn.classList.add("is-speaking");
+      audio.play().catch((err) => { cleanup(); reject(err); });
+    });
   }
 
-  function speak(text, btn) {
+  function speakDevice(text, btn) {
     if (!ttsSupported || !text) return;
     if (!jaVoice) pickJaVoice();
     window.speechSynthesis.cancel();
@@ -221,16 +234,18 @@
     window.speechSynthesis.speak(utter);
   }
 
-  function speakFront() {
-    const c = deck[index];
+  function speakCard(c, btn) {
     if (!c) return;
-    speak(c.mode === "isolated" ? c.word : c.jp, speakFrontBtn);
+    const fallbackText = c.mode === "isolated" ? c.word : c.jp;
+    if (c.audioFile) {
+      playPrerendered(c.audioFile, btn).catch(() => speakDevice(fallbackText, btn));
+    } else {
+      speakDevice(fallbackText, btn);
+    }
   }
-  function speakBack() {
-    const c = deck[index];
-    if (!c) return;
-    speak(c.mode === "isolated" ? c.word : c.jp, speakBackBtn);
-  }
+
+  function speakFront() { speakCard(deck[index], speakFrontBtn); }
+  function speakBack() { speakCard(deck[index], speakBackBtn); }
 
   // ---- Navigation ----
   function next() {

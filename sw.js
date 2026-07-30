@@ -1,6 +1,6 @@
 /* Service worker — offline cache for the N4 flashcard PWA. */
 
-const CACHE_NAME = "kanji-n4-v1";
+const CACHE_NAME = "kanji-n4-v2";
 const ASSETS = [
   "./",
   "./index.html",
@@ -11,12 +11,24 @@ const ASSETS = [
   "./data.js",
   "./manifest.json",
   "./icon-192.png",
-  "./icon-512.png"
+  "./icon-512.png",
+  "./audio/manifest.json"
 ];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS)).then(() => self.skipWaiting())
+    caches.open(CACHE_NAME)
+      .then((cache) =>
+        cache.addAll(ASSETS).then(() =>
+          // Pre-cache every pre-rendered audio clip so cards work offline
+          // even before they've ever been played.
+          fetch("./audio/manifest.json")
+            .then((r) => r.json())
+            .then((files) => cache.addAll(files.map((f) => `./audio/${f}`)))
+            .catch(() => {}) // offline on first install: audio caches lazily via fetch handler instead
+        )
+      )
+      .then(() => self.skipWaiting())
   );
 });
 

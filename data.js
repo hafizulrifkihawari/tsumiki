@@ -336,27 +336,32 @@ function buildCards() {
   for (const e of RAW) {
     const meta = { kanjiId: e.id, word: e.word, reading: e.reading, meaning: e.meaning, meaningEn: e.meaningEn, type: e.type };
 
-    // Card 1: just the kanji
-    out.push(Object.assign({}, meta, { mode: "isolated" }));
+    // Card 1: just the kanji. audioFile is a stable name (kanjiId-slot) shared
+    // by the pre-rendered audio pipeline (scripts/generate-audio.js) and the
+    // browser player (app.js), so both sides agree on filenames without
+    // either one recomputing indices independently.
+    out.push(Object.assign({}, meta, { mode: "isolated", audioFile: `${e.id}-0.m4a`, audioText: e.word }));
 
     // Cards 2-10: in a sentence
     if (e.type === "noun") {
-      for (const s of e.sentences) {
+      e.sentences.forEach((s, i) => {
         out.push(Object.assign({}, meta, {
           mode: "sentence", form: s.form, jp: s.jp, sentReading: s.reading,
-          sentMeaning: s.meaning, target: e.word, targetKana: e.reading
+          sentMeaning: s.meaning, target: e.word, targetKana: e.reading,
+          audioFile: `${e.id}-${i + 1}.m4a`, audioText: s.jp
         }));
-      }
+      });
     } else {
-      for (const f of conjugate(e.word, e.reading, e.type)) {
+      conjugate(e.word, e.reading, e.type).forEach((f, i) => {
+        const jp = e.carrier.pre + f.disp + "。";
         out.push(Object.assign({}, meta, {
           mode: "sentence", form: f.label,
-          jp: e.carrier.pre + f.disp + "。",
-          sentReading: e.carrier.preR + f.kana + "。",
+          jp, sentReading: e.carrier.preR + f.kana + "。",
           sentMeaning: e.carrier.mean + (FORM_MEANING_TAG[f.key] || ""),
-          target: f.disp, targetKana: f.kana
+          target: f.disp, targetKana: f.kana,
+          audioFile: `${e.id}-${i + 1}.m4a`, audioText: jp
         }));
-      }
+      });
     }
   }
   return out;
