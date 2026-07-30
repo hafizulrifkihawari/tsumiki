@@ -1,6 +1,7 @@
 /* Service worker — offline cache for the N4 flashcard PWA. */
 
-const CACHE_NAME = "kanji-n4-v2";
+const CACHE_NAME = "kanji-n4-v3";
+const FONT_ORIGINS = ["https://fonts.googleapis.com", "https://fonts.gstatic.com"];
 const ASSETS = [
   "./",
   "./index.html",
@@ -40,11 +41,15 @@ self.addEventListener("activate", (event) => {
   );
 });
 
-// Cache-first for same-origin GET requests, falling back to network then cache.
+// Cache-first for same-origin GET requests (plus the Google Fonts origins, so
+// Noto Sans JP keeps working offline after the first successful load),
+// falling back to network then cache.
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
   const url = new URL(event.request.url);
-  if (url.origin !== self.location.origin) return;
+  const sameOrigin = url.origin === self.location.origin;
+  const isFont = FONT_ORIGINS.includes(url.origin);
+  if (!sameOrigin && !isFont) return;
 
   event.respondWith(
     caches.match(event.request).then((cached) => {

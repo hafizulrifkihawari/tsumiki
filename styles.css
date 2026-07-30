@@ -14,7 +14,7 @@
   --good: #56d6a0;
   --shadow: 0 24px 60px -20px rgba(0, 0, 0, 0.7);
   --radius: 22px;
-  --font-jp: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", system-ui, sans-serif;
+  --font-jp: "Noto Sans JP", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", system-ui, sans-serif;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
