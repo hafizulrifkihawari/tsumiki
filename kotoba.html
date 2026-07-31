@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>言葉 Kotoba — Flashcards</title>
+  <meta name="theme-color" content="#171a2e" />
+  <link rel="icon" href="icon-192.png" />
+  <link rel="apple-touch-icon" href="icon-apple-touch.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="言葉 Kotoba" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="kotoba.css" />
+</head>
+<body>
+  <div class="app">
+    <a class="back-link" href="index.html">← 漢字 N4</a>
+
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-kanji">言葉</span>
+        <div class="brand-text">
+          <h1>Kotoba Flashcards</h1>
+          <p>Pelajaran 26 · <span id="wordCount">0</span> words</p>
+        </div>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-count"><span id="posNow">1</span> / <span id="posTotal">1</span></div>
+        <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+      </div>
+    </header>
+
+    <main class="stage">
+      <button class="nav-arrow" id="prevBtn" aria-label="Previous card">‹</button>
+
+      <div class="card-scene">
+        <div class="card" id="card">
+          <!-- FRONT: hiragana/katakana first — learn it as a word before the kanji -->
+          <div class="card-face card-front">
+            <div class="card-top">
+              <span class="lesson-badge" id="frontLesson">Pelajaran 26</span>
+            </div>
+            <div class="card-center">
+              <div class="word-display" id="frontKana">みます</div>
+              <div class="kotoba-kanji" id="frontKanji"></div>
+              <div class="kotoba-context" id="frontContext" hidden></div>
+              <button class="speak-btn" id="speakFrontBtn" type="button" aria-label="Play pronunciation" title="Play pronunciation (P)">🔊</button>
+            </div>
+            <div class="card-bottom">
+              <span class="hint-text">Tap card or press Space to flip</span>
+            </div>
+          </div>
+
+          <!-- BACK -->
+          <div class="card-face card-back">
+            <div class="card-top">
+              <span class="badge badge-type" id="backType">Kata Benda</span>
+            </div>
+            <div class="card-center">
+              <div class="reading-row">
+                <span class="reading-shown" id="backKana">みます</span>
+              </div>
+              <div class="kotoba-kanji" id="backKanji"></div>
+              <div class="kotoba-context" id="backContext" hidden></div>
+              <div class="meaning-row">
+                <span class="meaning-id" id="backMeaning">melihat, memeriksa</span>
+              </div>
+            </div>
+            <div class="card-bottom">
+              <span class="hint-text">Space to flip · ← → to move · S to shuffle</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button class="nav-arrow" id="nextBtn" aria-label="Next card">›</button>
+    </main>
+
+    <footer class="actionbar">
+      <button class="btn btn-ghost" id="shuffleBtn" title="Shuffle (S)">
+        <span class="btn-icon">⇄</span> Shuffle
+      </button>
+      <button class="btn btn-ghost" id="resetBtn" title="Study in order (un-shuffle)">
+        <span class="btn-icon">↺</span> In order
+      </button>
+      <div class="spacer"></div>
+      <button class="btn btn-flip" id="flipBtn">Flip card</button>
+    </footer>
+  </div>
+
+  <script src="kotoba-data.js"></script>
+  <script src="kotoba-app.js"></script>
+</body>
+</html>
