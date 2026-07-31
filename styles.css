@@ -217,6 +217,7 @@ body {
   background: var(--surface-2); border: 1px solid var(--border);
   padding: 6px 12px; border-radius: 99px; margin-bottom: 4px;
 }
+.base-row[hidden] { display: none; }
 .base-label { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-faint); }
 .base-word { font-family: var(--font-jp); font-size: 18px; font-weight: 700; }
 .base-reading { font-family: var(--font-jp); font-size: 14px; color: var(--text-dim); }
@@ -231,6 +232,7 @@ body {
   border-radius: 14px; padding: 12px 14px;
   display: flex; flex-direction: column; gap: 4px;
 }
+.example[hidden] { display: none; }
 .example-jp { font-family: var(--font-jp); font-size: 20px; font-weight: 600; }
 .example-reading { font-family: var(--font-jp); font-size: 13.5px; color: var(--accent); }
 .example-meaning { font-size: 13px; color: var(--text-dim); }
