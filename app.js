@@ -44,9 +44,19 @@
     noun: (c) => c.type === "noun"
   };
 
+  // Each session samples this many cards per kanji from the full 400-card
+  // pool, so a page refresh rotates through different cards for variety.
+  const SESSION_CARDS_PER_KANJI = 3;
+
   let filter = "all";
   let deck = [];
   let index = 0;
+  let finished = false;
+
+  const finishedScreen = el("finishedScreen");
+  const cardScene = el("cardScene");
+  const finishedResetBtn = el("finishedResetBtn");
+  const finishedCount = el("finishedCount");
 
   function shuffleArray(arr) {
     const a = arr.slice();
@@ -57,10 +67,35 @@
     return a;
   }
 
+  // Groups cards by kanjiId and randomly samples SESSION_CARDS_PER_KANJI from
+  // each group, so every kanji appears at least a few times per session while
+  // the specific cards shown still rotate across the full 400-card pool.
+  function sampleSession(cards) {
+    const byKanji = new Map();
+    for (const c of cards) {
+      if (!byKanji.has(c.kanjiId)) byKanji.set(c.kanjiId, []);
+      byKanji.get(c.kanjiId).push(c);
+    }
+    const sampled = [];
+    for (const group of byKanji.values()) {
+      sampled.push(...shuffleArray(group).slice(0, SESSION_CARDS_PER_KANJI));
+    }
+    return sampled;
+  }
+
+  function setFinished(isFinished) {
+    finished = isFinished;
+    finishedScreen.hidden = !isFinished;
+    cardScene.hidden = isFinished;
+    if (isFinished) finishedCount.textContent = deck.length;
+  }
+
   function buildDeck(shuffle) {
     const base = CARDS.filter(FILTERS[filter]);
-    deck = shuffle ? shuffleArray(base) : base.slice();
+    const session = sampleSession(base);
+    deck = shuffle ? shuffleArray(session) : session;
     index = 0;
+    setFinished(false);
     render();
   }
 
@@ -249,18 +284,20 @@
 
   // ---- Navigation ----
   function next() {
-    if (!deck.length) return;
-    index = (index + 1) % deck.length;
+    if (!deck.length || finished) return;
+    if (index === deck.length - 1) { setFinished(true); return; }
+    index++;
     render();
     if (autoSpeak.checked) speakFront();
   }
   function prev() {
-    if (!deck.length) return;
+    if (!deck.length || finished) return;
     index = (index - 1 + deck.length) % deck.length;
     render();
     if (autoSpeak.checked) speakFront();
   }
   function flip() {
+    if (finished) return;
     const willShowBack = !card.classList.contains("is-flipped");
     card.classList.toggle("is-flipped");
     if (autoSpeak.checked) {
@@ -275,6 +312,7 @@
   el("prevBtn").addEventListener("click", prev);
   el("shuffleBtn").addEventListener("click", () => buildDeck(true));
   el("resetBtn").addEventListener("click", () => buildDeck(false));
+  finishedResetBtn.addEventListener("click", () => buildDeck(true));
 
   speakFrontBtn.addEventListener("click", (e) => { e.stopPropagation(); speakFront(); });
   speakBackBtn.addEventListener("click", (e) => { e.stopPropagation(); speakBack(); });

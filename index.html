@@ -23,7 +23,7 @@
         <span class="brand-kanji">漢字</span>
         <div class="brand-text">
           <h1>N4 Flashcards</h1>
-          <p>40 words · 400 cards · shuffled</p>
+          <p>40 words · 120 of 400 cards · shuffled</p>
         </div>
       </div>
       <div class="progress-wrap">
@@ -70,7 +70,7 @@
     <main class="stage">
       <button class="nav-arrow" id="prevBtn" aria-label="Previous card">‹</button>
 
-      <div class="card-scene">
+      <div class="card-scene" id="cardScene">
         <div class="card" id="card">
           <!-- FRONT -->
           <div class="card-face card-front">
@@ -123,6 +123,14 @@
             </div>
           </div>
         </div>
+      </div>
+
+      <div class="finished-screen" id="finishedScreen" hidden>
+        <div class="finished-title">Session complete!</div>
+        <p class="finished-sub">You've reviewed all <span id="finishedCount">120</span> cards in this session.</p>
+        <button class="btn btn-ghost" id="finishedResetBtn">
+          <span class="btn-icon">↺</span> Start new session
+        </button>
       </div>
 
       <button class="nav-arrow" id="nextBtn" aria-label="Next card">›</button>

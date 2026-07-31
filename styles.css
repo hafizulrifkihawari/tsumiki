@@ -127,6 +127,21 @@ body {
 }
 .card.is-flipped { transform: rotateY(180deg); }
 
+.finished-screen {
+  flex: 1;
+  min-height: 380px;
+  background: linear-gradient(165deg, var(--surface), var(--surface-2));
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 10px; text-align: center; padding: 24px;
+}
+.finished-screen[hidden] { display: none; }
+.finished-title { font-size: 24px; font-weight: 700; color: var(--accent); }
+.finished-sub { font-size: 14px; color: var(--text-dim); max-width: 320px; }
+.finished-sub span { color: var(--text); font-weight: 700; }
+
 .card-face {
   position: absolute; inset: 0;
   backface-visibility: hidden;
