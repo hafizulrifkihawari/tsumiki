@@ -15,6 +15,11 @@
   margin-bottom: 6px;
 }
 
+/* Kotoba's main word (front kana / back reading) runs 4px smaller than
+   the shared styles.css default, on top of the N4 page's own -2px. */
+.word-display { font-size: clamp(52px, 16vw, 92px); }
+.reading-shown { font-size: clamp(30px, 9vw, 48px); }
+
 .kotoba-kanji {
   font-family: var(--font-jp);
   font-size: clamp(16px, 4.2vw, 20px);
