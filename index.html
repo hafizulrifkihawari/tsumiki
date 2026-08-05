@@ -17,20 +17,53 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+  <!-- Login / user picker -->
+  <div class="login-overlay" id="loginOverlay" hidden>
+    <div class="login-card">
+      <span class="login-kanji">漢字</span>
+      <h2>Masuk · Sign in</h2>
+      <p class="login-sub">Masukkan nama pengguna untuk menyimpan progres belajarmu.</p>
+      <form id="loginForm">
+        <input id="loginInput" type="text" inputmode="text" autocomplete="off"
+               autocapitalize="none" spellcheck="false" placeholder="nama pengguna…" />
+        <button class="btn btn-flip" type="submit">Masuk</button>
+      </form>
+      <div class="login-quick">
+        <button type="button" class="chip" data-user="guest">guest</button>
+        <button type="button" class="chip" data-user="psi">psi</button>
+        <button type="button" class="chip" data-user="plumpey">plumpey</button>
+      </div>
+      <p class="login-note">
+        <strong>guest</strong> — sesi acak baru setiap kali.<br />
+        <strong>psi</strong> / <strong>plumpey</strong> — mengingat kanji yang sudah kamu kuasai.
+      </p>
+    </div>
+  </div>
+
   <div class="app">
     <header class="topbar">
       <div class="brand">
         <span class="brand-kanji">漢字</span>
         <div class="brand-text">
           <h1>N4 Flashcards</h1>
-          <p>40 words · 120 of 400 cards · shuffled</p>
+          <p id="brandSub">300 words · shuffled every session</p>
         </div>
       </div>
       <div class="progress-wrap">
         <div class="progress-count"><span id="posNow">1</span> / <span id="posTotal">40</span></div>
         <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
       </div>
-      <a class="btn btn-ghost" href="kotoba.html" title="Kotoba vocabulary flashcards">言葉 Kotoba</a>
+      <div class="topbar-actions">
+        <button class="btn btn-ghost" id="userChip" type="button" title="Ganti pengguna">
+          <span class="user-avatar" id="userAvatar">👤</span>
+          <span id="userName">guest</span>
+        </button>
+        <a class="btn btn-ghost" href="manage.html" title="Choose which kanji appear">管理 Manage</a>
+        <a class="btn btn-ghost" href="kotoba.html" title="Kotoba vocabulary flashcards">言葉 Kotoba</a>
+        <button class="btn btn-ghost" id="updateBtn" type="button" title="Force refresh to the newest version (clears the app cache)">
+          <span class="btn-icon">↻</span> <span class="update-label">Force Update</span>
+        </button>
+      </div>
     </header>
 
     <section class="controls">
@@ -136,6 +169,18 @@
       <button class="nav-arrow" id="nextBtn" aria-label="Next card">›</button>
     </main>
 
+    <div class="answerbar" id="answerbar">
+      <button class="btn btn-no" id="noBtn" title="Don't know it yet — repeat later (N / ↓)">
+        <span class="btn-icon">✗</span> No
+      </button>
+      <div class="score" id="score" title="Correct this session">
+        <span class="score-icon">✓</span><span id="scoreCount">0</span>
+      </div>
+      <button class="btn btn-yes" id="yesBtn" title="Got it (Y / ↑)">
+        <span class="btn-icon">✓</span> Yes
+      </button>
+    </div>
+
     <footer class="actionbar">
       <button class="btn btn-ghost" id="shuffleBtn" title="Shuffle (S)">
         <span class="btn-icon">⇄</span> Shuffle
@@ -158,6 +203,32 @@
         navigator.serviceWorker.register("sw.js").catch(() => {});
       });
     }
+    // Force-update escape hatch: unregister the service worker, drop every
+    // cache, then reload with a cache-busting query so a stuck/stale bundle
+    // can never survive. Wired inline (not in app.js) so it still works even
+    // when a broken cached app.js fails to load.
+    (function () {
+      var btn = document.getElementById("updateBtn");
+      if (!btn) return;
+      btn.addEventListener("click", async function () {
+        btn.disabled = true;
+        var label = btn.querySelector(".update-label");
+        if (label) label.textContent = "Updating…";
+        try {
+          if ("serviceWorker" in navigator) {
+            var regs = await navigator.serviceWorker.getRegistrations();
+            await Promise.all(regs.map(function (r) { return r.unregister(); }));
+          }
+          if (window.caches) {
+            var keys = await caches.keys();
+            await Promise.all(keys.map(function (k) { return caches.delete(k); }));
+          }
+        } catch (e) { /* ignore — reload anyway */ }
+        var u = new URL(location.href);
+        u.searchParams.set("_v", Date.now());
+        location.replace(u.href);
+      });
+    })();
   </script>
 </body>
 </html>

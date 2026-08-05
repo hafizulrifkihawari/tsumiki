@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>管理 · Manage kanji</title>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#171a2e" />
+  <link rel="icon" href="icon-192.png" />
+  <link rel="apple-touch-icon" href="icon-apple-touch.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-kanji">管理</span>
+        <div class="brand-text">
+          <h1>Manage kanji</h1>
+          <p>Uncheck a kanji to keep it out of your flashcards.</p>
+        </div>
+      </div>
+      <div class="topbar-actions">
+        <span class="score" id="enabledCount" title="Enabled kanji">✓ <span id="enabledNum">0</span>/300</span>
+        <button class="btn btn-ghost" id="updateBtn" type="button" title="Force refresh to the newest version (clears the app cache)">
+          <span class="btn-icon">↻</span> <span class="update-label">Force Update</span>
+        </button>
+        <a class="btn btn-flip" href="index.html">← Flashcards</a>
+      </div>
+    </header>
+
+    <section class="manage-controls">
+      <button class="btn btn-ghost" id="allOnBtn"><span class="btn-icon">✓</span> Enable all</button>
+      <button class="btn btn-ghost" id="allOffBtn"><span class="btn-icon">✗</span> Disable all</button>
+      <span class="manage-hint">Each row = 10 kanji. Use the left checkbox to toggle a whole row.</span>
+    </section>
+
+    <main>
+      <div class="table-wrap">
+        <table class="manage-table" id="manageTable">
+          <tbody id="manageBody"></tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+
+  <script src="conjugate.js"></script>
+  <script src="data.js"></script>
+  <script src="manage.js"></script>
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("sw.js").catch(() => {});
+      });
+    }
+    // Force-update escape hatch (see index.html): drop the service worker and
+    // every cache, then hard-reload. Inline so it works even if manage.js fails.
+    (function () {
+      var btn = document.getElementById("updateBtn");
+      if (!btn) return;
+      btn.addEventListener("click", async function () {
+        btn.disabled = true;
+        var label = btn.querySelector(".update-label");
+        if (label) label.textContent = "Updating…";
+        try {
+          if ("serviceWorker" in navigator) {
+            var regs = await navigator.serviceWorker.getRegistrations();
+            await Promise.all(regs.map(function (r) { return r.unregister(); }));
+          }
+          if (window.caches) {
+            var keys = await caches.keys();
+            await Promise.all(keys.map(function (k) { return caches.delete(k); }));
+          }
+        } catch (e) { /* ignore — reload anyway */ }
+        var u = new URL(location.href);
+        u.searchParams.set("_v", Date.now());
+        location.replace(u.href);
+      });
+    })();
+  </script>
+</body>
+</html>

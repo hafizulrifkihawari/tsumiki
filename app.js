@@ -36,6 +36,20 @@
   const speakFrontBtn = el("speakFrontBtn");
   const speakBackBtn = el("speakBackBtn");
 
+  // Login + session
+  const loginOverlay = el("loginOverlay");
+  const loginForm = el("loginForm");
+  const loginInput = el("loginInput");
+  const userChip = el("userChip");
+  const userName = el("userName");
+  const userAvatar = el("userAvatar");
+  const brandSub = el("brandSub");
+  // Yes / No answering
+  const yesBtn = el("yesBtn");
+  const noBtn = el("noBtn");
+  const scoreCount = el("scoreCount");
+  const answerbar = el("answerbar");
+
   // Filter by the kanji's grammatical type
   const FILTERS = {
     all: () => true,
@@ -44,14 +58,82 @@
     noun: (c) => c.type === "noun"
   };
 
-  // Each session samples this many cards per kanji from the full 400-card
-  // pool, so a page refresh rotates through different cards for variety.
+  // Baseline: each session samples this many cards per kanji from the full
+  // 600-card pool, so a page refresh rotates through different cards while
+  // every kanji still shows up several times.
   const SESSION_CARDS_PER_KANJI = 3;
 
   let filter = "all";
   let deck = [];
   let index = 0;
   let finished = false;
+  let sessionCorrect = 0;
+
+  // ---- Users & persistent progress -----------------------------------------
+  // "guest"           -> nothing is saved; every session is a fresh shuffle.
+  // any other name    -> per-kanji correctness is remembered in localStorage,
+  //                      and well-known kanji are shown less often (see below).
+  const USER_KEY = "kanji.currentUser";
+  const statsKeyFor = (u) => "kanji.stats." + u;
+  const GUEST = "guest";
+
+  let currentUser = GUEST;
+  let stats = {};              // kanjiId -> { correct, wrong, seen }
+
+  const isGuest = () => currentUser === GUEST;
+
+  function ls(get, key, val) {
+    try { return get ? localStorage.getItem(key) : localStorage.setItem(key, val); }
+    catch (e) { return null; }
+  }
+
+  function loadStats() {
+    stats = {};
+    if (isGuest()) return;
+    const raw = ls(true, statsKeyFor(currentUser));
+    if (raw) { try { stats = JSON.parse(raw) || {}; } catch (e) { stats = {}; } }
+  }
+
+  function saveStats() {
+    if (isGuest()) return;
+    ls(false, statsKeyFor(currentUser), JSON.stringify(stats));
+  }
+
+  function statFor(kanjiId) {
+    let s = stats[kanjiId];
+    if (!s) { s = stats[kanjiId] = { correct: 0, wrong: 0, seen: 0 }; }
+    return s;
+  }
+
+  function recordAnswer(kanjiId, correct) {
+    const s = statFor(kanjiId);
+    s.seen++;
+    if (correct) s.correct++; else s.wrong++;
+    saveStats();
+  }
+
+  // How many cards a kanji contributes to a session. Guests always get the flat
+  // baseline. For a logged-in user the count bends with mastery: kanji answered
+  // "yes" repeatedly appear less often, struggling ones a little more.
+  function cardsForKanji(kanjiId) {
+    if (isGuest()) return SESSION_CARDS_PER_KANJI;
+    const s = stats[kanjiId];
+    if (!s) return SESSION_CARDS_PER_KANJI;          // never seen -> baseline
+    const net = s.correct - s.wrong;
+    if (net >= 6) return 1;                          // well mastered -> rare
+    if (net >= 3) return 2;                          // getting there
+    if (net <= -2) return 4;                         // struggling -> more
+    return SESSION_CARDS_PER_KANJI;
+  }
+
+  // Kanji the user has switched off on the Manage page are excluded from every
+  // session. Shared across users (it's a deck-scope choice, not per-person).
+  const DISABLED_KEY = "kanji.disabledIds";
+  function loadDisabledSet() {
+    const raw = ls(true, DISABLED_KEY);
+    if (raw) { try { return new Set(JSON.parse(raw)); } catch (e) { /* ignore */ } }
+    return new Set();
+  }
 
   const finishedScreen = el("finishedScreen");
   const cardScene = el("cardScene");
@@ -67,9 +149,10 @@
     return a;
   }
 
-  // Groups cards by kanjiId and randomly samples SESSION_CARDS_PER_KANJI from
-  // each group, so every kanji appears at least a few times per session while
-  // the specific cards shown still rotate across the full 400-card pool.
+  // Groups cards by kanjiId and randomly samples cardsForKanji() cards from each
+  // group, so every kanji appears a few times per session while the specific
+  // cards shown still rotate across the full 600-card pool. For logged-in users
+  // the per-kanji count is weighted by mastery (see cardsForKanji).
   function sampleSession(cards) {
     const byKanji = new Map();
     for (const c of cards) {
@@ -77,8 +160,9 @@
       byKanji.get(c.kanjiId).push(c);
     }
     const sampled = [];
-    for (const group of byKanji.values()) {
-      sampled.push(...shuffleArray(group).slice(0, SESSION_CARDS_PER_KANJI));
+    for (const [kanjiId, group] of byKanji.entries()) {
+      const n = Math.min(group.length, cardsForKanji(kanjiId));
+      sampled.push(...shuffleArray(group).slice(0, n));
     }
     return sampled;
   }
@@ -87,16 +171,24 @@
     finished = isFinished;
     finishedScreen.hidden = !isFinished;
     cardScene.hidden = isFinished;
+    answerbar.hidden = isFinished;
     if (isFinished) finishedCount.textContent = deck.length;
   }
 
   function buildDeck(shuffle) {
-    const base = CARDS.filter(FILTERS[filter]);
+    const disabled = loadDisabledSet();
+    const base = CARDS.filter(FILTERS[filter]).filter((c) => !disabled.has(c.kanjiId));
     const session = sampleSession(base);
     deck = shuffle ? shuffleArray(session) : session;
     index = 0;
+    sessionCorrect = 0;
+    updateScore();
     setFinished(false);
     render();
+  }
+
+  function updateScore() {
+    scoreCount.textContent = sessionCorrect;
   }
 
   function unflip() { card.classList.remove("is-flipped"); }
@@ -132,6 +224,8 @@
       frontWord.textContent = "—";
       frontSentence.textContent = "";
       frontRomaji.hidden = true;
+      frontNote.textContent = "No kanji enabled — open 管理 Manage to turn some on.";
+      frontFormHint.hidden = true;
       return;
     }
     unflip();
@@ -305,6 +399,63 @@
     }
   }
 
+  // ---- Yes / No answering ----
+  // "Yes"  -> count it, remember it (for logged-in users), move on.
+  // "No"   -> remember the miss, then drop the card back into a *random* spot
+  //           in the back portion of the remaining deck (never dead-last), so
+  //           it comes around again but shuffled, not always at the very end.
+  function answerYes() {
+    if (!deck.length || finished) return;
+    const c = deck[index];
+    recordAnswer(c.kanjiId, true);
+    sessionCorrect++;
+    updateScore();
+    next();
+  }
+
+  function answerNo() {
+    if (!deck.length || finished) return;
+    const c = deck[index];
+    recordAnswer(c.kanjiId, false);
+    deck.splice(index, 1);                // pull the current card out
+    if (deck.length === 0) { setFinished(true); return; }
+    // Back half of what's left, excluding the very last slot when possible.
+    const remaining = deck.length - index;
+    const lo = Math.min(deck.length, index + Math.max(1, Math.floor(remaining * 0.5)));
+    const hiNoLast = Math.max(lo, deck.length - 1);
+    const insertAt = lo + Math.floor(Math.random() * (hiNoLast - lo + 1));
+    deck.splice(insertAt, 0, c);
+    if (index >= deck.length) index = deck.length - 1;
+    posTotal.textContent = deck.length;
+    render();
+    if (autoSpeak.checked) speakFront();
+  }
+
+  // ---- Login / user switching ----
+  function applyUser(name) {
+    currentUser = name;
+    loadStats();
+    userName.textContent = name;
+    userAvatar.textContent = name === GUEST ? "👤" : name.charAt(0).toUpperCase();
+    brandSub.textContent = isGuest()
+      ? "300 words · shuffled every session"
+      : "300 words · remembers what you know";
+    ls(false, USER_KEY, name);
+  }
+
+  function login(rawName) {
+    const name = (rawName || "").trim().toLowerCase() || GUEST;
+    applyUser(name);
+    loginOverlay.hidden = true;
+    buildDeck(true);
+  }
+
+  function showLogin() {
+    loginOverlay.hidden = false;
+    loginInput.value = "";
+    setTimeout(() => loginInput.focus(), 30);
+  }
+
   // ---- Events ----
   card.addEventListener("click", flip);
   el("flipBtn").addEventListener("click", flip);
@@ -316,6 +467,15 @@
 
   speakFrontBtn.addEventListener("click", (e) => { e.stopPropagation(); speakFront(); });
   speakBackBtn.addEventListener("click", (e) => { e.stopPropagation(); speakBack(); });
+
+  yesBtn.addEventListener("click", answerYes);
+  noBtn.addEventListener("click", answerNo);
+
+  userChip.addEventListener("click", showLogin);
+  loginForm.addEventListener("submit", (e) => { e.preventDefault(); login(loginInput.value); });
+  document.querySelectorAll(".login-quick .chip").forEach((chip) => {
+    chip.addEventListener("click", () => login(chip.dataset.user));
+  });
 
   hintForm.addEventListener("change", render);
   clozeMode.addEventListener("change", render);
@@ -338,6 +498,8 @@
       case "ArrowRight": e.preventDefault(); next(); break;
       case "ArrowLeft": e.preventDefault(); prev(); break;
       case "s": case "S": buildDeck(true); break;
+      case "y": case "Y": case "ArrowUp": e.preventDefault(); answerYes(); break;
+      case "n": case "N": case "ArrowDown": e.preventDefault(); answerNo(); break;
       case "p": case "P":
         e.preventDefault();
         card.classList.contains("is-flipped") ? speakBack() : speakFront();
@@ -345,6 +507,14 @@
     }
   });
 
-  // ---- Init: shuffled by default ----
-  buildDeck(true);
+  // ---- Init: restore the last user, or ask who's studying ----
+  const saved = ls(true, USER_KEY);
+  if (saved) {
+    applyUser(saved);
+    buildDeck(true);
+  } else {
+    applyUser(GUEST);
+    showLogin();
+    buildDeck(true);   // build a guest deck behind the overlay so it's ready
+  }
 })();
