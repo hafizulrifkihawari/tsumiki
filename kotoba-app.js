@@ -7,6 +7,8 @@
   const el = (id) => document.getElementById(id);
   const card = el("card");
   const cardScene = el("cardScene");
+  const cardFront = document.querySelector(".card-front");
+  const cardBack = document.querySelector(".card-back");
   const frontLesson = el("frontLesson");
   const frontKana = el("frontKana");
   const frontKanji = el("frontKanji");
@@ -43,6 +45,23 @@
 
   function unflip() { card.classList.remove("is-flipped"); }
 
+  // Some vocab words run long (e.g. "うちゅうステーション", 10 kana) and the
+  // clamp()-based responsive size in kotoba.css is tuned for the common case
+  // — on a long word it can spill past the fixed-height card on narrow
+  // screens. Shrink it in steps until the face it lives in stops overflowing.
+  function fitWordText(faceEl, wordEl) {
+    if (!faceEl || !wordEl) return;
+    wordEl.style.fontSize = ""; // reset to the CSS clamp() size before measuring
+    const minSize = 22;
+    let size = parseFloat(getComputedStyle(wordEl).fontSize);
+    let guard = 0;
+    while (faceEl.scrollHeight > faceEl.clientHeight + 1 && size > minSize && guard < 40) {
+      size -= 2;
+      wordEl.style.fontSize = size + "px";
+      guard++;
+    }
+  }
+
   function render() {
     const c = deck[index];
     posTotal.textContent = deck.length;
@@ -63,6 +82,9 @@
     if (c.context) { backContext.textContent = c.context; backContext.hidden = false; }
     else { backContext.hidden = true; }
     backMeaning.textContent = c.meaning;
+
+    fitWordText(cardFront, frontKana);
+    fitWordText(cardBack, backKana);
 
     posNow.textContent = index + 1;
     const pct = deck.length ? ((index + 1) / deck.length) * 100 : 0;
@@ -163,6 +185,15 @@
   el("shuffleBtn").addEventListener("click", () => buildDeck(true));
   el("resetBtn").addEventListener("click", () => buildDeck(false));
   speakFrontBtn.addEventListener("click", (e) => { e.stopPropagation(); speakCurrent(); });
+
+  let resizeTimer = null;
+  window.addEventListener("resize", () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      fitWordText(cardFront, frontKana);
+      fitWordText(cardBack, backKana);
+    }, 150);
+  });
 
   document.addEventListener("keydown", (e) => {
     if (e.target.tagName === "INPUT") return;
