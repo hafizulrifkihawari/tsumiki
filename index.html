@@ -191,20 +191,54 @@
     </footer>
   </div>
 
+  <div class="update-toast" id="updateToast" hidden>
+    <span class="update-toast-msg">New version available</span>
+    <button class="btn btn-flip update-toast-btn" type="button" id="updateToastRefresh">Refresh</button>
+    <button class="update-toast-dismiss" type="button" id="updateToastDismiss" aria-label="Dismiss">×</button>
+  </div>
+
   <script src="conjugate.js"></script>
   <script src="romaji.js"></script>
   <script src="data.js"></script>
   <script src="app.js"></script>
   <script>
+    // Wired inline (not in app.js) so all of this — including the update
+    // notification below — still works even when a broken/stale-cached
+    // app.js fails to load.
     if ("serviceWorker" in navigator) {
+      var swHadController = !!navigator.serviceWorker.controller;
       window.addEventListener("load", () => {
-        navigator.serviceWorker.register("sw.js").catch(() => {});
+        navigator.serviceWorker.register("sw.js").then(function (reg) {
+          // Standalone/installed PWAs (iOS especially) don't reliably
+          // re-check sw.js on their own — nudge it whenever the tab
+          // regains focus.
+          document.addEventListener("visibilitychange", function () {
+            if (document.visibilityState === "visible") reg.update().catch(function () {});
+          });
+        }).catch(() => {});
+      });
+
+      // Fires once on this page's very first-ever activation (not a real
+      // update — skip it) and again every time a newer worker takes over
+      // afterward (a real update — let the user know).
+      navigator.serviceWorker.addEventListener("controllerchange", function () {
+        if (!swHadController) { swHadController = true; return; }
+        var toast = document.getElementById("updateToast");
+        if (toast) toast.hidden = false;
       });
     }
+
+    (function () {
+      var toast = document.getElementById("updateToast");
+      var refreshBtn = document.getElementById("updateToastRefresh");
+      var dismissBtn = document.getElementById("updateToastDismiss");
+      if (refreshBtn) refreshBtn.addEventListener("click", function () { location.reload(); });
+      if (dismissBtn) dismissBtn.addEventListener("click", function () { if (toast) toast.hidden = true; });
+    })();
+
     // Force-update escape hatch: unregister the service worker, drop every
     // cache, then reload with a cache-busting query so a stuck/stale bundle
-    // can never survive. Wired inline (not in app.js) so it still works even
-    // when a broken cached app.js fails to load.
+    // can never survive.
     (function () {
       var btn = document.getElementById("updateBtn");
       if (!btn) return;

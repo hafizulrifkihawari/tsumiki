@@ -49,15 +49,43 @@
     </main>
   </div>
 
+  <div class="update-toast" id="updateToast" hidden>
+    <span class="update-toast-msg">New version available</span>
+    <button class="btn btn-flip update-toast-btn" type="button" id="updateToastRefresh">Refresh</button>
+    <button class="update-toast-dismiss" type="button" id="updateToastDismiss" aria-label="Dismiss">×</button>
+  </div>
+
   <script src="conjugate.js"></script>
   <script src="data.js"></script>
   <script src="manage.js"></script>
   <script>
+    // Inline (see index.html) so all of this — including the update
+    // notification below — still works even if manage.js fails to load.
     if ("serviceWorker" in navigator) {
+      var swHadController = !!navigator.serviceWorker.controller;
       window.addEventListener("load", () => {
-        navigator.serviceWorker.register("sw.js").catch(() => {});
+        navigator.serviceWorker.register("sw.js").then(function (reg) {
+          document.addEventListener("visibilitychange", function () {
+            if (document.visibilityState === "visible") reg.update().catch(function () {});
+          });
+        }).catch(() => {});
+      });
+
+      navigator.serviceWorker.addEventListener("controllerchange", function () {
+        if (!swHadController) { swHadController = true; return; }
+        var toast = document.getElementById("updateToast");
+        if (toast) toast.hidden = false;
       });
     }
+
+    (function () {
+      var toast = document.getElementById("updateToast");
+      var refreshBtn = document.getElementById("updateToastRefresh");
+      var dismissBtn = document.getElementById("updateToastDismiss");
+      if (refreshBtn) refreshBtn.addEventListener("click", function () { location.reload(); });
+      if (dismissBtn) dismissBtn.addEventListener("click", function () { if (toast) toast.hidden = true; });
+    })();
+
     // Force-update escape hatch (see index.html): drop the service worker and
     // every cache, then hard-reload. Inline so it works even if manage.js fails.
     (function () {

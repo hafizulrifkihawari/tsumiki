@@ -32,6 +32,11 @@
         <div class="progress-count"><span id="posNow">1</span> / <span id="posTotal">1</span></div>
         <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
       </div>
+      <div class="topbar-actions">
+        <button class="btn btn-ghost" id="updateBtn" type="button" title="Force refresh to the newest version (clears the app cache)">
+          <span class="btn-icon">↻</span> <span class="update-label">Force Update</span>
+        </button>
+      </div>
     </header>
 
     <main class="stage">
@@ -92,7 +97,66 @@
     </footer>
   </div>
 
+  <div class="update-toast" id="updateToast" hidden>
+    <span class="update-toast-msg">New version available</span>
+    <button class="btn btn-flip update-toast-btn" type="button" id="updateToastRefresh">Refresh</button>
+    <button class="update-toast-dismiss" type="button" id="updateToastDismiss" aria-label="Dismiss">×</button>
+  </div>
+
   <script src="kotoba-data.js"></script>
   <script src="kotoba-app.js"></script>
+  <script>
+    // Inline (see index.html) so all of this — including the update
+    // notification below — still works even if kotoba-app.js fails to load.
+    if ("serviceWorker" in navigator) {
+      var swHadController = !!navigator.serviceWorker.controller;
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("sw.js").then(function (reg) {
+          document.addEventListener("visibilitychange", function () {
+            if (document.visibilityState === "visible") reg.update().catch(function () {});
+          });
+        }).catch(() => {});
+      });
+
+      navigator.serviceWorker.addEventListener("controllerchange", function () {
+        if (!swHadController) { swHadController = true; return; }
+        var toast = document.getElementById("updateToast");
+        if (toast) toast.hidden = false;
+      });
+    }
+
+    (function () {
+      var toast = document.getElementById("updateToast");
+      var refreshBtn = document.getElementById("updateToastRefresh");
+      var dismissBtn = document.getElementById("updateToastDismiss");
+      if (refreshBtn) refreshBtn.addEventListener("click", function () { location.reload(); });
+      if (dismissBtn) dismissBtn.addEventListener("click", function () { if (toast) toast.hidden = true; });
+    })();
+
+    // Force-update escape hatch (see index.html): drop the service worker and
+    // every cache, then hard-reload. Inline so it works even if kotoba-app.js fails.
+    (function () {
+      var btn = document.getElementById("updateBtn");
+      if (!btn) return;
+      btn.addEventListener("click", async function () {
+        btn.disabled = true;
+        var label = btn.querySelector(".update-label");
+        if (label) label.textContent = "Updating…";
+        try {
+          if ("serviceWorker" in navigator) {
+            var regs = await navigator.serviceWorker.getRegistrations();
+            await Promise.all(regs.map(function (r) { return r.unregister(); }));
+          }
+          if (window.caches) {
+            var keys = await caches.keys();
+            await Promise.all(keys.map(function (k) { return caches.delete(k); }));
+          }
+        } catch (e) { /* ignore — reload anyway */ }
+        var u = new URL(location.href);
+        u.searchParams.set("_v", Date.now());
+        location.replace(u.href);
+      });
+    })();
+  </script>
 </body>
 </html>
