@@ -30,12 +30,10 @@
       </form>
       <div class="login-quick">
         <button type="button" class="chip" data-user="guest">guest</button>
-        <button type="button" class="chip" data-user="psi">psi</button>
-        <button type="button" class="chip" data-user="plumpey">plumpey</button>
       </div>
       <p class="login-note">
         <strong>guest</strong> — sesi acak baru setiap kali.<br />
-        <strong>psi</strong> / <strong>plumpey</strong> — mengingat kanji yang sudah kamu kuasai.
+        nama lain — mengingat kanji yang sudah kamu kuasai.
       </p>
     </div>
   </div>
@@ -103,7 +101,7 @@
     <main class="stage">
       <button class="nav-arrow" id="prevBtn" aria-label="Previous card">‹</button>
 
-      <div class="card-scene" id="cardScene">
+      <div class="card-scene has-answerbar" id="cardScene">
         <div class="card" id="card">
           <!-- FRONT -->
           <div class="card-face card-front">
@@ -156,6 +154,18 @@
             </div>
           </div>
         </div>
+
+        <div class="answerbar" id="answerbar">
+          <button class="btn btn-no" id="noBtn" title="Don't know it yet — repeat later (N / ↓)">
+            <span class="btn-icon">✗</span> No
+          </button>
+          <div class="score" id="score" title="Correct this session">
+            <span class="score-icon">✓</span><span id="scoreCount">0</span>
+          </div>
+          <button class="btn btn-yes" id="yesBtn" title="Got it (Y / ↑)">
+            <span class="btn-icon">✓</span> Yes
+          </button>
+        </div>
       </div>
 
       <div class="finished-screen" id="finishedScreen" hidden>
@@ -168,18 +178,6 @@
 
       <button class="nav-arrow" id="nextBtn" aria-label="Next card">›</button>
     </main>
-
-    <div class="answerbar" id="answerbar">
-      <button class="btn btn-no" id="noBtn" title="Don't know it yet — repeat later (N / ↓)">
-        <span class="btn-icon">✗</span> No
-      </button>
-      <div class="score" id="score" title="Correct this session">
-        <span class="score-icon">✓</span><span id="scoreCount">0</span>
-      </div>
-      <button class="btn btn-yes" id="yesBtn" title="Got it (Y / ↑)">
-        <span class="btn-icon">✓</span> Yes
-      </button>
-    </div>
 
     <footer class="actionbar">
       <button class="btn btn-ghost" id="shuffleBtn" title="Shuffle (S)">

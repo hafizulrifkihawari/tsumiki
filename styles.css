@@ -30,7 +30,8 @@ body {
   background-attachment: fixed;
   display: flex;
   justify-content: center;
-  padding: 24px 16px 40px;
+  padding: max(24px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right))
+    max(40px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
 }
 
 .app {
@@ -115,7 +116,7 @@ body {
 
 /* ---------- Stage / card ---------- */
 .stage { display: flex; align-items: center; gap: 10px; }
-.card-scene { flex: 1; perspective: 1600px; }
+.card-scene { flex: 1; perspective: 1600px; position: relative; touch-action: pan-y; }
 
 .card {
   position: relative;
@@ -124,8 +125,13 @@ body {
   transform-style: preserve-3d;
   transition: transform 0.5s cubic-bezier(0.4, 0.1, 0.2, 1);
   cursor: pointer;
+  touch-action: pan-y;
 }
 .card.is-flipped { transform: rotateY(180deg); }
+/* The N4 kanji page overlays its Yes/No answerbar on the card (see
+   .answerbar below); give it extra headroom so that overlay never covers
+   real content. The Kotoba page has no answerbar and keeps the compact box. */
+.card-scene.has-answerbar .card { min-height: 438px; }
 
 .finished-screen {
   flex: 1;
@@ -153,6 +159,7 @@ body {
   padding: 20px 24px;
   display: flex; flex-direction: column;
 }
+.card-scene.has-answerbar .card-face { padding-bottom: 78px; }
 .card-back { transform: rotateY(180deg); }
 
 .card-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
@@ -193,7 +200,7 @@ body {
 }
 .example-romaji {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  font-size: 12.5px; font-style: italic; color: var(--text-faint);
+  font-size: clamp(11px, 3vw, 12.5px); font-style: italic; color: var(--text-faint);
 }
 
 .speak-btn {
@@ -216,7 +223,7 @@ body {
 .front-sentence .target-cloze {
   color: var(--accent-2); border-bottom-style: dashed; letter-spacing: 1px;
 }
-.conjugate-note { font-size: 13px; color: var(--text-faint); min-height: 18px; }
+.conjugate-note { font-size: clamp(11.5px, 3.2vw, 13px); color: var(--text-faint); min-height: 18px; }
 
 .card-bottom { text-align: center; }
 .hint-text { font-size: 11.5px; color: var(--text-faint); }
@@ -234,12 +241,12 @@ body {
 }
 .base-row[hidden] { display: none; }
 .base-label { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-faint); }
-.base-word { font-family: var(--font-jp); font-size: 18px; font-weight: 700; }
-.base-reading { font-family: var(--font-jp); font-size: 14px; color: var(--text-dim); }
+.base-word { font-family: var(--font-jp); font-size: clamp(15px, 4.4vw, 18px); font-weight: 700; }
+.base-reading { font-family: var(--font-jp); font-size: clamp(12px, 3.6vw, 14px); color: var(--text-dim); }
 
 .meaning-row { display: flex; flex-direction: column; gap: 2px; }
-.meaning-id { font-size: 21px; font-weight: 700; }
-.meaning-en { font-size: 14px; color: var(--text-dim); }
+.meaning-id { font-size: clamp(17px, 5vw, 21px); font-weight: 700; }
+.meaning-en { font-size: clamp(12px, 3.6vw, 14px); color: var(--text-dim); }
 
 .example {
   margin-top: 8px; width: 100%;
@@ -248,9 +255,9 @@ body {
   display: flex; flex-direction: column; gap: 4px;
 }
 .example[hidden] { display: none; }
-.example-jp { font-family: var(--font-jp); font-size: 20px; font-weight: 600; }
-.example-reading { font-family: var(--font-jp); font-size: 13.5px; color: var(--accent); }
-.example-meaning { font-size: 13px; color: var(--text-dim); }
+.example-jp { font-family: var(--font-jp); font-size: clamp(16px, 4.8vw, 20px); font-weight: 600; }
+.example-reading { font-family: var(--font-jp); font-size: clamp(12px, 3.4vw, 13.5px); color: var(--accent); }
+.example-meaning { font-size: clamp(11.5px, 3.2vw, 13px); color: var(--text-dim); }
 
 /* ---------- Nav arrows ---------- */
 .nav-arrow {
@@ -295,11 +302,15 @@ body {
 
 /* ---------- Answer bar (Yes / No) ---------- */
 .answerbar {
+  position: absolute;
+  left: 50%;
+  bottom: 16px;
+  transform: translateX(-50%);
+  z-index: 5;
   display: flex; align-items: center; justify-content: center; gap: 12px;
-  margin-top: 14px;
 }
 .btn-yes, .btn-no {
-  flex: 1; max-width: 200px; justify-content: center;
+  justify-content: center;
   font-size: 15px; padding: 13px 18px; font-weight: 700;
 }
 .btn-yes {
@@ -418,6 +429,7 @@ body {
   .segmented { width: 100%; justify-content: space-between; }
   .seg-btn { flex: 1; }
   .card { min-height: 340px; }
+  .card-scene.has-answerbar .card { min-height: 398px; }
   .nav-arrow { width: 38px; height: 38px; font-size: 22px; }
   .actionbar .btn span:not(.btn-icon) { display: none; }
   .btn-flip span { display: inline !important; }

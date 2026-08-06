@@ -62,6 +62,9 @@
   // 600-card pool, so a page refresh rotates through different cards while
   // every kanji still shows up several times.
   const SESSION_CARDS_PER_KANJI = 3;
+  // Then the whole session is capped to this many cards, so a page refresh
+  // rotates through a fresh 100-card slice instead of the full ~900-card pool.
+  const SESSION_CAP = 100;
 
   let filter = "all";
   let deck = [];
@@ -85,6 +88,19 @@
   function ls(get, key, val) {
     try { return get ? localStorage.getItem(key) : localStorage.setItem(key, val); }
     catch (e) { return null; }
+  }
+
+  // Special-named profiles (psi / plumpey) aren't offered as login chips
+  // anymore, but typing one in still works — remembered via a cookie so it
+  // survives even if localStorage gets cleared.
+  const SPECIAL_USERS = ["psi", "plumpey"];
+  const SPECIAL_USER_COOKIE = "kanji.specialUser";
+
+  function setCookie(name, value, days) {
+    try {
+      document.cookie = name + "=" + encodeURIComponent(value) +
+        "; path=/; max-age=" + (days * 24 * 60 * 60) + "; samesite=lax";
+    } catch (e) { /* ignore */ }
   }
 
   function loadStats() {
@@ -180,6 +196,7 @@
     const base = CARDS.filter(FILTERS[filter]).filter((c) => !disabled.has(c.kanjiId));
     const session = sampleSession(base);
     deck = shuffle ? shuffleArray(session) : session;
+    if (deck.length > SESSION_CAP) deck = deck.slice(0, SESSION_CAP);
     index = 0;
     sessionCorrect = 0;
     updateScore();
@@ -399,6 +416,36 @@
     }
   }
 
+  // ---- Swipe navigation (touch / mouse drag on the card) ----
+  // Attached to cardScene (not the flipping .card itself) so hit-testing
+  // stays stable through the rotateY flip animation.
+  function setupSwipe(target, onSwipeLeft, onSwipeRight) {
+    const THRESHOLD = 50;   // min horizontal travel, px
+    const RESTRAINT = 0.6;  // max allowed |dy| relative to |dx|
+    let startX = 0, startY = 0, tracking = false, swiped = false;
+
+    target.addEventListener("pointerdown", (e) => {
+      if (e.pointerType === "mouse" && e.button !== 0) return;
+      startX = e.clientX; startY = e.clientY;
+      tracking = true;
+    });
+    target.addEventListener("pointerup", (e) => {
+      if (!tracking) return;
+      tracking = false;
+      const dx = e.clientX - startX;
+      const dy = e.clientY - startY;
+      if (Math.abs(dx) >= THRESHOLD && Math.abs(dy) <= Math.abs(dx) * RESTRAINT) {
+        swiped = true;
+        if (dx < 0) onSwipeLeft(); else onSwipeRight();
+      }
+    });
+    target.addEventListener("pointercancel", () => { tracking = false; });
+    // Swallow the click a swipe leaves behind so it doesn't also flip the card.
+    target.addEventListener("click", (e) => {
+      if (swiped) { swiped = false; e.stopPropagation(); }
+    }, true);
+  }
+
   // ---- Yes / No answering ----
   // "Yes"  -> count it, remember it (for logged-in users), move on.
   // "No"   -> remember the miss, then drop the card back into a *random* spot
@@ -445,6 +492,7 @@
 
   function login(rawName) {
     const name = (rawName || "").trim().toLowerCase() || GUEST;
+    if (SPECIAL_USERS.includes(name)) setCookie(SPECIAL_USER_COOKIE, name, 365);
     applyUser(name);
     loginOverlay.hidden = true;
     buildDeck(true);
@@ -458,6 +506,7 @@
 
   // ---- Events ----
   card.addEventListener("click", flip);
+  setupSwipe(cardScene, next, prev);
   el("flipBtn").addEventListener("click", flip);
   el("nextBtn").addEventListener("click", next);
   el("prevBtn").addEventListener("click", prev);

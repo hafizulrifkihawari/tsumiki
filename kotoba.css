@@ -29,10 +29,14 @@
 
 .kotoba-context {
   font-family: var(--font-jp);
-  font-size: 13.5px;
+  font-size: clamp(12px, 3.4vw, 13.5px);
   color: var(--text-faint);
 }
 
 .kotoba-type {
   font-size: 12px; color: var(--text-dim);
 }
+
+/* meaning-id/meaning-en come from styles.css with fixed px sizes; kotoba.css
+   only loads on this page, so scaling them here doesn't touch the N4 page. */
+.meaning-id { font-size: clamp(17px, 5vw, 21px); }

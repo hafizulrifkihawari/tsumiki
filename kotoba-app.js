@@ -6,6 +6,7 @@
 
   const el = (id) => document.getElementById(id);
   const card = el("card");
+  const cardScene = el("cardScene");
   const frontLesson = el("frontLesson");
   const frontKana = el("frontKana");
   const frontKanji = el("frontKanji");
@@ -123,8 +124,39 @@
   function prev() { if (!deck.length) return; index = (index - 1 + deck.length) % deck.length; render(); }
   function flip() { card.classList.toggle("is-flipped"); }
 
+  // ---- Swipe navigation (touch / mouse drag on the card) ----
+  // Attached to cardScene (not the flipping .card itself) so hit-testing
+  // stays stable through the rotateY flip animation.
+  function setupSwipe(target, onSwipeLeft, onSwipeRight) {
+    const THRESHOLD = 50;   // min horizontal travel, px
+    const RESTRAINT = 0.6;  // max allowed |dy| relative to |dx|
+    let startX = 0, startY = 0, tracking = false, swiped = false;
+
+    target.addEventListener("pointerdown", (e) => {
+      if (e.pointerType === "mouse" && e.button !== 0) return;
+      startX = e.clientX; startY = e.clientY;
+      tracking = true;
+    });
+    target.addEventListener("pointerup", (e) => {
+      if (!tracking) return;
+      tracking = false;
+      const dx = e.clientX - startX;
+      const dy = e.clientY - startY;
+      if (Math.abs(dx) >= THRESHOLD && Math.abs(dy) <= Math.abs(dx) * RESTRAINT) {
+        swiped = true;
+        if (dx < 0) onSwipeLeft(); else onSwipeRight();
+      }
+    });
+    target.addEventListener("pointercancel", () => { tracking = false; });
+    // Swallow the click a swipe leaves behind so it doesn't also flip the card.
+    target.addEventListener("click", (e) => {
+      if (swiped) { swiped = false; e.stopPropagation(); }
+    }, true);
+  }
+
   // ---- Events ----
   card.addEventListener("click", flip);
+  setupSwipe(cardScene, next, prev);
   el("flipBtn").addEventListener("click", flip);
   el("nextBtn").addEventListener("click", next);
   el("prevBtn").addEventListener("click", prev);
