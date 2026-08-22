@@ -33,6 +33,8 @@
   const romajiMode = el("romajiMode");
   const autoSpeak = el("autoSpeak");
   const autoSpeakLabel = el("autoSpeakLabel");
+  const reverseMode = el("reverseMode");
+  const frontMeaning = el("frontMeaning");
   const speakFrontBtn = el("speakFrontBtn");
   const speakBackBtn = el("speakBackBtn");
 
@@ -44,11 +46,30 @@
   const userName = el("userName");
   const userAvatar = el("userAvatar");
   const brandSub = el("brandSub");
-  // Yes / No answering
-  const yesBtn = el("yesBtn");
-  const noBtn = el("noBtn");
+  // Graded answering (Again / Good / Easy)
+  const againBtn = el("againBtn");
+  const goodBtn = el("goodBtn");
+  const easyBtn = el("easyBtn");
   const scoreCount = el("scoreCount");
+  const missCount = el("missCount");
   const answerbar = el("answerbar");
+  const queueBadge = el("queueBadge");
+  const queueCount = el("queueCount");
+
+  // Help / onboarding
+  const helpBtn = el("helpBtn");
+  const helpOverlay = el("helpOverlay");
+  const helpCloseBtn = el("helpCloseBtn");
+
+  // Progress & mastery
+  const progressBtn = el("progressBtn");
+  const progressOverlay = el("progressOverlay");
+  const progressCloseBtn = el("progressCloseBtn");
+  const statDue = el("statDue");
+  const statNew = el("statNew");
+  const statStreak = el("statStreak");
+  const masteryBar = el("masteryBar");
+  const masteryGrid = el("masteryGrid");
 
   // Filter by the kanji's grammatical type
   const FILTERS = {
@@ -58,30 +79,31 @@
     noun: (c) => c.type === "noun"
   };
 
-  // Baseline: each session samples this many cards per kanji from the full
-  // 600-card pool, so a page refresh rotates through different cards while
-  // every kanji still shows up several times.
-  const SESSION_CARDS_PER_KANJI = 3;
-  // Then the whole session is capped to this many cards, so a page refresh
-  // rotates through a fresh 100-card slice instead of the full ~900-card pool.
+  // A session is built from due reviews first, then new cards, capped at this
+  // many total so a session stays a manageable size.
   const SESSION_CAP = 100;
+  // No single kanji floods a session even if several of its forms are due
+  // at once — mirrors the old per-kanji sampling cap.
+  const PER_KANJI_SESSION_CAP = 4;
 
   let filter = "all";
   let deck = [];
   let index = 0;
   let finished = false;
   let sessionCorrect = 0;
+  let sessionMissed = 0;
+  let srsMap = {};             // audioFile -> SRS entry, see srs.js
+  let againQueue = new Set();  // audioFile keys graded "again" and not yet resolved this session
 
   // ---- Users & persistent progress -----------------------------------------
   // "guest"           -> nothing is saved; every session is a fresh shuffle.
-  // any other name    -> per-kanji correctness is remembered in localStorage,
-  //                      and well-known kanji are shown less often (see below).
+  // any other name    -> reviews are scheduled per-card via srs.js (Leitner
+  //                      boxes + due dates), remembered in localStorage.
   const USER_KEY = "kanji.currentUser";
-  const statsKeyFor = (u) => "kanji.stats." + u;
+  const statsKeyFor = (u) => "kanji.stats." + u; // legacy key, read once by the seed below
   const GUEST = "guest";
 
   let currentUser = GUEST;
-  let stats = {};              // kanjiId -> { correct, wrong, seen }
 
   const isGuest = () => currentUser === GUEST;
 
@@ -103,43 +125,30 @@
     } catch (e) { /* ignore */ }
   }
 
-  function loadStats() {
-    stats = {};
-    if (isGuest()) return;
+  // One-time migration: kanji that were well-known under the old Yes/No
+  // correct-minus-wrong scheme start partway up the Leitner ladder instead
+  // of back at square one. Runs once ever per user, never overwrites a card
+  // that already has real SRS data, and never touches kanji.stats itself.
+  function seedFromLegacyStatsOnce() {
+    const seededKey = "kanji.srsSeeded." + currentUser;
+    if (ls(true, seededKey)) return;
+    ls(false, seededKey, "1");
     const raw = ls(true, statsKeyFor(currentUser));
-    if (raw) { try { stats = JSON.parse(raw) || {}; } catch (e) { stats = {}; } }
-  }
-
-  function saveStats() {
-    if (isGuest()) return;
-    ls(false, statsKeyFor(currentUser), JSON.stringify(stats));
-  }
-
-  function statFor(kanjiId) {
-    let s = stats[kanjiId];
-    if (!s) { s = stats[kanjiId] = { correct: 0, wrong: 0, seen: 0 }; }
-    return s;
-  }
-
-  function recordAnswer(kanjiId, correct) {
-    const s = statFor(kanjiId);
-    s.seen++;
-    if (correct) s.correct++; else s.wrong++;
-    saveStats();
-  }
-
-  // How many cards a kanji contributes to a session. Guests always get the flat
-  // baseline. For a logged-in user the count bends with mastery: kanji answered
-  // "yes" repeatedly appear less often, struggling ones a little more.
-  function cardsForKanji(kanjiId) {
-    if (isGuest()) return SESSION_CARDS_PER_KANJI;
-    const s = stats[kanjiId];
-    if (!s) return SESSION_CARDS_PER_KANJI;          // never seen -> baseline
-    const net = s.correct - s.wrong;
-    if (net >= 6) return 1;                          // well mastered -> rare
-    if (net >= 3) return 2;                          // getting there
-    if (net <= -2) return 4;                         // struggling -> more
-    return SESSION_CARDS_PER_KANJI;
+    if (!raw) return;
+    let legacyStats;
+    try { legacyStats = JSON.parse(raw) || {}; } catch (e) { return; }
+    const now = Date.now();
+    let changed = false;
+    for (const c of CARDS) {
+      if (srsMap[c.audioFile]) continue;
+      const s = legacyStats[c.kanjiId];
+      if (!s) continue;
+      if (s.correct - s.wrong >= 3) {
+        srsMap[c.audioFile] = { box: 3, due: now, correct: 0, wrong: 0, seen: 0, last: now };
+        changed = true;
+      }
+    }
+    if (changed) saveSrs("kanji", currentUser, srsMap);
   }
 
   // Kanji the user has switched off on the Manage page are excluded from every
@@ -156,6 +165,26 @@
   const finishedResetBtn = el("finishedResetBtn");
   const finishedCount = el("finishedCount");
 
+  // ---- Toggle preferences (persisted via srs.js, shared across sessions) ----
+  function applyPrefs() {
+    const prefs = loadPrefs();
+    hintForm.checked = !!prefs.hintForm;
+    clozeMode.checked = !!prefs.clozeMode;
+    romajiMode.checked = !!prefs.romajiMode;
+    autoSpeak.checked = !!prefs.autoSpeak;
+    reverseMode.checked = !!prefs.reverseMode;
+  }
+
+  function savePrefsFromUI() {
+    savePrefs({
+      hintForm: hintForm.checked,
+      clozeMode: clozeMode.checked,
+      romajiMode: romajiMode.checked,
+      autoSpeak: autoSpeak.checked,
+      reverseMode: reverseMode.checked
+    });
+  }
+
   // ---- Session progress persistence -----------------------------------------
   // A plain page refresh (or navigating to Manage and back) used to silently
   // wipe the current position and score back to 0, since buildDeck() ran fresh
@@ -169,7 +198,8 @@
     const data = {
       filter,
       order: deck.map((c) => c.audioFile),
-      index, sessionCorrect, finished
+      index, sessionCorrect, sessionMissed, finished,
+      againQueue: [...againQueue]
     };
     ls(false, progressKeyFor(currentUser), JSON.stringify(data));
   }
@@ -199,7 +229,10 @@
     deck = restored;
     index = Math.min(Math.max(0, saved.index || 0), deck.length - 1);
     sessionCorrect = saved.sessionCorrect || 0;
+    sessionMissed = saved.sessionMissed || 0;
+    againQueue = new Set(saved.againQueue || []);
     updateScore();
+    updateQueueBadge();
     setFinished(!!saved.finished);
     if (!finished) render();
     return true;
@@ -214,24 +247,6 @@
     return a;
   }
 
-  // Groups cards by kanjiId and randomly samples cardsForKanji() cards from each
-  // group, so every kanji appears a few times per session while the specific
-  // cards shown still rotate across the full 600-card pool. For logged-in users
-  // the per-kanji count is weighted by mastery (see cardsForKanji).
-  function sampleSession(cards) {
-    const byKanji = new Map();
-    for (const c of cards) {
-      if (!byKanji.has(c.kanjiId)) byKanji.set(c.kanjiId, []);
-      byKanji.get(c.kanjiId).push(c);
-    }
-    const sampled = [];
-    for (const [kanjiId, group] of byKanji.entries()) {
-      const n = Math.min(group.length, cardsForKanji(kanjiId));
-      sampled.push(...shuffleArray(group).slice(0, n));
-    }
-    return sampled;
-  }
-
   function setFinished(isFinished) {
     finished = isFinished;
     finishedScreen.hidden = !isFinished;
@@ -241,21 +256,61 @@
     saveProgress();
   }
 
+  // Builds a session from the filtered, enabled pool: every due review first
+  // (oldest-overdue first), then new (never-graded) cards fill the rest, each
+  // kanji capped at PER_KANJI_SESSION_CAP cards so one kanji can't flood a
+  // session even if several of its forms are due at once. `shuffle` controls
+  // whether new-card order and the final deck order are randomized (Shuffle)
+  // or left in natural deck order (In order) — due cards always come first
+  // either way, since that's the point of spaced repetition.
   function buildDeck(shuffle) {
     const disabled = loadDisabledSet();
     const base = CARDS.filter(FILTERS[filter]).filter((c) => !disabled.has(c.kanjiId));
-    const session = sampleSession(base);
+
+    const now = Date.now();
+    const dueCards = [];
+    const newCards = [];
+    for (const c of base) {
+      const entry = srsMap[c.audioFile];
+      if (entry && entry.box > 0) {
+        if (isDue(entry, now)) dueCards.push({ c, due: entry.due });
+      } else {
+        newCards.push(c);
+      }
+    }
+    dueCards.sort((a, b) => a.due - b.due);
+    const orderedNew = shuffle ? shuffleArray(newCards) : newCards;
+    const ordered = dueCards.map((d) => d.c).concat(orderedNew);
+
+    const perKanji = new Map();
+    const session = [];
+    for (const c of ordered) {
+      const n = perKanji.get(c.kanjiId) || 0;
+      if (n >= PER_KANJI_SESSION_CAP) continue;
+      session.push(c);
+      perKanji.set(c.kanjiId, n + 1);
+      if (session.length >= SESSION_CAP) break;
+    }
+
     deck = shuffle ? shuffleArray(session) : session;
-    if (deck.length > SESSION_CAP) deck = deck.slice(0, SESSION_CAP);
     index = 0;
     sessionCorrect = 0;
+    sessionMissed = 0;
+    againQueue = new Set();
     updateScore();
+    updateQueueBadge();
     setFinished(false);
     render();
   }
 
   function updateScore() {
     scoreCount.textContent = sessionCorrect;
+    missCount.textContent = sessionMissed;
+  }
+
+  function updateQueueBadge() {
+    queueCount.textContent = againQueue.size;
+    queueBadge.hidden = againQueue.size === 0;
   }
 
   function unflip() { card.classList.remove("is-flipped"); }
@@ -300,12 +355,29 @@
     frontType.textContent = TYPE_LABELS[c.type] || c.type;
     backType.textContent = TYPE_LABELS[c.type] || c.type;
 
+    const reverse = reverseMode.checked;
+    // In reverse mode the front must never leak the Japanese answer: no
+    // target text, no romaji of it, and no pronunciation button (that would
+    // just hand over the reading by ear).
+    speakFrontBtn.hidden = reverse;
+
     if (c.mode === "isolated") {
       // ---- "Just the kanji" card ----
-      frontWord.textContent = c.word;
-      frontSentence.textContent = "";
-      setRomajiLine(frontRomaji, c.reading);
-      frontNote.textContent = "just the kanji — recall the reading & meaning";
+      if (reverse) {
+        frontWord.hidden = true;
+        frontSentence.textContent = "";
+        frontRomaji.hidden = true;
+        frontMeaning.hidden = false;
+        frontMeaning.textContent = c.meaning + "\n" + c.meaningEn;
+        frontNote.textContent = "recall the word & reading";
+      } else {
+        frontWord.hidden = false;
+        frontWord.textContent = c.word;
+        frontSentence.textContent = "";
+        setRomajiLine(frontRomaji, c.reading);
+        frontMeaning.hidden = true;
+        frontNote.textContent = "just the kanji — recall the reading & meaning";
+      }
       frontFormHint.hidden = true;
 
       backForm.textContent = "Word";
@@ -318,12 +390,25 @@
     } else {
       // ---- Sentence card ----
       const isConjugated = c.target !== c.word;
-      frontWord.textContent = c.target;
-      renderSentence(frontSentence, c.jp, c.target, clozeMode.checked);
-      setRomajiLine(frontRomaji, c.sentReading);
-      frontNote.textContent = isConjugated
-        ? "conjugated form — recall the base word, reading & meaning"
-        : "recall the reading & meaning";
+      if (reverse) {
+        frontWord.hidden = true;
+        // Always blank the target here regardless of the cloze toggle —
+        // showing it would give away the exact answer being tested.
+        renderSentence(frontSentence, c.jp, c.target, true);
+        frontRomaji.hidden = true;
+        frontMeaning.hidden = false;
+        frontMeaning.textContent = c.sentMeaning;
+        frontNote.textContent = "recall the word, reading & form to fill the blank";
+      } else {
+        frontWord.hidden = false;
+        frontWord.textContent = c.target;
+        renderSentence(frontSentence, c.jp, c.target, clozeMode.checked);
+        setRomajiLine(frontRomaji, c.sentReading);
+        frontMeaning.hidden = true;
+        frontNote.textContent = isConjugated
+          ? "conjugated form — recall the base word, reading & meaning"
+          : "recall the reading & meaning";
+      }
       if (hintForm.checked) {
         frontFormHint.textContent = c.form;
         frontFormHint.hidden = false;
@@ -440,7 +525,9 @@
     }
   }
 
-  function speakFront() { speakCard(deck[index], speakFrontBtn); }
+  // No-op in reverse mode: the front shows only the meaning, and playing the
+  // target's pronunciation there would just hand over the reading by ear.
+  function speakFront() { if (!reverseMode.checked) speakCard(deck[index], speakFrontBtn); }
   function speakBack() { speakCard(deck[index], speakBackBtn); }
 
   // ---- Navigation ----
@@ -498,43 +585,52 @@
     }, true);
   }
 
-  // ---- Yes / No answering ----
-  // "Yes"  -> count it, remember it (for logged-in users), move on.
-  // "No"   -> remember the miss, then drop the card back into a *random* spot
-  //           in the back portion of the remaining deck (never dead-last), so
-  //           it comes around again but shuffled, not always at the very end.
-  function answerYes() {
+  // ---- Graded answering (Again / Good / Easy) ----
+  // Every grade schedules the card via srs.js (Leitner box + due date).
+  // "Again" -> counts as a miss, then drops the card back into a *random*
+  //            spot in the back portion of the remaining deck (never
+  //            dead-last), so it comes around again this session, shuffled
+  //            rather than always at the very end.
+  // "Good" / "Easy" -> counts as correct, card is done for this session, move on.
+  function grade(level) {
     if (!deck.length || finished) return;
     const c = deck[index];
-    recordAnswer(c.kanjiId, true);
-    sessionCorrect++;
-    updateScore();
-    next();
-  }
+    srsMap[c.audioFile] = schedule(srsMap[c.audioFile], level);
+    saveSrs("kanji", currentUser, srsMap);
 
-  function answerNo() {
-    if (!deck.length || finished) return;
-    const c = deck[index];
-    recordAnswer(c.kanjiId, false);
-    deck.splice(index, 1);                // pull the current card out
-    if (deck.length === 0) { setFinished(true); return; }
-    // Back half of what's left, excluding the very last slot when possible.
-    const remaining = deck.length - index;
-    const lo = Math.min(deck.length, index + Math.max(1, Math.floor(remaining * 0.5)));
-    const hiNoLast = Math.max(lo, deck.length - 1);
-    const insertAt = lo + Math.floor(Math.random() * (hiNoLast - lo + 1));
-    deck.splice(insertAt, 0, c);
-    if (index >= deck.length) index = deck.length - 1;
-    posTotal.textContent = deck.length;
-    render();
-    saveProgress();
-    if (autoSpeak.checked) speakFront();
+    if (level === "again") {
+      sessionMissed++;
+      againQueue.add(c.audioFile);
+      updateScore();
+      updateQueueBadge();
+      deck.splice(index, 1);                // pull the current card out
+      if (deck.length === 0) { setFinished(true); return; }
+      // Back half of what's left, excluding the very last slot when possible.
+      const remaining = deck.length - index;
+      const lo = Math.min(deck.length, index + Math.max(1, Math.floor(remaining * 0.5)));
+      const hiNoLast = Math.max(lo, deck.length - 1);
+      const insertAt = lo + Math.floor(Math.random() * (hiNoLast - lo + 1));
+      deck.splice(insertAt, 0, c);
+      if (index >= deck.length) index = deck.length - 1;
+      posTotal.textContent = deck.length;
+      render();
+      saveProgress();
+      if (autoSpeak.checked) speakFront();
+    } else {
+      sessionCorrect++;
+      againQueue.delete(c.audioFile);
+      updateScore();
+      updateQueueBadge();
+      next();
+    }
   }
 
   // ---- Login / user switching ----
   function applyUser(name) {
     currentUser = name;
-    loadStats();
+    srsMap = loadSrs("kanji", currentUser);
+    seedFromLegacyStatsOnce();
+    bumpStreak(name);
     userName.textContent = name;
     userAvatar.textContent = name === GUEST ? "👤" : name.charAt(0).toUpperCase();
     brandSub.textContent = isGuest()
@@ -549,12 +645,89 @@
     applyUser(name);
     loginOverlay.hidden = true;
     buildDeck(true);
+    maybeShowHelpOnce();
   }
 
   function showLogin() {
     loginOverlay.hidden = false;
     loginInput.value = "";
     setTimeout(() => loginInput.focus(), 30);
+  }
+
+  // ---- Progress & mastery overlay ----
+  const PROGRESS_PER_ROW = 10;
+
+  function showProgress() { renderProgress(); progressOverlay.hidden = false; }
+  function hideProgress() { progressOverlay.hidden = true; }
+
+  // Builds the stat tiles, the new/learning/mature bar, and a per-kanji heat
+  // grid (same 10-per-row layout as Manage) colored by that kanji's average
+  // SRS box across its 10 cards — a quick "what still needs work" view.
+  function renderProgress() {
+    const now = Date.now();
+    const disabled = loadDisabledSet();
+    const enabledCards = CARDS.filter((c) => !disabled.has(c.kanjiId));
+
+    let due = 0, newCount = 0;
+    const bucketCounts = { new: 0, learning: 0, mature: 0 };
+    const boxByKanji = new Map(); // kanjiId -> { sum, n }
+
+    for (const c of enabledCards) {
+      const entry = srsMap[c.audioFile];
+      if (!entry || entry.box === 0) newCount++;
+      else if (isDue(entry, now)) due++;
+      bucketCounts[bucketOf(entry)]++;
+
+      const box = entry ? entry.box : 0;
+      const agg = boxByKanji.get(c.kanjiId) || { sum: 0, n: 0 };
+      agg.sum += box; agg.n++;
+      boxByKanji.set(c.kanjiId, agg);
+    }
+
+    statDue.textContent = due;
+    statNew.textContent = newCount;
+    statStreak.textContent = loadStreak(currentUser).count;
+
+    const total = enabledCards.length || 1;
+    masteryBar.innerHTML =
+      `<span class="seg-new" style="width:${(bucketCounts.new / total) * 100}%"></span>` +
+      `<span class="seg-learning" style="width:${(bucketCounts.learning / total) * 100}%"></span>` +
+      `<span class="seg-mature" style="width:${(bucketCounts.mature / total) * 100}%"></span>`;
+
+    masteryGrid.innerHTML = "";
+    const kanjiList = RAW.filter((e) => !disabled.has(e.id));
+    for (let i = 0; i < kanjiList.length; i += PROGRESS_PER_ROW) {
+      const tr = document.createElement("tr");
+      for (const e of kanjiList.slice(i, i + PROGRESS_PER_ROW)) {
+        const td = document.createElement("td");
+        const agg = boxByKanji.get(e.id);
+        const avgBox = agg ? Math.round(agg.sum / agg.n) : 0;
+        const bucket = bucketOf({ box: avgBox });
+        const cell = document.createElement("div");
+        cell.className = "cell bucket-" + bucket;
+        cell.title = e.word + " — " + bucket;
+        const kanji = document.createElement("span");
+        kanji.className = "cell-kanji";
+        kanji.textContent = e.word;
+        cell.appendChild(kanji);
+        td.appendChild(cell);
+        tr.appendChild(td);
+      }
+      masteryGrid.appendChild(tr);
+    }
+  }
+
+  // ---- Help / onboarding overlay ----
+  const SEEN_HELP_KEY = "kanji.seenHelp";
+  function showHelp() { helpOverlay.hidden = false; }
+  function hideHelp() { helpOverlay.hidden = true; }
+  // Surfaces the help sheet once, ever, per browser — but never stacked on
+  // top of the login overlay (that would block picking a user), so callers
+  // only invoke this once no overlay is already up.
+  function maybeShowHelpOnce() {
+    if (ls(true, SEEN_HELP_KEY)) return;
+    ls(false, SEEN_HELP_KEY, "1");
+    setTimeout(showHelp, 400);
   }
 
   // ---- Events ----
@@ -570,8 +743,9 @@
   speakFrontBtn.addEventListener("click", (e) => { e.stopPropagation(); speakFront(); });
   speakBackBtn.addEventListener("click", (e) => { e.stopPropagation(); speakBack(); });
 
-  yesBtn.addEventListener("click", answerYes);
-  noBtn.addEventListener("click", answerNo);
+  againBtn.addEventListener("click", () => grade("again"));
+  goodBtn.addEventListener("click", () => grade("good"));
+  easyBtn.addEventListener("click", () => grade("easy"));
 
   userChip.addEventListener("click", showLogin);
   loginForm.addEventListener("submit", (e) => { e.preventDefault(); login(loginInput.value); });
@@ -579,9 +753,19 @@
     chip.addEventListener("click", () => login(chip.dataset.user));
   });
 
-  hintForm.addEventListener("change", render);
-  clozeMode.addEventListener("change", render);
-  romajiMode.addEventListener("change", render);
+  helpBtn.addEventListener("click", showHelp);
+  helpCloseBtn.addEventListener("click", hideHelp);
+  helpOverlay.addEventListener("click", (e) => { if (e.target === helpOverlay) hideHelp(); });
+
+  progressBtn.addEventListener("click", showProgress);
+  progressCloseBtn.addEventListener("click", hideProgress);
+  progressOverlay.addEventListener("click", (e) => { if (e.target === progressOverlay) hideProgress(); });
+
+  hintForm.addEventListener("change", () => { savePrefsFromUI(); render(); });
+  clozeMode.addEventListener("change", () => { savePrefsFromUI(); render(); });
+  romajiMode.addEventListener("change", () => { savePrefsFromUI(); render(); });
+  reverseMode.addEventListener("change", () => { savePrefsFromUI(); unflip(); render(); });
+  autoSpeak.addEventListener("change", savePrefsFromUI);
 
   el("filterSeg").addEventListener("click", (e) => {
     const btn = e.target.closest(".seg-btn");
@@ -594,14 +778,16 @@
 
   document.addEventListener("keydown", (e) => {
     if (e.target.tagName === "INPUT") return;
+    if (e.key === "Escape") { hideHelp(); hideProgress(); return; }
     switch (e.key) {
       case " ":
       case "Enter": e.preventDefault(); flip(); break;
       case "ArrowRight": e.preventDefault(); next(); break;
       case "ArrowLeft": e.preventDefault(); prev(); break;
       case "s": case "S": buildDeck(true); break;
-      case "y": case "Y": case "ArrowUp": e.preventDefault(); answerYes(); break;
-      case "n": case "N": case "ArrowDown": e.preventDefault(); answerNo(); break;
+      case "2": case "y": case "Y": case "ArrowUp": e.preventDefault(); grade("good"); break;
+      case "1": case "n": case "N": case "ArrowDown": e.preventDefault(); grade("again"); break;
+      case "3": e.preventDefault(); grade("easy"); break;
       case "p": case "P":
         e.preventDefault();
         card.classList.contains("is-flipped") ? speakBack() : speakFront();
@@ -614,13 +800,16 @@
   // exists for the user, so a refresh or a trip to another page and back
   // resumes exactly where it left off. Only the Shuffle / In order /
   // Study Again buttons and the filter tabs start a fresh session.
+  applyPrefs();
   const saved = ls(true, USER_KEY);
   if (saved) {
     applyUser(saved);
     if (!restoreProgress(loadProgress())) buildDeck(true);
+    maybeShowHelpOnce();
   } else {
     applyUser(GUEST);
     showLogin();
     if (!restoreProgress(loadProgress())) buildDeck(true);
+    // help is deferred to login() so it never stacks on top of the login overlay
   }
 })();

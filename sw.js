@@ -1,6 +1,6 @@
 /* Service worker — offline cache for the N4 flashcard PWA. */
 
-const CACHE_NAME = "kanji-n4-v13";
+const CACHE_NAME = "kanji-n4-v14";
 const FONT_ORIGINS = ["https://fonts.googleapis.com", "https://fonts.gstatic.com"];
 const ASSETS = [
   "./",
@@ -10,6 +10,7 @@ const ASSETS = [
   "./conjugate.js",
   "./romaji.js",
   "./data.js",
+  "./srs.js",
   "./manifest.json",
   "./icon-192.png",
   "./icon-512.png",

@@ -22,10 +22,98 @@
   const posTotal = el("posTotal");
   const progressFill = el("progressFill");
   const wordCount = el("wordCount");
+  const dueCountEl = el("dueCount");
   const speakFrontBtn = el("speakFrontBtn");
+
+  // Graded answering (Again / Good / Easy) — same scheduling engine (srs.js)
+  // and visual language as the N4 kanji deck, so studying here also builds
+  // the shared streak and behaves consistently across both decks.
+  const againBtn = el("againBtn");
+  const goodBtn = el("goodBtn");
+  const easyBtn = el("easyBtn");
+  const scoreCountEl = el("scoreCount");
+  const missCountEl = el("missCount");
+  const queueBadge = el("queueBadge");
+  const queueCountEl = el("queueCount");
+
+  function ls(get, key, val) {
+    try { return get ? localStorage.getItem(key) : localStorage.setItem(key, val); }
+    catch (e) { return null; }
+  }
+
+  // Kotoba has no login UI of its own — it studies as whoever is currently
+  // signed into the kanji deck (or "guest"), so SRS progress and the daily
+  // streak are shared across both decks rather than siloed per page.
+  const currentUser = ls(true, "kanji.currentUser") || "guest";
+  const KOTOBA_DECK = "kotoba";
+
+  // Stable per-card id (position in the fixed KOTOBA array never changes),
+  // used as the SRS key and for restoring a saved session after reload.
+  KOTOBA.forEach((c, i) => { c.key = "k-" + c.lesson + "-" + i; });
+  const cardsByKey = new Map(KOTOBA.map((c) => [c.key, c]));
+
+  let srsMap = loadSrs(KOTOBA_DECK, currentUser);
+  let sessionCorrect = 0;
+  let sessionMissed = 0;
+  let againQueue = new Set();
 
   let deck = [];
   let index = 0;
+
+  function updateScore() {
+    scoreCountEl.textContent = sessionCorrect;
+    missCountEl.textContent = sessionMissed;
+  }
+
+  function updateQueueBadge() {
+    queueCountEl.textContent = againQueue.size;
+    queueBadge.hidden = againQueue.size === 0;
+  }
+
+  function updateDueCount() {
+    const now = Date.now();
+    let due = 0;
+    for (const c of KOTOBA) {
+      const entry = srsMap[c.key];
+      if (entry && entry.box > 0 && isDue(entry, now)) due++;
+    }
+    dueCountEl.textContent = due;
+  }
+
+  // ---- Session progress persistence ----
+  const progressKeyFor = (u) => "kotoba.progress." + u;
+
+  function saveProgress() {
+    const data = {
+      order: deck.map((c) => c.key),
+      index, sessionCorrect, sessionMissed,
+      againQueue: [...againQueue]
+    };
+    ls(false, progressKeyFor(currentUser), JSON.stringify(data));
+  }
+
+  function loadProgress() {
+    const raw = ls(true, progressKeyFor(currentUser));
+    if (!raw) return null;
+    try { return JSON.parse(raw); } catch (e) { return null; }
+  }
+
+  function restoreProgress(saved) {
+    if (!saved || !Array.isArray(saved.order) || !saved.order.length) return false;
+    const restored = saved.order.map((k) => cardsByKey.get(k)).filter(Boolean);
+    if (!restored.length) return false;
+    deck = restored;
+    index = Math.min(Math.max(0, saved.index || 0), deck.length - 1);
+    sessionCorrect = saved.sessionCorrect || 0;
+    sessionMissed = saved.sessionMissed || 0;
+    againQueue = new Set(saved.againQueue || []);
+    wordCount.textContent = KOTOBA.length;
+    updateScore();
+    updateQueueBadge();
+    updateDueCount();
+    render();
+    return true;
+  }
 
   function shuffleArray(arr) {
     const a = arr.slice();
@@ -36,11 +124,35 @@
     return a;
   }
 
+  // Due reviews first (oldest-overdue first), then never-graded cards fill
+  // the rest — same due-based approach as the kanji deck's buildDeck().
   function buildDeck(shuffle) {
-    deck = shuffle ? shuffleArray(KOTOBA) : KOTOBA.slice();
+    const now = Date.now();
+    const dueCards = [];
+    const newCards = [];
+    for (const c of KOTOBA) {
+      const entry = srsMap[c.key];
+      if (entry && entry.box > 0) {
+        if (isDue(entry, now)) dueCards.push({ c, due: entry.due });
+      } else {
+        newCards.push(c);
+      }
+    }
+    dueCards.sort((a, b) => a.due - b.due);
+    const orderedNew = shuffle ? shuffleArray(newCards) : newCards;
+    const ordered = dueCards.map((d) => d.c).concat(orderedNew);
+
+    deck = shuffle ? shuffleArray(ordered) : ordered;
     index = 0;
+    sessionCorrect = 0;
+    sessionMissed = 0;
+    againQueue = new Set();
     wordCount.textContent = KOTOBA.length;
+    updateScore();
+    updateQueueBadge();
+    updateDueCount();
     render();
+    saveProgress();
   }
 
   function unflip() { card.classList.remove("is-flipped"); }
@@ -142,9 +254,44 @@
   }
 
   // ---- Navigation ----
-  function next() { if (!deck.length) return; index = (index + 1) % deck.length; render(); }
-  function prev() { if (!deck.length) return; index = (index - 1 + deck.length) % deck.length; render(); }
+  function next() { if (!deck.length) return; index = (index + 1) % deck.length; render(); saveProgress(); }
+  function prev() { if (!deck.length) return; index = (index - 1 + deck.length) % deck.length; render(); saveProgress(); }
   function flip() { card.classList.toggle("is-flipped"); }
+
+  // ---- Graded answering (Again / Good / Easy) ----
+  // Mirrors the kanji deck's grade(): schedule via srs.js, then either
+  // requeue the card later this session ("again") or move on ("good"/"easy").
+  function grade(level) {
+    if (!deck.length) return;
+    const c = deck[index];
+    srsMap[c.key] = schedule(srsMap[c.key], level);
+    saveSrs(KOTOBA_DECK, currentUser, srsMap);
+    updateDueCount();
+
+    if (level === "again") {
+      sessionMissed++;
+      againQueue.add(c.key);
+      updateScore();
+      updateQueueBadge();
+      deck.splice(index, 1);
+      if (deck.length === 0) { render(); saveProgress(); return; }
+      const remaining = deck.length - index;
+      const lo = Math.min(deck.length, index + Math.max(1, Math.floor(remaining * 0.5)));
+      const hiNoLast = Math.max(lo, deck.length - 1);
+      const insertAt = lo + Math.floor(Math.random() * (hiNoLast - lo + 1));
+      deck.splice(insertAt, 0, c);
+      if (index >= deck.length) index = deck.length - 1;
+      posTotal.textContent = deck.length;
+      render();
+      saveProgress();
+    } else {
+      sessionCorrect++;
+      againQueue.delete(c.key);
+      updateScore();
+      updateQueueBadge();
+      next();
+    }
+  }
 
   // ---- Swipe navigation (touch / mouse drag on the card) ----
   // Attached to cardScene (not the flipping .card itself) so hit-testing
@@ -186,6 +333,10 @@
   el("resetBtn").addEventListener("click", () => buildDeck(false));
   speakFrontBtn.addEventListener("click", (e) => { e.stopPropagation(); speakCurrent(); });
 
+  againBtn.addEventListener("click", () => grade("again"));
+  goodBtn.addEventListener("click", () => grade("good"));
+  easyBtn.addEventListener("click", () => grade("easy"));
+
   let resizeTimer = null;
   window.addEventListener("resize", () => {
     clearTimeout(resizeTimer);
@@ -203,10 +354,15 @@
       case "ArrowRight": e.preventDefault(); next(); break;
       case "ArrowLeft": e.preventDefault(); prev(); break;
       case "s": case "S": buildDeck(true); break;
+      case "1": case "n": case "N": case "ArrowDown": e.preventDefault(); grade("again"); break;
+      case "2": case "y": case "Y": case "ArrowUp": e.preventDefault(); grade("good"); break;
+      case "3": e.preventDefault(); grade("easy"); break;
       case "p": case "P": e.preventDefault(); speakCurrent(); break;
     }
   });
 
-  // ---- Init: shuffled by default ----
-  buildDeck(true);
+  // ---- Init: resume a saved session (position/score/queue) if one exists
+  // for this user, otherwise build a fresh due-first session. ----
+  bumpStreak(currentUser);
+  if (!restoreProgress(loadProgress())) buildDeck(true);
 })();

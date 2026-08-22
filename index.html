@@ -48,7 +48,10 @@
         </div>
       </div>
       <div class="progress-wrap">
-        <div class="progress-count"><span id="posNow">1</span> / <span id="posTotal">40</span></div>
+        <div class="progress-count">
+          <span id="posNow">1</span> / <span id="posTotal">40</span>
+          <span class="queue-badge" id="queueBadge" hidden title="Cards graded Again, waiting to come back this session">↺ <span id="queueCount">0</span></span>
+        </div>
         <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
       </div>
       <div class="topbar-actions">
@@ -58,6 +61,8 @@
         </button>
         <a class="btn btn-ghost" href="manage.html" title="Choose which kanji appear">管理 Manage</a>
         <a class="btn btn-ghost" href="kotoba.html" title="Kotoba vocabulary flashcards">言葉 Kotoba</a>
+        <button class="btn btn-ghost btn-icon-only" id="progressBtn" type="button" title="Your progress & mastery">📊</button>
+        <button class="btn btn-ghost btn-icon-only" id="helpBtn" type="button" title="How to study">❓</button>
         <button class="btn btn-ghost" id="updateBtn" type="button" title="Force refresh to the newest version (clears the app cache)">
           <span class="btn-icon">↻</span> <span class="update-label">Force Update</span>
         </button>
@@ -86,6 +91,11 @@
           <span class="switch-track"><span class="switch-thumb"></span></span>
           <span class="switch-label" id="autoSpeakLabel">Auto-play audio</span>
         </label>
+        <label class="switch">
+          <input type="checkbox" id="reverseMode" />
+          <span class="switch-track"><span class="switch-thumb"></span></span>
+          <span class="switch-label">Reverse (meaning → Japanese)</span>
+        </label>
       </div>
 
       <div class="control-group">
@@ -113,11 +123,12 @@
               <div class="word-display" id="frontWord">着物</div>
               <div class="front-sentence" id="frontSentence"></div>
               <div class="romaji-line" id="frontRomaji" hidden></div>
+              <div class="front-meaning" id="frontMeaning" hidden></div>
               <div class="conjugate-note" id="frontNote"></div>
               <button class="speak-btn" id="speakFrontBtn" type="button" aria-label="Play pronunciation" title="Play pronunciation (P)">🔊</button>
             </div>
             <div class="card-bottom">
-              <span class="hint-text">Tap card or press Space to flip</span>
+              <span class="hint-text">Tap or swipe · Space to flip</span>
             </div>
           </div>
 
@@ -150,21 +161,31 @@
               <button class="speak-btn" id="speakBackBtn" type="button" aria-label="Play pronunciation" title="Play pronunciation (P)">🔊</button>
             </div>
             <div class="card-bottom">
-              <span class="hint-text">Space to flip · ← → to move · S to shuffle</span>
+              <span class="hint-text">Swipe or ← → to move · Grade: Again / Good / Easy</span>
             </div>
           </div>
         </div>
 
         <div class="answerbar" id="answerbar">
-          <button class="btn btn-no" id="noBtn" title="Don't know it yet — repeat later (N / ↓)">
-            <span class="btn-icon">✗</span> No
-          </button>
-          <div class="score" id="score" title="Correct this session">
-            <span class="score-icon">✓</span><span id="scoreCount">0</span>
+          <div class="answerbar-stats">
+            <div class="score" id="score" title="Correct this session">
+              <span class="score-icon">✓</span><span id="scoreCount">0</span>
+            </div>
+            <div class="miss" id="miss" title="Missed this session">
+              <span class="miss-icon">✗</span><span id="missCount">0</span>
+            </div>
           </div>
-          <button class="btn btn-yes" id="yesBtn" title="Got it (Y / ↑)">
-            <span class="btn-icon">✓</span> Yes
-          </button>
+          <div class="answerbar-buttons">
+            <button class="btn btn-again" id="againBtn" title="Didn't recall it — comes back soon (1 / N / ↓)">
+              <span class="btn-icon">↺</span> Again
+            </button>
+            <button class="btn btn-good" id="goodBtn" title="Got it (2 / Y / ↑)">
+              <span class="btn-icon">✓</span> Good
+            </button>
+            <button class="btn btn-easy" id="easyBtn" title="Knew it well (3)">
+              <span class="btn-icon">⚡</span> Easy
+            </button>
+          </div>
         </div>
       </div>
 
@@ -191,6 +212,64 @@
     </footer>
   </div>
 
+  <!-- Help / onboarding -->
+  <div class="sheet-overlay" id="helpOverlay" hidden>
+    <div class="sheet-card">
+      <div class="sheet-header">
+        <h2>How to study</h2>
+        <button class="sheet-close" id="helpCloseBtn" type="button" aria-label="Close">×</button>
+      </div>
+      <div class="sheet-body">
+        <ul class="help-list">
+          <li><span class="help-key">Tap card / Space</span><span>Flip to see the answer</span></li>
+          <li><span class="help-key">Swipe or ← →</span><span>Move to the next / previous card</span></li>
+          <li><span class="help-key">Again / Good / Easy</span><span>Grade your recall — this decides when the card comes back</span></li>
+          <li><span class="help-key">P</span><span>Play pronunciation</span></li>
+        </ul>
+        <div class="help-example">
+          <div class="help-example-title">Blank word in sentence (cloze)</div>
+          <p>Front shows <span class="help-demo-jp">駅が<span class="target target-cloze">◯◯◯</span>。</span> instead of the full sentence, so you have to recall the word rather than just read it.</p>
+        </div>
+        <div class="help-example">
+          <div class="help-example-title">Show form hint on front</div>
+          <p>Adds a badge like <span class="badge badge-form">Negative (くない)</span> to the front, telling you which grammatical form to produce before you flip.</p>
+        </div>
+        <div class="help-example">
+          <div class="help-example-title">Again / Good / Easy grading</div>
+          <p>Each grade schedules the card differently: <strong>Again</strong> brings it back later in this session, <strong>Good</strong> pushes it a few days out, <strong>Easy</strong> pushes it out further. Check 📊 Progress any time to see what's due.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Progress & mastery -->
+  <div class="sheet-overlay" id="progressOverlay" hidden>
+    <div class="sheet-card">
+      <div class="sheet-header">
+        <h2>Your progress</h2>
+        <button class="sheet-close" id="progressCloseBtn" type="button" aria-label="Close">×</button>
+      </div>
+      <div class="sheet-body">
+        <div class="progress-stats">
+          <div class="stat-tile"><span class="stat-num" id="statDue">0</span><span class="stat-label">Due now</span></div>
+          <div class="stat-tile"><span class="stat-num" id="statNew">0</span><span class="stat-label">New</span></div>
+          <div class="stat-tile"><span class="stat-num" id="statStreak">0</span><span class="stat-label">Day streak</span></div>
+        </div>
+        <div class="mastery-bar-wrap">
+          <div class="mastery-bar" id="masteryBar"></div>
+          <div class="mastery-legend">
+            <span><i class="dot dot-new"></i>New</span>
+            <span><i class="dot dot-learning"></i>Learning</span>
+            <span><i class="dot dot-mature"></i>Mature</span>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="manage-table" id="masteryGrid"></table>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="update-toast" id="updateToast" hidden>
     <span class="update-toast-msg">New version available</span>
     <button class="btn btn-flip update-toast-btn" type="button" id="updateToastRefresh">Refresh</button>
@@ -200,6 +279,7 @@
   <script src="conjugate.js"></script>
   <script src="romaji.js"></script>
   <script src="data.js"></script>
+  <script src="srs.js"></script>
   <script src="app.js"></script>
   <script>
     // Wired inline (not in app.js) so all of this — including the update

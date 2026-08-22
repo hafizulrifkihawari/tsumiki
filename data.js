@@ -1,5 +1,5 @@
 /*
- * 漢字 N4 — First 40 entries from 漢字N4.pdf, expanded to a 400-card deck.
+ * 漢字 N4 — 300 words from 漢字N4.pdf, each expanded to a 10-card set (below).
  *
  * Each kanji becomes 10 flashcards:
  *   card 1      : the word by itself ("just the kanji")
@@ -2613,7 +2613,7 @@ function carrierMeaning(carrier, formKey) {
   return carrier.mean;
 }
 
-// ---- Flatten RAW into the 400-card deck -------------------------------------
+// ---- Flatten RAW into the full card deck (300 words x 10 cards each) -------
 function buildCards() {
   const out = [];
   for (const e of RAW) {

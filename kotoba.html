@@ -25,11 +25,14 @@
         <span class="brand-kanji">言葉</span>
         <div class="brand-text">
           <h1>Kotoba Flashcards</h1>
-          <p>Pelajaran 26 · <span id="wordCount">0</span> words</p>
+          <p>Pelajaran 26 · <span id="wordCount">0</span> words · <span id="dueCount">0</span> due</p>
         </div>
       </div>
       <div class="progress-wrap">
-        <div class="progress-count"><span id="posNow">1</span> / <span id="posTotal">1</span></div>
+        <div class="progress-count">
+          <span id="posNow">1</span> / <span id="posTotal">1</span>
+          <span class="queue-badge" id="queueBadge" hidden title="Cards graded Again, waiting to come back this session">↺ <span id="queueCount">0</span></span>
+        </div>
         <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
       </div>
       <div class="topbar-actions">
@@ -42,7 +45,7 @@
     <main class="stage">
       <button class="nav-arrow" id="prevBtn" aria-label="Previous card">‹</button>
 
-      <div class="card-scene" id="cardScene">
+      <div class="card-scene has-answerbar" id="cardScene">
         <div class="card" id="card">
           <!-- FRONT: hiragana/katakana first — learn it as a word before the kanji -->
           <div class="card-face card-front">
@@ -56,7 +59,7 @@
               <button class="speak-btn" id="speakFrontBtn" type="button" aria-label="Play pronunciation" title="Play pronunciation (P)">🔊</button>
             </div>
             <div class="card-bottom">
-              <span class="hint-text">Tap card or press Space to flip</span>
+              <span class="hint-text">Tap or swipe · Space to flip</span>
             </div>
           </div>
 
@@ -76,8 +79,30 @@
               </div>
             </div>
             <div class="card-bottom">
-              <span class="hint-text">Space to flip · ← → to move · S to shuffle</span>
+              <span class="hint-text">Swipe or ← → to move · Grade: Again / Good / Easy</span>
             </div>
+          </div>
+        </div>
+
+        <div class="answerbar" id="answerbar">
+          <div class="answerbar-stats">
+            <div class="score" id="score" title="Correct this session">
+              <span class="score-icon">✓</span><span id="scoreCount">0</span>
+            </div>
+            <div class="miss" id="miss" title="Missed this session">
+              <span class="miss-icon">✗</span><span id="missCount">0</span>
+            </div>
+          </div>
+          <div class="answerbar-buttons">
+            <button class="btn btn-again" id="againBtn" title="Didn't recall it — comes back soon (1 / N / ↓)">
+              <span class="btn-icon">↺</span> Again
+            </button>
+            <button class="btn btn-good" id="goodBtn" title="Got it (2 / Y / ↑)">
+              <span class="btn-icon">✓</span> Good
+            </button>
+            <button class="btn btn-easy" id="easyBtn" title="Knew it well (3)">
+              <span class="btn-icon">⚡</span> Easy
+            </button>
           </div>
         </div>
       </div>
@@ -104,6 +129,7 @@
   </div>
 
   <script src="kotoba-data.js"></script>
+  <script src="srs.js"></script>
   <script src="kotoba-app.js"></script>
   <script>
     // Inline (see index.html) so all of this — including the update

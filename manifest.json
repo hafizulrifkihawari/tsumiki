@@ -1,7 +1,7 @@
 {
   "name": "漢字 N4 Flashcards",
   "short_name": "漢字 N4",
-  "description": "400-card N4 kanji flashcard deck with conjugation drills, romaji, and text-to-speech.",
+  "description": "300-word N4 kanji flashcard deck with conjugation drills, romaji, and text-to-speech.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
