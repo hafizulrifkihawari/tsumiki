@@ -156,6 +156,55 @@
   const finishedResetBtn = el("finishedResetBtn");
   const finishedCount = el("finishedCount");
 
+  // ---- Session progress persistence -----------------------------------------
+  // A plain page refresh (or navigating to Manage and back) used to silently
+  // wipe the current position and score back to 0, since buildDeck() ran fresh
+  // on every load. Now the in-progress deck/position/score survive a reload;
+  // the only way to reset is the existing Shuffle / In order / Study Again
+  // buttons (and the filter tabs), which already rebuild the deck on purpose.
+  const progressKeyFor = (u) => "kanji.progress." + u;
+  const cardsByAudioFile = new Map(CARDS.map((c) => [c.audioFile, c]));
+
+  function saveProgress() {
+    const data = {
+      filter,
+      order: deck.map((c) => c.audioFile),
+      index, sessionCorrect, finished
+    };
+    ls(false, progressKeyFor(currentUser), JSON.stringify(data));
+  }
+
+  function loadProgress() {
+    const raw = ls(true, progressKeyFor(currentUser));
+    if (!raw) return null;
+    try { return JSON.parse(raw); } catch (e) { return null; }
+  }
+
+  // Rebuilds `deck` from a saved session by mapping each stored audioFile back
+  // to its CARDS entry. Returns false (and leaves state untouched) if the save
+  // doesn't map to a usable deck, so the caller can fall back to buildDeck().
+  function restoreProgress(saved) {
+    if (!saved || !Array.isArray(saved.order) || !saved.order.length) return false;
+    const disabled = loadDisabledSet();
+    const restored = saved.order
+      .map((key) => cardsByAudioFile.get(key))
+      .filter((c) => c && !disabled.has(c.kanjiId));
+    if (!restored.length) return false;
+
+    filter = FILTERS[saved.filter] ? saved.filter : "all";
+    document.querySelectorAll(".seg-btn").forEach((b) => {
+      b.classList.toggle("is-active", b.dataset.filter === filter);
+    });
+
+    deck = restored;
+    index = Math.min(Math.max(0, saved.index || 0), deck.length - 1);
+    sessionCorrect = saved.sessionCorrect || 0;
+    updateScore();
+    setFinished(!!saved.finished);
+    if (!finished) render();
+    return true;
+  }
+
   function shuffleArray(arr) {
     const a = arr.slice();
     for (let i = a.length - 1; i > 0; i--) {
@@ -189,6 +238,7 @@
     cardScene.hidden = isFinished;
     answerbar.hidden = isFinished;
     if (isFinished) finishedCount.textContent = deck.length;
+    saveProgress();
   }
 
   function buildDeck(shuffle) {
@@ -399,12 +449,14 @@
     if (index === deck.length - 1) { setFinished(true); return; }
     index++;
     render();
+    saveProgress();
     if (autoSpeak.checked) speakFront();
   }
   function prev() {
     if (!deck.length || finished) return;
     index = (index - 1 + deck.length) % deck.length;
     render();
+    saveProgress();
     if (autoSpeak.checked) speakFront();
   }
   function flip() {
@@ -475,6 +527,7 @@
     if (index >= deck.length) index = deck.length - 1;
     posTotal.textContent = deck.length;
     render();
+    saveProgress();
     if (autoSpeak.checked) speakFront();
   }
 
@@ -557,13 +610,17 @@
   });
 
   // ---- Init: restore the last user, or ask who's studying ----
+  // A saved session (deck order / position / score) is restored whenever one
+  // exists for the user, so a refresh or a trip to another page and back
+  // resumes exactly where it left off. Only the Shuffle / In order /
+  // Study Again buttons and the filter tabs start a fresh session.
   const saved = ls(true, USER_KEY);
   if (saved) {
     applyUser(saved);
-    buildDeck(true);
+    if (!restoreProgress(loadProgress())) buildDeck(true);
   } else {
     applyUser(GUEST);
     showLogin();
-    buildDeck(true);   // build a guest deck behind the overlay so it's ready
+    if (!restoreProgress(loadProgress())) buildDeck(true);
   }
 })();

@@ -98,15 +98,6 @@ function conjugate(word, reading, type) {
   }
 }
 
-// Short bilingual tense/polarity tag appended to the carrier translation.
-const FORM_MEANING_TAG = {
-  basic: "", masu: " — polite", te: " — (-te form)", ta: " — past",
-  nai: " — negative", mashita: " — past, polite", masen: " — negative, polite",
-  nakatta: " — past negative", potential: " — potential (can ~)",
-  polite: " — polite", pastPolite: " — past, polite", negPolite: " — negative, polite",
-  pastNeg: " — past negative", pastNegPolite: " — past negative, polite"
-};
-
 if (typeof module !== "undefined" && module.exports) {
-  module.exports = { conjugate, FORM_MEANING_TAG };
+  module.exports = { conjugate };
 }

@@ -78,9 +78,9 @@ const RAW = [
       { form: "〜が", jp: "この品物が人気だ。", reading: "このしなものがにんきだ。", meaning: "Barang ini populer. (These goods are popular.)" }
     ] },
   { id: 6, word: "着く", reading: "つく", meaning: "tiba", meaningEn: "to arrive", type: "godan",
-    carrier: { pre: "駅に", preR: "えきに", mean: "Tiba di stasiun (arrive at the station)" } },
+    carrier: { pre: "駅に", preR: "えきに", mean: "Tiba di stasiun (arrive at the station)", meanNeg: "Tidak tiba di stasiun (not arrive at the station)", meanPast: "Sudah tiba di stasiun (arrived at the station)", meanPastNeg: "Belum tiba di stasiun (did not arrive at the station)", meanPotential: "Bisa tiba di stasiun (can arrive at the station)" } },
   { id: 7, word: "降りる", reading: "おりる", meaning: "turun", meaningEn: "to get off / descend", type: "ichidan",
-    carrier: { pre: "バスを", preR: "ばすを", mean: "Turun dari bus (get off the bus)" } },
+    carrier: { pre: "バスを", preR: "ばすを", mean: "Turun dari bus (get off the bus)", meanNeg: "Tidak turun dari bus (not get off the bus)", meanPast: "Sudah turun dari bus (got off the bus)", meanPastNeg: "Belum turun dari bus (did not get off the bus)", meanPotential: "Bisa turun dari bus (can get off the bus)" } },
   { id: 8, word: "動物", reading: "どうぶつ", meaning: "binatang", meaningEn: "animal", type: "noun",
     sentences: [
       { form: "〜が", jp: "動物が好きだ。", reading: "どうぶつがすきだ。", meaning: "Suka binatang. (I like animals.)" },
@@ -106,11 +106,11 @@ const RAW = [
       { form: "〜で", jp: "台風で休みだ。", reading: "たいふうでやすみだ。", meaning: "Libur karena topan. (Off because of the typhoon.)" }
     ] },
   { id: 10, word: "輸入する", reading: "ゆにゅうする", meaning: "import", meaningEn: "to import", type: "suru",
-    carrier: { pre: "車を", preR: "くるまを", mean: "Mengimpor mobil (import a car)" } },
+    carrier: { pre: "車を", preR: "くるまを", mean: "Mengimpor mobil (import a car)", meanNeg: "Tidak mengimpor mobil (not import a car)", meanPast: "Sudah mengimpor mobil (imported a car)", meanPastNeg: "Belum mengimpor mobil (did not import a car)", meanPotential: "Bisa mengimpor mobil (can import a car)" } },
   { id: 11, word: "輸出する", reading: "ゆしゅつする", meaning: "eksport", meaningEn: "to export", type: "suru",
-    carrier: { pre: "米を", preR: "こめを", mean: "Mengekspor beras (export rice)" } },
+    carrier: { pre: "米を", preR: "こめを", mean: "Mengekspor beras (export rice)", meanNeg: "Tidak mengekspor beras (not export rice)", meanPast: "Sudah mengekspor beras (exported rice)", meanPastNeg: "Belum mengekspor beras (did not export rice)", meanPotential: "Bisa mengekspor beras (can export rice)" } },
   { id: 12, word: "建てる", reading: "たてる", meaning: "mendirikan", meaningEn: "to build", type: "ichidan",
-    carrier: { pre: "家を", preR: "いえを", mean: "Membangun rumah (build a house)" } },
+    carrier: { pre: "家を", preR: "いえを", mean: "Membangun rumah (build a house)", meanNeg: "Tidak membangun rumah (not build a house)", meanPast: "Sudah membangun rumah (built a house)", meanPastNeg: "Belum membangun rumah (did not build a house)", meanPotential: "Bisa membangun rumah (can build a house)" } },
   { id: 13, word: "荷物", reading: "にもつ", meaning: "barang bawaan", meaningEn: "luggage, baggage", type: "noun",
     sentences: [
       { form: "〜が", jp: "荷物が重い。", reading: "にもつがおもい。", meaning: "Bawaan berat. (The luggage is heavy.)" },
@@ -124,9 +124,9 @@ const RAW = [
       { form: "〜が", jp: "荷物が多すぎる。", reading: "にもつがおおすぎる。", meaning: "Barangnya terlalu banyak. (Too much luggage.)" }
     ] },
   { id: 14, word: "着る", reading: "きる", meaning: "memakai, mengenakan", meaningEn: "to wear (upper body)", type: "ichidan",
-    carrier: { pre: "服を", preR: "ふくを", mean: "Memakai baju (wear clothes)" } },
+    carrier: { pre: "服を", preR: "ふくを", mean: "Memakai baju (wear clothes)", meanNeg: "Tidak memakai baju (not wear clothes)", meanPast: "Sudah memakai baju (wore clothes)", meanPastNeg: "Belum memakai baju (did not wear clothes)", meanPotential: "Bisa memakai baju (can wear clothes)" } },
   { id: 15, word: "通る", reading: "とおる", meaning: "melewati", meaningEn: "to pass through", type: "godan",
-    carrier: { pre: "道を", preR: "みちを", mean: "Melewati jalan (pass along the road)" } },
+    carrier: { pre: "道を", preR: "みちを", mean: "Melewati jalan (pass along the road)", meanNeg: "Tidak melewati jalan (not pass along the road)", meanPast: "Sudah melewati jalan (passed along the road)", meanPastNeg: "Belum melewati jalan (did not pass along the road)", meanPotential: "Bisa melewati jalan (can pass along the road)" } },
   { id: 16, word: "普通", reading: "ふつう", meaning: "biasa", meaningEn: "normal, ordinary", type: "noun",
     sentences: [
       { form: "〜の", jp: "普通の日だ。", reading: "ふつうのひだ。", meaning: "Hari biasa. (An ordinary day.)" },
@@ -152,11 +152,11 @@ const RAW = [
       { form: "〜事故", jp: "交通事故に注意。", reading: "こうつうじこにちゅうい。", meaning: "Awas kecelakaan lalu lintas. (Beware traffic accidents.)" }
     ] },
   { id: 18, word: "通う", reading: "かよう", meaning: "bolak-balik", meaningEn: "to commute / attend regularly", type: "godan",
-    carrier: { pre: "学校に", preR: "がっこうに", mean: "Pergi ke sekolah rutin (commute to school)" } },
+    carrier: { pre: "学校に", preR: "がっこうに", mean: "Pergi ke sekolah rutin (commute to school)", meanNeg: "Tidak pergi ke sekolah rutin (not commute to school)", meanPast: "Sudah pergi ke sekolah rutin (commuted to school)", meanPastNeg: "Belum pergi ke sekolah rutin (did not commute to school)", meanPotential: "Bisa pergi ke sekolah rutin (can commute to school)" } },
   { id: 19, word: "集まる", reading: "あつまる", meaning: "berkumpul", meaningEn: "to gather (intransitive)", type: "godan",
-    carrier: { pre: "人が", preR: "ひとが", mean: "Orang berkumpul (people gather)" } },
+    carrier: { pre: "人が", preR: "ひとが", mean: "Orang berkumpul (people gather)", meanNeg: "Orang tidak berkumpul (people do not gather)", meanPast: "Orang sudah berkumpul (people gathered)", meanPastNeg: "Orang belum berkumpul (people did not gather)", meanPotential: "Orang bisa berkumpul (people can gather)" } },
   { id: 20, word: "便利な", reading: "べんりな", meaning: "praktis", meaningEn: "convenient", type: "na-adj",
-    carrier: { pre: "この店は", preR: "このみせは", mean: "Toko ini praktis (this shop is convenient)" } },
+    carrier: { pre: "この店は", preR: "このみせは", mean: "Toko ini praktis (this shop is convenient)", meanNeg: "Toko ini tidak praktis (this shop is not convenient)", meanPast: "Toko ini dulu praktis (this shop was convenient)", meanPastNeg: "Toko ini dulu tidak praktis (this shop was not convenient)" } },
   { id: 21, word: "同じ", reading: "おなじ", meaning: "sama", meaningEn: "same", type: "noun",
     sentences: [
       { form: "〜だ", jp: "同じ本だ。", reading: "おなじほんだ。", meaning: "Buku yang sama. (It's the same book.)" },
@@ -182,11 +182,11 @@ const RAW = [
       { form: "〜働く", jp: "毎晩遅くまで働く。", reading: "まいばんおそくまではたらく。", meaning: "Kerja sampai malam tiap hari. (Work late every night.)" }
     ] },
   { id: 23, word: "使う", reading: "つかう", meaning: "menggunakan", meaningEn: "to use", type: "godan",
-    carrier: { pre: "箸を", preR: "はしを", mean: "Memakai sumpit (use chopsticks)" } },
+    carrier: { pre: "箸を", preR: "はしを", mean: "Memakai sumpit (use chopsticks)", meanNeg: "Tidak memakai sumpit (not use chopsticks)", meanPast: "Sudah memakai sumpit (used chopsticks)", meanPastNeg: "Belum memakai sumpit (did not use chopsticks)", meanPotential: "Bisa memakai sumpit (can use chopsticks)" } },
   { id: 24, word: "進む", reading: "すすむ", meaning: "memajukan, meningkatkan", meaningEn: "to advance, proceed", type: "godan",
-    carrier: { pre: "前に", preR: "まえに", mean: "Maju ke depan (move forward)" } },
+    carrier: { pre: "前に", preR: "まえに", mean: "Maju ke depan (move forward)", meanNeg: "Tidak maju ke depan (not move forward)", meanPast: "Sudah maju ke depan (moved forward)", meanPastNeg: "Belum maju ke depan (did not move forward)", meanPotential: "Bisa maju ke depan (can move forward)" } },
   { id: 25, word: "作る", reading: "つくる", meaning: "membuat", meaningEn: "to make", type: "godan",
-    carrier: { pre: "料理を", preR: "りょうりを", mean: "Membuat masakan (make food)" } },
+    carrier: { pre: "料理を", preR: "りょうりを", mean: "Membuat masakan (make food)", meanNeg: "Tidak membuat masakan (not make food)", meanPast: "Sudah membuat masakan (made food)", meanPastNeg: "Belum membuat masakan (did not make food)", meanPotential: "Bisa membuat masakan (can make food)" } },
   { id: 26, word: "今晩", reading: "こんばん", meaning: "malam ini", meaningEn: "tonight", type: "noun",
     sentences: [
       { form: "〜は", jp: "今晩は暇だ。", reading: "こんばんはひまだ。", meaning: "Malam ini senggang. (I'm free tonight.)" },
@@ -200,7 +200,7 @@ const RAW = [
       { form: "〜電話", jp: "今晩電話するね。", reading: "こんばんでんわするね。", meaning: "Nanti malam kutelepon. (I'll call tonight.)" }
     ] },
   { id: 27, word: "勉強する", reading: "べんきょうする", meaning: "belajar", meaningEn: "to study", type: "suru",
-    carrier: { pre: "日本語を", preR: "にほんごを", mean: "Belajar bahasa Jepang (study Japanese)" } },
+    carrier: { pre: "日本語を", preR: "にほんごを", mean: "Belajar bahasa Jepang (study Japanese)", meanNeg: "Tidak belajar bahasa Jepang (not study Japanese)", meanPast: "Sudah belajar bahasa Jepang (studied Japanese)", meanPastNeg: "Belum belajar bahasa Jepang (did not study Japanese)", meanPotential: "Bisa belajar bahasa Jepang (can study Japanese)" } },
   { id: 28, word: "文章", reading: "ぶんしょう", meaning: "kalimat", meaningEn: "sentence, writing", type: "noun",
     sentences: [
       { form: "〜を", jp: "文章を書く。", reading: "ぶんしょうをかく。", meaning: "Menulis tulisan. (Write a text.)" },
@@ -310,23 +310,23 @@ const RAW = [
       { form: "〜が", jp: "近所が便利だ。", reading: "きんじょがべんりだ。", meaning: "Lingkungannya praktis. (The area is convenient.)" }
     ] },
   { id: 37, word: "短い", reading: "みじかい", meaning: "pendek", meaningEn: "short", type: "i-adj",
-    carrier: { pre: "髪が", preR: "かみが", mean: "Rambut pendek (the hair is short)" } },
+    carrier: { pre: "髪が", preR: "かみが", mean: "Rambut pendek (the hair is short)", meanNeg: "Rambut tidak pendek (the hair is not short)", meanPast: "Rambut dulu pendek (the hair was short)", meanPastNeg: "Rambut dulu tidak pendek (the hair was not short)" } },
   { id: 38, word: "弱い", reading: "よわい", meaning: "lemah", meaningEn: "weak", type: "i-adj",
-    carrier: { pre: "体が", preR: "からだが", mean: "Badan lemah (the body is weak)" } },
+    carrier: { pre: "体が", preR: "からだが", mean: "Badan lemah (the body is weak)", meanNeg: "Badan tidak lemah (the body is not weak)", meanPast: "Badan dulu lemah (the body was weak)", meanPastNeg: "Badan dulu tidak lemah (the body was not weak)" } },
   { id: 39, word: "遠い", reading: "とおい", meaning: "jauh", meaningEn: "far", type: "i-adj",
-    carrier: { pre: "駅が", preR: "えきが", mean: "Stasiun jauh (the station is far)" } },
+    carrier: { pre: "駅が", preR: "えきが", mean: "Stasiun jauh (the station is far)", meanNeg: "Stasiun tidak jauh (the station is not far)", meanPast: "Stasiun dulu jauh (the station was far)", meanPastNeg: "Stasiun dulu tidak jauh (the station was not far)" } },
   { id: 40, word: "強い", reading: "つよい", meaning: "kuat, kencang", meaningEn: "strong", type: "i-adj",
-    carrier: { pre: "風が", preR: "かぜが", mean: "Angin kencang (the wind is strong)" } },
+    carrier: { pre: "風が", preR: "かぜが", mean: "Angin kencang (the wind is strong)", meanNeg: "Angin tidak kencang (the wind is not strong)", meanPast: "Angin dulu kencang (the wind was strong)", meanPastNeg: "Angin dulu tidak kencang (the wind was not strong)" } },
   { id: 41, word: "暗い", reading: "くらい", meaning: "gelap", meaningEn: "dark", type: "i-adj",
-    carrier: { pre: "部屋が", preR: "へやが", mean: "Kamar gelap (the room is dark)" } },
+    carrier: { pre: "部屋が", preR: "へやが", mean: "Kamar gelap (the room is dark)", meanNeg: "Kamar tidak gelap (the room is not dark)", meanPast: "Kamar dulu gelap (the room was dark)", meanPastNeg: "Kamar dulu tidak gelap (the room was not dark)" } },
   { id: 42, word: "明るい", reading: "あかるい", meaning: "terang", meaningEn: "bright", type: "i-adj",
-    carrier: { pre: "部屋が", preR: "へやが", mean: "Kamar terang (the room is bright)" } },
+    carrier: { pre: "部屋が", preR: "へやが", mean: "Kamar terang (the room is bright)", meanNeg: "Kamar tidak terang (the room is not bright)", meanPast: "Kamar dulu terang (the room was bright)", meanPastNeg: "Kamar dulu tidak terang (the room was not bright)" } },
   { id: 43, word: "悪い", reading: "わるい", meaning: "jelek, buruk", meaningEn: "bad", type: "i-adj",
-    carrier: { pre: "天気が", preR: "てんきが", mean: "Cuaca buruk (the weather is bad)" } },
+    carrier: { pre: "天気が", preR: "てんきが", mean: "Cuaca buruk (the weather is bad)", meanNeg: "Cuaca tidak buruk (the weather is not bad)", meanPast: "Cuaca dulu buruk (the weather was bad)", meanPastNeg: "Cuaca dulu tidak buruk (the weather was not bad)" } },
   { id: 44, word: "利用する", reading: "りようする", meaning: "memanfaatkan", meaningEn: "to use, utilize", type: "suru",
-    carrier: { pre: "電車を", preR: "でんしゃを", mean: "Menggunakan kereta (use the train)" } },
+    carrier: { pre: "電車を", preR: "でんしゃを", mean: "Menggunakan kereta (use the train)", meanNeg: "Tidak menggunakan kereta (not use the train)", meanPast: "Sudah menggunakan kereta (used the train)", meanPastNeg: "Belum menggunakan kereta (did not use the train)", meanPotential: "Bisa menggunakan kereta (can use the train)" } },
   { id: 45, word: "有名な", reading: "ゆうめいな", meaning: "terkenal", meaningEn: "famous", type: "na-adj",
-    carrier: { pre: "この店は", preR: "このみせは", mean: "Toko ini terkenal (this shop is famous)" } },
+    carrier: { pre: "この店は", preR: "このみせは", mean: "Toko ini terkenal (this shop is famous)", meanNeg: "Toko ini tidak terkenal (this shop is not famous)", meanPast: "Toko ini dulu terkenal (this shop was famous)", meanPastNeg: "Toko ini dulu tidak terkenal (this shop was not famous)" } },
   { id: 46, word: "夕食", reading: "ゆうしょく", meaning: "makan malam", meaningEn: "dinner, supper", type: "noun",
     sentences: [
       { form: "〜を", jp: "夕食を食べる。", reading: "ゆうしょくをたべる。", meaning: "Makan malam. (Eat dinner.)" },
@@ -376,7 +376,7 @@ const RAW = [
       { form: "〜の", jp: "夕方の散歩。", reading: "ゆうがたのさんぽ。", meaning: "Jalan-jalan sore. (An evening walk.)" }
     ] },
   { id: 50, word: "写す", reading: "うつす", meaning: "menyalin", meaningEn: "to copy, transcribe", type: "godan",
-    carrier: { pre: "ノートを", preR: "ノートを", mean: "Menyalin catatan (copy the notes)" } },
+    carrier: { pre: "ノートを", preR: "ノートを", mean: "Menyalin catatan (copy the notes)", meanNeg: "Tidak menyalin catatan (not copy the notes)", meanPast: "Sudah menyalin catatan (copied the notes)", meanPastNeg: "Belum menyalin catatan (did not copy the notes)", meanPotential: "Bisa menyalin catatan (can copy the notes)" } },
   { id: 51, word: "真ん中", reading: "まんなか", meaning: "di tengah", meaningEn: "the middle, center", type: "noun",
     sentences: [
       { form: "〜に", jp: "真ん中に立つ。", reading: "まんなかにたつ。", meaning: "Berdiri di tengah. (Stand in the middle.)" },
@@ -546,7 +546,7 @@ const RAW = [
       { form: "〜のために", jp: "市民のために働く。", reading: "しみんのためにはたらく。", meaning: "Bekerja untuk warga. (Work for the citizens.)" }
     ] },
   { id: 65, word: "歌う", reading: "うたう", meaning: "menyanyi", meaningEn: "to sing", type: "godan",
-    carrier: { pre: "歌を", preR: "うたを", mean: "Menyanyikan lagu (sing a song)" } },
+    carrier: { pre: "歌を", preR: "うたを", mean: "Menyanyikan lagu (sing a song)", meanNeg: "Tidak menyanyikan lagu (not sing a song)", meanPast: "Sudah menyanyikan lagu (sang a song)", meanPastNeg: "Belum menyanyikan lagu (did not sing a song)", meanPotential: "Bisa menyanyikan lagu (can sing a song)" } },
   { id: 66, word: "家族", reading: "かぞく", meaning: "keluarga", meaningEn: "family", type: "noun",
     sentences: [
       { form: "〜が", jp: "家族が多い。", reading: "かぞくがおおい。", meaning: "Keluarganya banyak. (I have a big family.)" },
@@ -824,12 +824,12 @@ const RAW = [
       { form: "〜は", jp: "京都は有名だ。", reading: "きょうとはゆうめいだ。", meaning: "Kyoto terkenal. (Kyoto is famous.)" }
     ] },
   { id: 89, word: "動く", reading: "うごく", meaning: "bergerak", meaningEn: "to move", type: "godan",
-    carrier: { pre: "手が", preR: "てが", mean: "Tangan bergerak (the hand moves)" } },
+    carrier: { pre: "手が", preR: "てが", mean: "Tangan bergerak (the hand moves)", meanNeg: "Tangan tidak bergerak (the hand does not move)", meanPast: "Tangan sudah bergerak (the hand moved)", meanPastNeg: "Tangan belum bergerak (the hand did not move)", meanPotential: "Tangan bisa bergerak (the hand can move)" } },
   { id: 90, word: "低い", reading: "ひくい", meaning: "rendah, pendek", meaningEn: "low, short", type: "i-adj",
-    carrier: { pre: "背が", preR: "せが", mean: "Badan pendek (short in stature)" } }
+    carrier: { pre: "背が", preR: "せが", mean: "Badan pendek (short in stature)", meanNeg: "Badan tidak pendek (not short in stature)", meanPast: "Dulu, badan pendek (was short in stature)", meanPastNeg: "Dulu, badan tidak pendek (was not short in stature)" } }
   ,
   { id: 91, word: "回る", reading: "まわる", meaning: "berputar", meaningEn: "to turn, spin", type: "godan",
-    carrier: { pre: "地球が", preR: "ちきゅうが", mean: "Bumi berputar (the earth turns)" } },
+    carrier: { pre: "地球が", preR: "ちきゅうが", mean: "Bumi berputar (the earth turns)", meanNeg: "Bumi tidak berputar (the earth does not turn)", meanPast: "Bumi sudah berputar (the earth turned)", meanPastNeg: "Bumi belum berputar (the earth did not turn)", meanPotential: "Bumi bisa berputar (the earth can turn)" } },
   { id: 92, word: "料理", reading: "りょうり", meaning: "masakan", meaningEn: "cooking, dish", type: "noun",
     sentences: [
       { form: "〜を", jp: "料理をする。", reading: "りょうりをする。", meaning: "Memasak. (Cook.)" },
@@ -891,9 +891,9 @@ const RAW = [
       { form: "〜で", jp: "米でお酒を作る。", reading: "こめでおさけをつくる。", meaning: "Membuat sake dari beras. (Make sake from rice.)" }
     ] },
   { id: 97, word: "洗濯する", reading: "せんたくする", meaning: "mencuci baju", meaningEn: "to do laundry", type: "suru",
-    carrier: { pre: "服を", preR: "ふくを", mean: "Mencuci baju (do the laundry)" } },
+    carrier: { pre: "服を", preR: "ふくを", mean: "Mencuci baju (do the laundry)", meanNeg: "Tidak mencuci baju (not do the laundry)", meanPast: "Sudah mencuci baju (did the laundry)", meanPastNeg: "Belum mencuci baju (did not do the laundry)", meanPotential: "Bisa mencuci baju (can do the laundry)" } },
   { id: 98, word: "洗う", reading: "あらう", meaning: "mencuci", meaningEn: "to wash", type: "godan",
-    carrier: { pre: "手を", preR: "てを", mean: "Mencuci tangan (wash the hands)" } },
+    carrier: { pre: "手を", preR: "てを", mean: "Mencuci tangan (wash the hands)", meanNeg: "Tidak mencuci tangan (not wash the hands)", meanPast: "Sudah mencuci tangan (washed the hands)", meanPastNeg: "Belum mencuci tangan (did not wash the hands)", meanPotential: "Bisa mencuci tangan (can wash the hands)" } },
   { id: 99, word: "お手洗い", reading: "おてあらい", meaning: "toilet", meaningEn: "restroom", type: "noun",
     sentences: [
       { form: "〜に", jp: "お手洗いに行く。", reading: "おてあらいにいく。", meaning: "Pergi ke toilet. (Go to the restroom.)" },
@@ -1111,7 +1111,7 @@ const RAW = [
       { form: "〜で", jp: "映画館で待つ。", reading: "えいがかんでまつ。", meaning: "Menunggu di bioskop. (Wait at the cinema.)" }
     ] },
   { id: 117, word: "用意する", reading: "よういする", meaning: "menyiapkan", meaningEn: "to prepare", type: "suru",
-    carrier: { pre: "食事を", preR: "しょくじを", mean: "Menyiapkan makanan (prepare a meal)" } },
+    carrier: { pre: "食事を", preR: "しょくじを", mean: "Menyiapkan makanan (prepare a meal)", meanNeg: "Tidak menyiapkan makanan (not prepare a meal)", meanPast: "Sudah menyiapkan makanan (prepared a meal)", meanPastNeg: "Belum menyiapkan makanan (did not prepare a meal)", meanPotential: "Bisa menyiapkan makanan (can prepare a meal)" } },
   { id: 118, word: "地震", reading: "じしん", meaning: "gempa bumi", meaningEn: "earthquake", type: "noun",
     sentences: [
       { form: "〜が", jp: "地震が起きる。", reading: "じしんがおきる。", meaning: "Gempa terjadi. (An earthquake occurs.)" },
@@ -1150,7 +1150,7 @@ const RAW = [
     ] }
   ,
   { id: 121, word: "太い", reading: "ふとい", meaning: "gemuk, tebal", meaningEn: "thick, fat", type: "i-adj",
-    carrier: { pre: "指が", preR: "ゆびが", mean: "Jari besar (the finger is thick)" } },
+    carrier: { pre: "指が", preR: "ゆびが", mean: "Jari besar (the finger is thick)", meanNeg: "Jari tidak besar (the finger is not thick)", meanPast: "Jari dulu besar (the finger was thick)", meanPastNeg: "Jari dulu tidak besar (the finger was not thick)" } },
   { id: 122, word: "和室", reading: "わしつ", meaning: "ruang ala Jepang", meaningEn: "Japanese-style room", type: "noun",
     sentences: [
       { form: "〜が", jp: "和室がある。", reading: "わしつがある。", meaning: "Ada ruang ala Jepang. (There is a Japanese-style room.)" },
@@ -1164,9 +1164,9 @@ const RAW = [
       { form: "〜だ", jp: "この旅館は和室だ。", reading: "このりょかんはわしつだ。", meaning: "Penginapan ini ala Jepang. (This inn has tatami rooms.)" }
     ] },
   { id: 123, word: "知る", reading: "しる", meaning: "mengenal, tahu", meaningEn: "to know", type: "godan",
-    carrier: { pre: "答えを", preR: "こたえを", mean: "Mengetahui jawaban (know the answer)" } },
+    carrier: { pre: "答えを", preR: "こたえを", mean: "Mengetahui jawaban (know the answer)", meanNeg: "Tidak mengetahui jawaban (not know the answer)", meanPast: "Sudah mengetahui jawaban (knew the answer)", meanPastNeg: "Belum mengetahui jawaban (did not know the answer)", meanPotential: "Bisa mengetahui jawaban (can know the answer)" } },
   { id: 124, word: "光る", reading: "ひかる", meaning: "bersinar", meaningEn: "to shine", type: "godan",
-    carrier: { pre: "星が", preR: "ほしが", mean: "Bintang bersinar (the star shines)" } },
+    carrier: { pre: "星が", preR: "ほしが", mean: "Bintang bersinar (the star shines)", meanNeg: "Bintang tidak bersinar (the star does not shine)", meanPast: "Bintang sudah bersinar (the star shone)", meanPastNeg: "Bintang belum bersinar (the star did not shine)", meanPotential: "Bintang bisa bersinar (the star can shine)" } },
   { id: 125, word: "思い", reading: "おもい", meaning: "pikiran, perasaan", meaningEn: "thought, feeling", type: "noun",
     sentences: [
       { form: "〜を", jp: "思いを伝える。", reading: "おもいをつたえる。", meaning: "Menyampaikan perasaan. (Convey one's feelings.)" },
@@ -1180,7 +1180,7 @@ const RAW = [
       { form: "〜を", jp: "思いを持つ。", reading: "おもいをもつ。", meaning: "Menyimpan perasaan. (Hold a feeling.)" }
     ] },
   { id: 126, word: "思い出す", reading: "おもいだす", meaning: "teringat", meaningEn: "to recall", type: "godan",
-    carrier: { pre: "昔を", preR: "むかしを", mean: "Teringat masa lalu (recall the past)" } },
+    carrier: { pre: "昔を", preR: "むかしを", mean: "Teringat masa lalu (recall the past)", meanNeg: "Tidak teringat masa lalu (not recall the past)", meanPast: "Sudah teringat masa lalu (recalled the past)", meanPastNeg: "Belum teringat masa lalu (did not recall the past)", meanPotential: "Bisa teringat masa lalu (can recall the past)" } },
   { id: 127, word: "和菓子", reading: "わがし", meaning: "kue ala Jepang", meaningEn: "Japanese sweets", type: "noun",
     sentences: [
       { form: "〜を", jp: "和菓子を食べる。", reading: "わがしをたべる。", meaning: "Makan kue Jepang. (Eat Japanese sweets.)" },
@@ -1230,9 +1230,9 @@ const RAW = [
       { form: "〜で", jp: "電池で動く。", reading: "でんちでうごく。", meaning: "Berjalan dengan baterai. (Runs on batteries.)" }
     ] },
   { id: 131, word: "特別な", reading: "とくべつな", meaning: "istimewa", meaningEn: "special", type: "na-adj",
-    carrier: { pre: "今日は", preR: "きょうは", mean: "Hari ini istimewa (today is special)" } },
+    carrier: { pre: "今日は", preR: "きょうは", mean: "Hari ini istimewa (today is special)", meanNeg: "Hari ini tidak istimewa (today is not special)", meanPast: "Hari ini dulu istimewa (today was special)", meanPastNeg: "Hari ini dulu tidak istimewa (today was not special)" } },
   { id: 132, word: "別れる", reading: "わかれる", meaning: "berpisah", meaningEn: "to part, break up", type: "ichidan",
-    carrier: { pre: "友達と", preR: "ともだちと", mean: "Berpisah dengan teman (part from a friend)" } },
+    carrier: { pre: "友達と", preR: "ともだちと", mean: "Berpisah dengan teman (part from a friend)", meanNeg: "Tidak berpisah dengan teman (not part from a friend)", meanPast: "Sudah berpisah dengan teman (parted from a friend)", meanPastNeg: "Belum berpisah dengan teman (did not part from a friend)", meanPotential: "Bisa berpisah dengan teman (can part from a friend)" } },
   { id: 133, word: "病気", reading: "びょうき", meaning: "sakit, penyakit", meaningEn: "illness", type: "noun",
     sentences: [
       { form: "〜が", jp: "病気が治る。", reading: "びょうきがなおる。", meaning: "Sembuh dari sakit. (Recover from illness.)" },
@@ -1246,19 +1246,19 @@ const RAW = [
       { form: "〜が", jp: "病気がよくなる。", reading: "びょうきがよくなる。", meaning: "Sakitnya membaik. (The illness gets better.)" }
     ] },
   { id: 134, word: "軽い", reading: "かるい", meaning: "ringan", meaningEn: "light (weight)", type: "i-adj",
-    carrier: { pre: "荷物が", preR: "にもつが", mean: "Barang ringan (the luggage is light)" } },
+    carrier: { pre: "荷物が", preR: "にもつが", mean: "Barang ringan (the luggage is light)", meanNeg: "Barang tidak ringan (the luggage is not light)", meanPast: "Barang dulu ringan (the luggage was light)", meanPastNeg: "Barang dulu tidak ringan (the luggage was not light)" } },
   { id: 135, word: "寝る", reading: "ねる", meaning: "tidur", meaningEn: "to sleep", type: "ichidan",
-    carrier: { pre: "早く", preR: "はやく", mean: "Tidur cepat (sleep early)" } },
+    carrier: { pre: "早く", preR: "はやく", mean: "Tidur cepat (sleep early)", meanNeg: "Tidak tidur cepat (not sleep early)", meanPast: "Sudah tidur cepat (slept early)", meanPastNeg: "Belum tidur cepat (did not sleep early)", meanPotential: "Bisa tidur cepat (can sleep early)" } },
   { id: 136, word: "始める", reading: "はじめる", meaning: "memulai", meaningEn: "to begin (something)", type: "ichidan",
-    carrier: { pre: "勉強を", preR: "べんきょうを", mean: "Memulai belajar (start studying)" } },
+    carrier: { pre: "勉強を", preR: "べんきょうを", mean: "Memulai belajar (start studying)", meanNeg: "Tidak memulai belajar (not start studying)", meanPast: "Sudah memulai belajar (started studying)", meanPastNeg: "Belum memulai belajar (did not start studying)", meanPotential: "Bisa memulai belajar (can start studying)" } },
   { id: 137, word: "暑い", reading: "あつい", meaning: "panas (cuaca)", meaningEn: "hot (weather)", type: "i-adj",
-    carrier: { pre: "今日は", preR: "きょうは", mean: "Hari ini panas (today is hot)" } },
+    carrier: { pre: "今日は", preR: "きょうは", mean: "Hari ini panas (today is hot)", meanNeg: "Hari ini tidak panas (today is not hot)", meanPast: "Hari ini dulu panas (today was hot)", meanPastNeg: "Hari ini dulu tidak panas (today was not hot)" } },
   { id: 138, word: "終わる", reading: "おわる", meaning: "selesai", meaningEn: "to end, finish", type: "godan",
-    carrier: { pre: "授業が", preR: "じゅぎょうが", mean: "Pelajaran selesai (the class ends)" } },
+    carrier: { pre: "授業が", preR: "じゅぎょうが", mean: "Pelajaran selesai (the class ends)", meanNeg: "Pelajaran tidak selesai (the class does not end)", meanPast: "Pelajaran sudah selesai (the class ended)", meanPastNeg: "Pelajaran belum selesai (the class did not end)", meanPotential: "Pelajaran bisa selesai (the class can end)" } },
   { id: 139, word: "寒い", reading: "さむい", meaning: "dingin (cuaca)", meaningEn: "cold (weather)", type: "i-adj",
-    carrier: { pre: "冬は", preR: "ふゆは", mean: "Musim dingin dingin (winter is cold)" } },
+    carrier: { pre: "冬は", preR: "ふゆは", mean: "Musim dingin dingin (winter is cold)", meanNeg: "Musim dingin tidak dingin (winter is not cold)", meanPast: "Musim dingin dulu dingin (winter was cold)", meanPastNeg: "Musim dingin dulu tidak dingin (winter was not cold)" } },
   { id: 140, word: "蒸し暑い", reading: "むしあつい", meaning: "panas lembab", meaningEn: "hot and humid", type: "i-adj",
-    carrier: { pre: "夏は", preR: "なつは", mean: "Musim panas lembab (summer is humid)" } },
+    carrier: { pre: "夏は", preR: "なつは", mean: "Musim panas lembab (summer is humid)", meanNeg: "Musim panas tidak lembab (summer is not humid)", meanPast: "Musim panas dulu lembab (summer was humid)", meanPastNeg: "Musim panas dulu tidak lembab (summer was not humid)" } },
   { id: 141, word: "寝坊", reading: "ねぼう", meaning: "ketiduran", meaningEn: "oversleeping", type: "noun",
     sentences: [
       { form: "〜を", jp: "寝坊をする。", reading: "ねぼうをする。", meaning: "Kesiangan. (Oversleep.)" },
@@ -1320,9 +1320,9 @@ const RAW = [
       { form: "〜に", jp: "静かな場所に行く。", reading: "しずかなばしょにいく。", meaning: "Pergi ke tempat tenang. (Go to a quiet place.)" }
     ] },
   { id: 146, word: "注意する", reading: "ちゅういする", meaning: "berhati-hati", meaningEn: "to be careful, warn", type: "suru",
-    carrier: { pre: "車に", preR: "くるまに", mean: "Berhati-hati pada mobil (watch out for cars)" } },
+    carrier: { pre: "車に", preR: "くるまに", mean: "Berhati-hati pada mobil (watch out for cars)", meanNeg: "Tidak berhati-hati pada mobil (not watch out for cars)", meanPast: "Sudah berhati-hati pada mobil (watched out for cars)", meanPastNeg: "Belum berhati-hati pada mobil (did not watch out for cars)", meanPotential: "Bisa berhati-hati pada mobil (can watch out for cars)" } },
   { id: 147, word: "注文する", reading: "ちゅうもんする", meaning: "memesan", meaningEn: "to order", type: "suru",
-    carrier: { pre: "料理を", preR: "りょうりを", mean: "Memesan makanan (order food)" } },
+    carrier: { pre: "料理を", preR: "りょうりを", mean: "Memesan makanan (order food)", meanNeg: "Tidak memesan makanan (not order food)", meanPast: "Sudah memesan makanan (ordered food)", meanPastNeg: "Belum memesan makanan (did not order food)", meanPotential: "Bisa memesan makanan (can order food)" } },
   { id: 148, word: "意見", reading: "いけん", meaning: "pendapat", meaningEn: "opinion", type: "noun",
     sentences: [
       { form: "〜を", jp: "意見を言う。", reading: "いけんをいう。", meaning: "Menyampaikan pendapat. (Give an opinion.)" },
@@ -1373,7 +1373,7 @@ const RAW = [
       { form: "〜に", jp: "発音に気をつける。", reading: "はつおんにきをつける。", meaning: "Memperhatikan pengucapan. (Pay attention to pronunciation.)" }
     ] },
   { id: 152, word: "出発する", reading: "しゅっぱつする", meaning: "berangkat", meaningEn: "to depart", type: "suru",
-    carrier: { pre: "東京へ", preR: "とうきょうへ", mean: "Berangkat ke Tokyo (depart for Tokyo)" } },
+    carrier: { pre: "東京へ", preR: "とうきょうへ", mean: "Berangkat ke Tokyo (depart for Tokyo)", meanNeg: "Tidak berangkat ke Tokyo (not depart for Tokyo)", meanPast: "Sudah berangkat ke Tokyo (departed for Tokyo)", meanPastNeg: "Belum berangkat ke Tokyo (did not depart for Tokyo)", meanPotential: "Bisa berangkat ke Tokyo (can depart for Tokyo)" } },
   { id: 153, word: "音楽", reading: "おんがく", meaning: "musik", meaningEn: "music", type: "noun",
     sentences: [
       { form: "〜を", jp: "音楽を聞く。", reading: "おんがくをきく。", meaning: "Mendengarkan musik. (Listen to music.)" },
@@ -1615,7 +1615,7 @@ const RAW = [
       { form: "〜は", jp: "次は一番線だ。", reading: "つぎはいちばんせんだ。", meaning: "Berikutnya peron 1. (Next is platform 1.)" }
     ] },
   { id: 173, word: "支度する", reading: "したくする", meaning: "menyiapkan diri", meaningEn: "to get ready", type: "suru",
-    carrier: { pre: "すぐに", preR: "すぐに", mean: "Segera bersiap (get ready right away)" } },
+    carrier: { pre: "すぐに", preR: "すぐに", mean: "Segera bersiap (get ready right away)", meanNeg: "Tidak segera bersiap (not get ready right away)", meanPast: "Sudah segera bersiap (got ready right away)", meanPastNeg: "Belum segera bersiap (did not get ready right away)", meanPotential: "Bisa segera bersiap (can get ready right away)" } },
   { id: 174, word: "全部", reading: "ぜんぶ", meaning: "keseluruhan, semua", meaningEn: "all, everything", type: "noun",
     sentences: [
       { form: "〜を", jp: "全部食べる。", reading: "ぜんぶたべる。", meaning: "Makan semua. (Eat it all.)" },
@@ -1750,9 +1750,9 @@ const RAW = [
       { form: "〜を", jp: "顔を上げる。", reading: "かおをあげる。", meaning: "Mengangkat wajah. (Raise one's face.)" }
     ] },
   { id: 185, word: "起こす", reading: "おこす", meaning: "membangunkan", meaningEn: "to wake (someone)", type: "godan",
-    carrier: { pre: "子供を", preR: "こどもを", mean: "Membangunkan anak (wake the child)" } },
+    carrier: { pre: "子供を", preR: "こどもを", mean: "Membangunkan anak (wake the child)", meanNeg: "Tidak membangunkan anak (not wake the child)", meanPast: "Sudah membangunkan anak (woke the child)", meanPastNeg: "Belum membangunkan anak (did not wake the child)", meanPotential: "Bisa membangunkan anak (can wake the child)" } },
   { id: 186, word: "取り替える", reading: "とりかえる", meaning: "mengganti, menukar", meaningEn: "to replace, exchange", type: "ichidan",
-    carrier: { pre: "電池を", preR: "でんちを", mean: "Mengganti baterai (replace the battery)" } },
+    carrier: { pre: "電池を", preR: "でんちを", mean: "Mengganti baterai (replace the battery)", meanNeg: "Tidak mengganti baterai (not replace the battery)", meanPast: "Sudah mengganti baterai (replaced the battery)", meanPastNeg: "Belum mengganti baterai (did not replace the battery)", meanPotential: "Bisa mengganti baterai (can replace the battery)" } },
   { id: 187, word: "押し入れ", reading: "おしいれ", meaning: "kloset, lemari dinding", meaningEn: "closet", type: "noun",
     sentences: [
       { form: "〜に", jp: "押し入れに入れる。", reading: "おしいれにいれる。", meaning: "Menaruh di lemari. (Put it in the closet.)" },
@@ -1778,13 +1778,13 @@ const RAW = [
       { form: "〜が", jp: "引き出しが開かない。", reading: "ひきだしがあかない。", meaning: "Laci tak bisa dibuka. (The drawer won't open.)" }
     ] },
   { id: 189, word: "開く", reading: "ひらく", meaning: "membuka, terbuka", meaningEn: "to open", type: "godan",
-    carrier: { pre: "本を", preR: "ほんを", mean: "Membuka buku (open a book)" } },
+    carrier: { pre: "本を", preR: "ほんを", mean: "Membuka buku (open a book)", meanNeg: "Tidak membuka buku (not open a book)", meanPast: "Sudah membuka buku (opened a book)", meanPastNeg: "Belum membuka buku (did not open a book)", meanPotential: "Bisa membuka buku (can open a book)" } },
   { id: 190, word: "開ける", reading: "あける", meaning: "membuka", meaningEn: "to open (something)", type: "ichidan",
-    carrier: { pre: "窓を", preR: "まどを", mean: "Membuka jendela (open the window)" } },
+    carrier: { pre: "窓を", preR: "まどを", mean: "Membuka jendela (open the window)", meanNeg: "Tidak membuka jendela (not open the window)", meanPast: "Sudah membuka jendela (opened the window)", meanPastNeg: "Belum membuka jendela (did not open the window)", meanPotential: "Bisa membuka jendela (can open the window)" } },
   { id: 191, word: "閉まる", reading: "しまる", meaning: "tertutup", meaningEn: "to close (intrans.)", type: "godan",
-    carrier: { pre: "ドアが", preR: "どあが", mean: "Pintu tertutup (the door closes)" } },
+    carrier: { pre: "ドアが", preR: "どあが", mean: "Pintu tertutup (the door closes)", meanNeg: "Pintu tidak tertutup (the door does not close)", meanPast: "Pintu sudah tertutup (the door closed)", meanPastNeg: "Pintu belum tertutup (the door did not close)", meanPotential: "Pintu bisa tertutup (the door can close)" } },
   { id: 192, word: "中止する", reading: "ちゅうしする", meaning: "membatalkan", meaningEn: "to call off, cancel", type: "suru",
-    carrier: { pre: "試合を", preR: "しあいを", mean: "Membatalkan pertandingan (call off the match)" } },
+    carrier: { pre: "試合を", preR: "しあいを", mean: "Membatalkan pertandingan (call off the match)", meanNeg: "Tidak membatalkan pertandingan (not call off the match)", meanPast: "Sudah membatalkan pertandingan (called off the match)", meanPastNeg: "Belum membatalkan pertandingan (did not call off the match)", meanPotential: "Bisa membatalkan pertandingan (can call off the match)" } },
   { id: 193, word: "使用中止", reading: "しようちゅうし", meaning: "tidak boleh digunakan", meaningEn: "out of service", type: "noun",
     sentences: [
       { form: "〜だ", jp: "このトイレは使用中止だ。", reading: "このといれはしようちゅうしだ。", meaning: "Toilet ini tidak dipakai. (This toilet is out of service.)" },
@@ -1798,7 +1798,7 @@ const RAW = [
       { form: "〜だ", jp: "今日は使用中止だ。", reading: "きょうはしようちゅうしだ。", meaning: "Hari ini tidak dipakai. (It's out of service today.)" }
     ] },
   { id: 194, word: "止まる", reading: "とまる", meaning: "berhenti", meaningEn: "to stop (intrans.)", type: "godan",
-    carrier: { pre: "電車が", preR: "でんしゃが", mean: "Kereta berhenti (the train stops)" } },
+    carrier: { pre: "電車が", preR: "でんしゃが", mean: "Kereta berhenti (the train stops)", meanNeg: "Kereta tidak berhenti (the train does not stop)", meanPast: "Kereta sudah berhenti (the train stopped)", meanPastNeg: "Kereta belum berhenti (the train did not stop)", meanPotential: "Kereta bisa berhenti (the train can stop)" } },
   { id: 195, word: "屋上", reading: "おくじょう", meaning: "atap, lantai atas", meaningEn: "rooftop", type: "noun",
     sentences: [
       { form: "〜に", jp: "屋上に上がる。", reading: "おくじょうにあがる。", meaning: "Naik ke atap. (Go up to the roof.)" },
@@ -1860,7 +1860,7 @@ const RAW = [
       { form: "〜まで", jp: "本屋まで歩く。", reading: "ほんやまであるく。", meaning: "Berjalan ke toko buku. (Walk to the bookstore.)" }
     ] },
   { id: 200, word: "世話をする", reading: "せわをする", meaning: "merawat", meaningEn: "to take care of", type: "suru",
-    carrier: { pre: "子供の", preR: "こどもの", mean: "Merawat anak (take care of a child)" } },
+    carrier: { pre: "子供の", preR: "こどもの", mean: "Merawat anak (take care of a child)", meanNeg: "Tidak merawat anak (not take care of a child)", meanPast: "Sudah merawat anak (took care of a child)", meanPastNeg: "Belum merawat anak (did not take care of a child)", meanPotential: "Bisa merawat anak (can take care of a child)" } },
   { id: 201, word: "気持ち", reading: "きもち", meaning: "perasaan", meaningEn: "feeling, mood", type: "noun",
     sentences: [
       { form: "〜が", jp: "気持ちがいい。", reading: "きもちがいい。", meaning: "Perasaan enak. (It feels good.)" },
@@ -1886,7 +1886,7 @@ const RAW = [
       { form: "〜に", jp: "金持ちになりたい。", reading: "かねもちになりたい。", meaning: "Ingin jadi kaya. (I want to be rich.)" }
     ] },
   { id: 203, word: "招待する", reading: "しょうたいする", meaning: "mengundang", meaningEn: "to invite", type: "suru",
-    carrier: { pre: "友達を", preR: "ともだちを", mean: "Mengundang teman (invite a friend)" } },
+    carrier: { pre: "友達を", preR: "ともだちを", mean: "Mengundang teman (invite a friend)", meanNeg: "Tidak mengundang teman (not invite a friend)", meanPast: "Sudah mengundang teman (invited a friend)", meanPastNeg: "Belum mengundang teman (did not invite a friend)", meanPotential: "Bisa mengundang teman (can invite a friend)" } },
   { id: 204, word: "特急", reading: "とっきゅう", meaning: "kereta ekspres terbatas", meaningEn: "limited express", type: "noun",
     sentences: [
       { form: "〜に", jp: "特急に乗る。", reading: "とっきゅうにのる。", meaning: "Naik kereta ekspres. (Take the limited express.)" },
@@ -1924,7 +1924,7 @@ const RAW = [
       { form: "〜が", jp: "森林が美しい。", reading: "しんりんがうつくしい。", meaning: "Hutannya indah. (The forest is beautiful.)" }
     ] },
   { id: 207, word: "質問する", reading: "しつもんする", meaning: "bertanya", meaningEn: "to ask a question", type: "suru",
-    carrier: { pre: "先生に", preR: "せんせいに", mean: "Bertanya pada guru (ask the teacher)" } },
+    carrier: { pre: "先生に", preR: "せんせいに", mean: "Bertanya pada guru (ask the teacher)", meanNeg: "Tidak bertanya pada guru (not ask the teacher)", meanPast: "Sudah bertanya pada guru (asked the teacher)", meanPastNeg: "Belum bertanya pada guru (did not ask the teacher)", meanPotential: "Bisa bertanya pada guru (can ask the teacher)" } },
   { id: 208, word: "問題", reading: "もんだい", meaning: "soal, masalah", meaningEn: "problem, question", type: "noun",
     sentences: [
       { form: "〜が", jp: "問題がある。", reading: "もんだいがある。", meaning: "Ada masalah. (There is a problem.)" },
@@ -1963,15 +1963,15 @@ const RAW = [
     ] }
   ,
   { id: 211, word: "借りる", reading: "かりる", meaning: "meminjam", meaningEn: "to borrow", type: "ichidan",
-    carrier: { pre: "本を", preR: "ほんを", mean: "Meminjam buku (borrow a book)" } },
+    carrier: { pre: "本を", preR: "ほんを", mean: "Meminjam buku (borrow a book)", meanNeg: "Tidak meminjam buku (not borrow a book)", meanPast: "Sudah meminjam buku (borrowed a book)", meanPastNeg: "Belum meminjam buku (did not borrow a book)", meanPotential: "Bisa meminjam buku (can borrow a book)" } },
   { id: 212, word: "貸す", reading: "かす", meaning: "meminjamkan", meaningEn: "to lend", type: "godan",
-    carrier: { pre: "お金を", preR: "おかねを", mean: "Meminjamkan uang (lend money)" } },
+    carrier: { pre: "お金を", preR: "おかねを", mean: "Meminjamkan uang (lend money)", meanNeg: "Tidak meminjamkan uang (not lend money)", meanPast: "Sudah meminjamkan uang (lent money)", meanPastNeg: "Belum meminjamkan uang (did not lend money)", meanPotential: "Bisa meminjamkan uang (can lend money)" } },
   { id: 213, word: "練習する", reading: "れんしゅうする", meaning: "berlatih", meaningEn: "to practice", type: "suru",
-    carrier: { pre: "ピアノを", preR: "ぴあのを", mean: "Berlatih piano (practice piano)" } },
+    carrier: { pre: "ピアノを", preR: "ぴあのを", mean: "Berlatih piano (practice piano)", meanNeg: "Tidak berlatih piano (not practice piano)", meanPast: "Sudah berlatih piano (practiced piano)", meanPastNeg: "Belum berlatih piano (did not practice piano)", meanPotential: "Bisa berlatih piano (can practice piano)" } },
   { id: 214, word: "復習する", reading: "ふくしゅうする", meaning: "mengulang", meaningEn: "to review", type: "suru",
-    carrier: { pre: "漢字を", preR: "かんじを", mean: "Mengulang kanji (review kanji)" } },
+    carrier: { pre: "漢字を", preR: "かんじを", mean: "Mengulang kanji (review kanji)", meanNeg: "Tidak mengulang kanji (not review kanji)", meanPast: "Sudah mengulang kanji (reviewed kanji)", meanPastNeg: "Belum mengulang kanji (did not review kanji)", meanPotential: "Bisa mengulang kanji (can review kanji)" } },
   { id: 215, word: "予習する", reading: "よしゅうする", meaning: "persiapan belajar", meaningEn: "to prepare (a lesson)", type: "suru",
-    carrier: { pre: "授業を", preR: "じゅぎょうを", mean: "Persiapan sebelum kelas (prepare for class)" } },
+    carrier: { pre: "授業を", preR: "じゅぎょうを", mean: "Persiapan sebelum kelas (prepare for class)", meanNeg: "Bukan persiapan sebelum kelas (not prepare for class)", meanPast: "Sudah persiapan sebelum kelas (prepared for class)", meanPastNeg: "Belum persiapan sebelum kelas (did not prepare for class)", meanPotential: "Bisa persiapan sebelum kelas (can prepare for class)" } },
   { id: 216, word: "習慣", reading: "しゅうかん", meaning: "kebiasaan", meaningEn: "habit, custom", type: "noun",
     sentences: [
       { form: "〜が", jp: "習慣がある。", reading: "しゅうかんがある。", meaning: "Punya kebiasaan. (I have a habit.)" },
@@ -1985,7 +1985,7 @@ const RAW = [
       { form: "〜が", jp: "悪い習慣がある。", reading: "わるいしゅうかんがある。", meaning: "Ada kebiasaan buruk. (I have a bad habit.)" }
     ] },
   { id: 217, word: "座る", reading: "すわる", meaning: "duduk", meaningEn: "to sit", type: "godan",
-    carrier: { pre: "椅子に", preR: "いすに", mean: "Duduk di kursi (sit on the chair)" } },
+    carrier: { pre: "椅子に", preR: "いすに", mean: "Duduk di kursi (sit on the chair)", meanNeg: "Tidak duduk di kursi (not sit on the chair)", meanPast: "Sudah duduk di kursi (sat on the chair)", meanPastNeg: "Belum duduk di kursi (did not sit on the chair)", meanPotential: "Bisa duduk di kursi (can sit on the chair)" } },
   { id: 218, word: "乗り物", reading: "のりもの", meaning: "kendaraan", meaningEn: "vehicle, ride", type: "noun",
     sentences: [
       { form: "〜に", jp: "乗り物に乗る。", reading: "のりものにのる。", meaning: "Naik kendaraan. (Ride a vehicle.)" },
@@ -1999,11 +1999,11 @@ const RAW = [
       { form: "〜に", jp: "乗り物に乗るのが楽しい。", reading: "のりものにのるのがたのしい。", meaning: "Naik kendaraan itu seru. (Riding vehicles is fun.)" }
     ] },
   { id: 219, word: "乗り換える", reading: "のりかえる", meaning: "pindah kendaraan", meaningEn: "to transfer (trains)", type: "ichidan",
-    carrier: { pre: "電車を", preR: "でんしゃを", mean: "Ganti kereta (change trains)" } },
+    carrier: { pre: "電車を", preR: "でんしゃを", mean: "Ganti kereta (change trains)", meanNeg: "Tidak ganti kereta (not change trains)", meanPast: "Sudah ganti kereta (changed trains)", meanPastNeg: "Belum ganti kereta (did not change trains)", meanPotential: "Bisa ganti kereta (can change trains)" } },
   { id: 220, word: "死ぬ", reading: "しぬ", meaning: "meninggal", meaningEn: "to die", type: "godan",
-    carrier: { pre: "魚が", preR: "さかなが", mean: "Ikan mati (the fish dies)" } },
+    carrier: { pre: "魚が", preR: "さかなが", mean: "Ikan mati (the fish dies)", meanNeg: "Ikan tidak mati (the fish does not die)", meanPast: "Ikan sudah mati (the fish died)", meanPastNeg: "Ikan belum mati (the fish did not die)", meanPotential: "Ikan bisa mati (the fish can die)" } },
   { id: 221, word: "不便な", reading: "ふべんな", meaning: "tidak nyaman/praktis", meaningEn: "inconvenient", type: "na-adj",
-    carrier: { pre: "ここは", preR: "ここは", mean: "Di sini tidak praktis (it's inconvenient here)" } },
+    carrier: { pre: "ここは", preR: "ここは", mean: "Di sini tidak praktis (it's inconvenient here)", meanNeg: "Di sini praktis (it's convenient here)", meanPast: "Dulu, di sini tidak praktis (it was inconvenient here)", meanPastNeg: "Dulu, di sini praktis (it was convenient here)" } },
   { id: 222, word: "体操", reading: "たいそう", meaning: "senam", meaningEn: "gymnastics, exercises", type: "noun",
     sentences: [
       { form: "〜を", jp: "体操をする。", reading: "たいそうをする。", meaning: "Senam. (Do exercises.)" },
@@ -2065,7 +2065,7 @@ const RAW = [
       { form: "〜が", jp: "次の急行が来る。", reading: "つぎのきゅうこうがくる。", meaning: "Ekspres berikutnya datang. (The next express comes.)" }
     ] },
   { id: 227, word: "急ぐ", reading: "いそぐ", meaning: "terburu-buru", meaningEn: "to hurry", type: "godan",
-    carrier: { pre: "駅へ", preR: "えきへ", mean: "Bergegas ke stasiun (hurry to the station)" } },
+    carrier: { pre: "駅へ", preR: "えきへ", mean: "Bergegas ke stasiun (hurry to the station)", meanNeg: "Tidak bergegas ke stasiun (not hurry to the station)", meanPast: "Sudah bergegas ke stasiun (hurried to the station)", meanPastNeg: "Belum bergegas ke stasiun (did not hurry to the station)", meanPotential: "Bisa bergegas ke stasiun (can hurry to the station)" } },
   { id: 228, word: "急に", reading: "きゅうに", meaning: "tiba-tiba", meaningEn: "suddenly", type: "noun",
     sentences: [
       { form: "〜(副)", jp: "急に雨が降る。", reading: "きゅうにあめがふる。", meaning: "Tiba-tiba hujan. (It suddenly rains.)" },
@@ -2103,11 +2103,11 @@ const RAW = [
       { form: "〜を", jp: "試験を頑張る。", reading: "しけんをがんばる。", meaning: "Berjuang di ujian. (Do one's best on the exam.)" }
     ] },
   { id: 231, word: "経験する", reading: "けいけんする", meaning: "mengalami", meaningEn: "to experience", type: "suru",
-    carrier: { pre: "地震を", preR: "じしんを", mean: "Mengalami gempa (experience an earthquake)" } },
+    carrier: { pre: "地震を", preR: "じしんを", mean: "Mengalami gempa (experience an earthquake)", meanNeg: "Tidak mengalami gempa (not experience an earthquake)", meanPast: "Sudah mengalami gempa (experienced an earthquake)", meanPastNeg: "Belum mengalami gempa (did not experience an earthquake)", meanPotential: "Bisa mengalami gempa (can experience an earthquake)" } },
   { id: 232, word: "安心する", reading: "あんしんする", meaning: "merasa lega", meaningEn: "to feel relieved", type: "suru",
-    carrier: { pre: "本当に", preR: "ほんとうに", mean: "Benar-benar lega (really relieved)" } },
+    carrier: { pre: "本当に", preR: "ほんとうに", mean: "Benar-benar lega (really relieved)", meanNeg: "Tidak benar-benar lega (not really relieved)", meanPast: "Sudah lega (was really relieved)", meanPastNeg: "Belum benar-benar lega (was not really relieved)", meanPotential: "Bisa lega (can feel relieved)" } },
   { id: 233, word: "合格する", reading: "ごうかくする", meaning: "lulus (ujian)", meaningEn: "to pass (an exam)", type: "suru",
-    carrier: { pre: "試験に", preR: "しけんに", mean: "Lulus ujian (pass the exam)" } },
+    carrier: { pre: "試験に", preR: "しけんに", mean: "Lulus ujian (pass the exam)", meanNeg: "Tidak lulus ujian (not pass the exam)", meanPast: "Sudah lulus ujian (passed the exam)", meanPastNeg: "Belum lulus ujian (did not pass the exam)", meanPotential: "Bisa lulus ujian (can pass the exam)" } },
   { id: 234, word: "漢字", reading: "かんじ", meaning: "huruf Kanji", meaningEn: "kanji", type: "noun",
     sentences: [
       { form: "〜を", jp: "漢字を書く。", reading: "かんじをかく。", meaning: "Menulis kanji. (Write kanji.)" },
@@ -2133,7 +2133,7 @@ const RAW = [
       { form: "〜が", jp: "文字がきれいだ。", reading: "もじがきれいだ。", meaning: "Tulisannya rapi. (The handwriting is neat.)" }
     ] },
   { id: 236, word: "親切な", reading: "しんせつな", meaning: "ramah", meaningEn: "kind", type: "na-adj",
-    carrier: { pre: "店員が", preR: "てんいんが", mean: "Pelayan ramah (the clerk is kind)" } },
+    carrier: { pre: "店員が", preR: "てんいんが", mean: "Pelayan ramah (the clerk is kind)", meanNeg: "Pelayan tidak ramah (the clerk is not kind)", meanPast: "Pelayan dulu ramah (the clerk was kind)", meanPastNeg: "Pelayan dulu tidak ramah (the clerk was not kind)" } },
   { id: 237, word: "両親", reading: "りょうしん", meaning: "orangtua", meaningEn: "parents", type: "noun",
     sentences: [
       { form: "〜が", jp: "両親がいる。", reading: "りょうしんがいる。", meaning: "Punya orangtua. (I have parents.)" },
@@ -2147,7 +2147,7 @@ const RAW = [
       { form: "〜は", jp: "両親は優しい。", reading: "りょうしんはやさしい。", meaning: "Orangtua penyayang. (My parents are kind.)" }
     ] },
   { id: 238, word: "大切な", reading: "たいせつな", meaning: "penting", meaningEn: "important, precious", type: "na-adj",
-    carrier: { pre: "家族が", preR: "かぞくが", mean: "Keluarga itu penting (family is important)" } },
+    carrier: { pre: "家族が", preR: "かぞくが", mean: "Keluarga itu penting (family is important)", meanNeg: "Keluarga itu tidak penting (family is not important)", meanPast: "Keluarga itu dulu penting (family was important)", meanPastNeg: "Keluarga itu dulu tidak penting (family was not important)" } },
   { id: 239, word: "切手", reading: "きって", meaning: "perangko", meaningEn: "postage stamp", type: "noun",
     sentences: [
       { form: "〜を", jp: "切手を貼る。", reading: "きってをはる。", meaning: "Menempel perangko. (Put on a stamp.)" },
@@ -2161,7 +2161,7 @@ const RAW = [
       { form: "〜の", jp: "珍しい切手。", reading: "めずらしいきって。", meaning: "Perangko langka. (A rare stamp.)" }
     ] },
   { id: 240, word: "楽しい", reading: "たのしい", meaning: "menyenangkan", meaningEn: "fun, enjoyable", type: "i-adj",
-    carrier: { pre: "旅行が", preR: "りょこうが", mean: "Perjalanan menyenangkan (the trip is fun)" } }
+    carrier: { pre: "旅行が", preR: "りょこうが", mean: "Perjalanan menyenangkan (the trip is fun)", meanNeg: "Perjalanan tidak menyenangkan (the trip is not fun)", meanPast: "Perjalanan dulu menyenangkan (the trip was fun)", meanPastNeg: "Perjalanan dulu tidak menyenangkan (the trip was not fun)" } }
   ,
   { id: 241, word: "自由", reading: "じゆう", meaning: "bebas", meaningEn: "freedom, free", type: "noun",
     sentences: [
@@ -2224,7 +2224,7 @@ const RAW = [
       { form: "〜で", jp: "会議室で会議をする。", reading: "かいぎしつでかいぎをする。", meaning: "Rapat di ruang rapat. (Hold a meeting in the meeting room.)" }
     ] },
   { id: 246, word: "間に合う", reading: "まにあう", meaning: "tepat waktu", meaningEn: "to be in time", type: "godan",
-    carrier: { pre: "電車に", preR: "でんしゃに", mean: "Sempat naik kereta (make the train)" } },
+    carrier: { pre: "電車に", preR: "でんしゃに", mean: "Sempat naik kereta (make the train)", meanNeg: "Tidak sempat naik kereta (not make the train)", meanPast: "Sudah sempat naik kereta (made the train)", meanPastNeg: "Belum sempat naik kereta (did not make the train)", meanPotential: "Bisa sempat naik kereta (can make the train)" } },
   { id: 247, word: "小鳥", reading: "ことり", meaning: "burung kecil", meaningEn: "small bird", type: "noun",
     sentences: [
       { form: "〜が", jp: "小鳥が鳴く。", reading: "ことりがなく。", meaning: "Burung kecil berkicau. (A small bird chirps.)" },
@@ -2274,11 +2274,11 @@ const RAW = [
       { form: "〜は", jp: "病院は静かだ。", reading: "びょういんはしずかだ。", meaning: "Rumah sakit tenang. (The hospital is quiet.)" }
     ] },
   { id: 251, word: "入院する", reading: "にゅういんする", meaning: "masuk rumah sakit", meaningEn: "to be hospitalized", type: "suru",
-    carrier: { pre: "病気で", preR: "びょうきで", mean: "Dirawat karena sakit (be hospitalized for illness)" } },
+    carrier: { pre: "病気で", preR: "びょうきで", mean: "Dirawat karena sakit (be hospitalized for illness)", meanNeg: "Tidak dirawat karena sakit (not be hospitalized for illness)", meanPast: "Sudah dirawat karena sakit (was hospitalized for illness)", meanPastNeg: "Belum dirawat karena sakit (was not hospitalized for illness)", meanPotential: "Bisa dirawat karena sakit (can be hospitalized for illness)" } },
   { id: 252, word: "退院する", reading: "たいいんする", meaning: "keluar rumah sakit", meaningEn: "to leave hospital", type: "suru",
-    carrier: { pre: "来週", preR: "らいしゅう", mean: "Keluar RS minggu depan (leave the hospital next week)" } },
+    carrier: { pre: "来週", preR: "らいしゅう", mean: "Keluar RS minggu depan (leave the hospital next week)", meanNeg: "Tidak keluar RS minggu depan (not leave the hospital next week)", meanPast: "Sudah keluar RS (left the hospital)", meanPastNeg: "Belum keluar RS (had not left the hospital)", meanPotential: "Bisa keluar RS minggu depan (can leave the hospital next week)" } },
   { id: 253, word: "散歩する", reading: "さんぽする", meaning: "jalan-jalan", meaningEn: "to take a walk", type: "suru",
-    carrier: { pre: "公園を", preR: "こうえんを", mean: "Jalan-jalan di taman (take a walk in the park)" } },
+    carrier: { pre: "公園を", preR: "こうえんを", mean: "Jalan-jalan di taman (take a walk in the park)", meanNeg: "Tidak jalan-jalan di taman (not take a walk in the park)", meanPast: "Sudah jalan-jalan di taman (took a walk in the park)", meanPastNeg: "Belum jalan-jalan di taman (did not take a walk in the park)", meanPotential: "Bisa jalan-jalan di taman (can take a walk in the park)" } },
   { id: 254, word: "海岸", reading: "かいがん", meaning: "pantai", meaningEn: "coast, seashore", type: "noun",
     sentences: [
       { form: "〜に", jp: "海岸に行く。", reading: "かいがんにいく。", meaning: "Pergi ke pantai. (Go to the coast.)" },
@@ -2292,7 +2292,7 @@ const RAW = [
       { form: "〜で", jp: "海岸で写真を撮る。", reading: "かいがんでしゃしんをとる。", meaning: "Foto di pantai. (Take photos at the beach.)" }
     ] },
   { id: 255, word: "走る", reading: "はしる", meaning: "berlari", meaningEn: "to run", type: "godan",
-    carrier: { pre: "公園を", preR: "こうえんを", mean: "Berlari di taman (run in the park)" } },
+    carrier: { pre: "公園を", preR: "こうえんを", mean: "Berlari di taman (run in the park)", meanNeg: "Tidak berlari di taman (not run in the park)", meanPast: "Sudah berlari di taman (ran in the park)", meanPastNeg: "Belum berlari di taman (did not run in the park)", meanPotential: "Bisa berlari di taman (can run in the park)" } },
   { id: 256, word: "自動", reading: "じどう", meaning: "otomatis", meaningEn: "automatic", type: "noun",
     sentences: [
       { form: "〜の", jp: "自動のドア。", reading: "じどうのどあ。", meaning: "Pintu otomatis. (An automatic door.)" },
@@ -2342,7 +2342,7 @@ const RAW = [
       { form: "〜で", jp: "喫茶店で休む。", reading: "きっさてんでやすむ。", meaning: "Istirahat di kafe. (Rest at the café.)" }
     ] },
   { id: 260, word: "答える", reading: "こたえる", meaning: "menjawab", meaningEn: "to answer", type: "ichidan",
-    carrier: { pre: "質問に", preR: "しつもんに", mean: "Menjawab pertanyaan (answer the question)" } },
+    carrier: { pre: "質問に", preR: "しつもんに", mean: "Menjawab pertanyaan (answer the question)", meanNeg: "Tidak menjawab pertanyaan (not answer the question)", meanPast: "Sudah menjawab pertanyaan (answered the question)", meanPastNeg: "Belum menjawab pertanyaan (did not answer the question)", meanPotential: "Bisa menjawab pertanyaan (can answer the question)" } },
   { id: 261, word: "手紙", reading: "てがみ", meaning: "surat", meaningEn: "letter", type: "noun",
     sentences: [
       { form: "〜を", jp: "手紙を書く。", reading: "てがみをかく。", meaning: "Menulis surat. (Write a letter.)" },
@@ -2392,9 +2392,9 @@ const RAW = [
       { form: "〜が", jp: "いい辞書がほしい。", reading: "いいじしょがほしい。", meaning: "Ingin kamus bagus. (I want a good dictionary.)" }
     ] },
   { id: 265, word: "欲しい", reading: "ほしい", meaning: "mau, ingin", meaningEn: "to want", type: "i-adj",
-    carrier: { pre: "新しい車が", preR: "あたらしいくるまが", mean: "Ingin mobil baru (want a new car)" } },
+    carrier: { pre: "新しい車が", preR: "あたらしいくるまが", mean: "Ingin mobil baru (want a new car)", meanNeg: "Tidak ingin mobil baru (not want a new car)", meanPast: "Dulu ingin mobil baru (wanted a new car)", meanPastNeg: "Dulu tidak ingin mobil baru (did not want a new car)" } },
   { id: 266, word: "遅れる", reading: "おくれる", meaning: "terlambat", meaningEn: "to be late", type: "ichidan",
-    carrier: { pre: "学校に", preR: "がっこうに", mean: "Terlambat ke sekolah (be late for school)" } },
+    carrier: { pre: "学校に", preR: "がっこうに", mean: "Terlambat ke sekolah (be late for school)", meanNeg: "Tidak terlambat ke sekolah (not be late for school)", meanPast: "Sudah terlambat ke sekolah (was late for school)", meanPastNeg: "Belum terlambat ke sekolah (was not late for school)", meanPotential: "Bisa terlambat ke sekolah (can be late for school)" } },
   { id: 267, word: "景色", reading: "けしき", meaning: "pemandangan", meaningEn: "scenery, view", type: "noun",
     sentences: [
       { form: "〜が", jp: "景色がいい。", reading: "けしきがいい。", meaning: "Pemandangannya bagus. (The scenery is nice.)" },
@@ -2420,7 +2420,7 @@ const RAW = [
       { form: "〜を", jp: "道具を借りる。", reading: "どうぐをかりる。", meaning: "Meminjam alat. (Borrow a tool.)" }
     ] },
   { id: 269, word: "役に立つ", reading: "やくにたつ", meaning: "bermanfaat", meaningEn: "to be useful", type: "godan",
-    carrier: { pre: "とても", preR: "とても", mean: "Sangat bermanfaat (be very useful)" } },
+    carrier: { pre: "とても", preR: "とても", mean: "Sangat bermanfaat (be very useful)", meanNeg: "Tidak sangat bermanfaat (not be very useful)", meanPast: "Sudah sangat bermanfaat (was very useful)", meanPastNeg: "Belum sangat bermanfaat (was not very useful)", meanPotential: "Bisa sangat bermanfaat (can be very useful)" } },
   { id: 270, word: "将来", reading: "しょうらい", meaning: "masa depan", meaningEn: "the future", type: "noun",
     sentences: [
       { form: "〜の", jp: "将来の夢。", reading: "しょうらいのゆめ。", meaning: "Cita-cita masa depan. (A future dream.)" },
@@ -2435,11 +2435,11 @@ const RAW = [
     ] }
   ,
   { id: 271, word: "熱心な", reading: "ねっしんな", meaning: "antusias", meaningEn: "enthusiastic, eager", type: "na-adj",
-    carrier: { pre: "彼は", preR: "かれは", mean: "Dia antusias (he is enthusiastic)" } },
+    carrier: { pre: "彼は", preR: "かれは", mean: "Dia antusias (he is enthusiastic)", meanNeg: "Dia tidak antusias (he is not enthusiastic)", meanPast: "Dia dulu antusias (he was enthusiastic)", meanPastNeg: "Dia dulu tidak antusias (he was not enthusiastic)" } },
   { id: 272, word: "優しい", reading: "やさしい", meaning: "baik hati", meaningEn: "kind, gentle", type: "i-adj",
-    carrier: { pre: "母は", preR: "ははは", mean: "Ibu baik hati (mother is kind)" } },
+    carrier: { pre: "母は", preR: "ははは", mean: "Ibu baik hati (mother is kind)", meanNeg: "Ibu tidak baik hati (mother is not kind)", meanPast: "Ibu dulu baik hati (mother was kind)", meanPastNeg: "Ibu dulu tidak baik hati (mother was not kind)" } },
   { id: 273, word: "選ぶ", reading: "えらぶ", meaning: "memilih", meaningEn: "to choose", type: "godan",
-    carrier: { pre: "服を", preR: "ふくを", mean: "Memilih baju (choose clothes)" } },
+    carrier: { pre: "服を", preR: "ふくを", mean: "Memilih baju (choose clothes)", meanNeg: "Tidak memilih baju (not choose clothes)", meanPast: "Sudah memilih baju (chose clothes)", meanPastNeg: "Belum memilih baju (did not choose clothes)", meanPotential: "Bisa memilih baju (can choose clothes)" } },
   { id: 274, word: "神社", reading: "じんじゃ", meaning: "kuil Shinto", meaningEn: "Shinto shrine", type: "noun",
     sentences: [
       { form: "〜に", jp: "神社に行く。", reading: "じんじゃにいく。", meaning: "Pergi ke kuil. (Go to the shrine.)" },
@@ -2453,13 +2453,13 @@ const RAW = [
       { form: "〜に", jp: "正月に神社に行く。", reading: "しょうがつにじんじゃにいく。", meaning: "Ke kuil saat tahun baru. (Visit a shrine at New Year.)" }
     ] },
   { id: 275, word: "落とす", reading: "おとす", meaning: "menjatuhkan", meaningEn: "to drop", type: "godan",
-    carrier: { pre: "財布を", preR: "さいふを", mean: "Menjatuhkan dompet (drop the wallet)" } },
+    carrier: { pre: "財布を", preR: "さいふを", mean: "Menjatuhkan dompet (drop the wallet)", meanNeg: "Tidak menjatuhkan dompet (not drop the wallet)", meanPast: "Sudah menjatuhkan dompet (dropped the wallet)", meanPastNeg: "Belum menjatuhkan dompet (did not drop the wallet)", meanPotential: "Bisa menjatuhkan dompet (can drop the wallet)" } },
   { id: 276, word: "汚れる", reading: "よごれる", meaning: "menjadi kotor", meaningEn: "to get dirty", type: "ichidan",
-    carrier: { pre: "服が", preR: "ふくが", mean: "Baju kotor (the clothes get dirty)" } },
+    carrier: { pre: "服が", preR: "ふくが", mean: "Baju kotor (the clothes get dirty)", meanNeg: "Baju tidak kotor (the clothes do not get dirty)", meanPast: "Baju sudah kotor (the clothes got dirty)", meanPastNeg: "Baju belum kotor (the clothes did not get dirty)", meanPotential: "Baju bisa kotor (the clothes can get dirty)" } },
   { id: 277, word: "割れる", reading: "われる", meaning: "pecah", meaningEn: "to break, shatter", type: "ichidan",
-    carrier: { pre: "皿が", preR: "さらが", mean: "Piring pecah (the plate breaks)" } },
+    carrier: { pre: "皿が", preR: "さらが", mean: "Piring pecah (the plate breaks)", meanNeg: "Piring tidak pecah (the plate does not break)", meanPast: "Piring sudah pecah (the plate broke)", meanPastNeg: "Piring belum pecah (the plate did not break)", meanPotential: "Piring bisa pecah (the plate can break)" } },
   { id: 278, word: "消える", reading: "きえる", meaning: "padam, hilang", meaningEn: "to go out, disappear", type: "ichidan",
-    carrier: { pre: "電気が", preR: "でんきが", mean: "Lampu padam (the light goes out)" } },
+    carrier: { pre: "電気が", preR: "でんきが", mean: "Lampu padam (the light goes out)", meanNeg: "Lampu tidak padam (the light does not go out)", meanPast: "Lampu sudah padam (the light went out)", meanPastNeg: "Lampu belum padam (the light did not go out)", meanPotential: "Lampu bisa padam (the light can go out)" } },
   { id: 279, word: "机", reading: "つくえ", meaning: "meja", meaningEn: "desk", type: "noun",
     sentences: [
       { form: "〜の", jp: "机の上。", reading: "つくえのうえ。", meaning: "Di atas meja. (On the desk.)" },
@@ -2485,9 +2485,9 @@ const RAW = [
       { form: "〜に", jp: "おもちゃを箱にしまう。", reading: "おもちゃをはこにしまう。", meaning: "Menyimpan mainan di kotak. (Put toys in the box.)" }
     ] },
   { id: 281, word: "片づける", reading: "かたづける", meaning: "membereskan", meaningEn: "to tidy up", type: "ichidan",
-    carrier: { pre: "部屋を", preR: "へやを", mean: "Membereskan kamar (tidy the room)" } },
+    carrier: { pre: "部屋を", preR: "へやを", mean: "Membereskan kamar (tidy the room)", meanNeg: "Tidak membereskan kamar (not tidy the room)", meanPast: "Sudah membereskan kamar (tidied the room)", meanPastNeg: "Belum membereskan kamar (did not tidy the room)", meanPotential: "Bisa membereskan kamar (can tidy the room)" } },
   { id: 282, word: "冷たい", reading: "つめたい", meaning: "dingin (untuk benda)", meaningEn: "cold (to touch)", type: "i-adj",
-    carrier: { pre: "水が", preR: "みずが", mean: "Air dingin (the water is cold)" } },
+    carrier: { pre: "水が", preR: "みずが", mean: "Air dingin (the water is cold)", meanNeg: "Air tidak dingin (the water is not cold)", meanPast: "Air dulu dingin (the water was cold)", meanPastNeg: "Air dulu tidak dingin (the water was not cold)" } },
   { id: 283, word: "空港", reading: "くうこう", meaning: "bandara", meaningEn: "airport", type: "noun",
     sentences: [
       { form: "〜に", jp: "空港に着く。", reading: "くうこうにつく。", meaning: "Tiba di bandara. (Arrive at the airport.)" },
@@ -2525,7 +2525,7 @@ const RAW = [
       { form: "〜に", jp: "飛行機に間に合う。", reading: "ひこうきにまにあう。", meaning: "Sempat naik pesawat. (Make the flight.)" }
     ] },
   { id: 286, word: "残る", reading: "のこる", meaning: "tersisa", meaningEn: "to remain", type: "godan",
-    carrier: { pre: "料理が", preR: "りょうりが", mean: "Makanan tersisa (the food remains)" } },
+    carrier: { pre: "料理が", preR: "りょうりが", mean: "Makanan tersisa (the food remains)", meanNeg: "Makanan tidak tersisa (the food does not remain)", meanPast: "Makanan sudah tersisa (the food remained)", meanPastNeg: "Makanan belum tersisa (the food did not remain)", meanPotential: "Makanan bisa tersisa (the food can remain)" } },
   { id: 287, word: "星", reading: "ほし", meaning: "bintang", meaningEn: "star", type: "noun",
     sentences: [
       { form: "〜が", jp: "星が見える。", reading: "ほしがみえる。", meaning: "Bintang terlihat. (I can see the stars.)" },
@@ -2539,9 +2539,9 @@ const RAW = [
       { form: "〜が", jp: "星が出る。", reading: "ほしがでる。", meaning: "Bintang muncul. (The stars come out.)" }
     ] },
   { id: 288, word: "戻る", reading: "もどる", meaning: "kembali", meaningEn: "to return", type: "godan",
-    carrier: { pre: "家に", preR: "いえに", mean: "Kembali ke rumah (return home)" } },
+    carrier: { pre: "家に", preR: "いえに", mean: "Kembali ke rumah (return home)", meanNeg: "Tidak kembali ke rumah (not return home)", meanPast: "Sudah kembali ke rumah (returned home)", meanPastNeg: "Belum kembali ke rumah (did not return home)", meanPotential: "Bisa kembali ke rumah (can return home)" } },
   { id: 289, word: "登る", reading: "のぼる", meaning: "mendaki", meaningEn: "to climb", type: "godan",
-    carrier: { pre: "山に", preR: "やまに", mean: "Mendaki gunung (climb the mountain)" } },
+    carrier: { pre: "山に", preR: "やまに", mean: "Mendaki gunung (climb the mountain)", meanNeg: "Tidak mendaki gunung (not climb the mountain)", meanPast: "Sudah mendaki gunung (climbed the mountain)", meanPastNeg: "Belum mendaki gunung (did not climb the mountain)", meanPotential: "Bisa mendaki gunung (can climb the mountain)" } },
   { id: 290, word: "水道", reading: "すいどう", meaning: "saluran air", meaningEn: "water supply, tap", type: "noun",
     sentences: [
       { form: "〜が", jp: "水道が止まる。", reading: "すいどうがとまる。", meaning: "Air mati. (The water stops.)" },
@@ -2555,11 +2555,11 @@ const RAW = [
       { form: "〜で", jp: "水道で手を洗う。", reading: "すいどうでてをあらう。", meaning: "Cuci tangan pakai air keran. (Wash hands with tap water.)" }
     ] },
   { id: 291, word: "触る", reading: "さわる", meaning: "menyentuh, meraba", meaningEn: "to touch", type: "godan",
-    carrier: { pre: "絵に", preR: "えに", mean: "Menyentuh lukisan (touch the painting)" } },
+    carrier: { pre: "絵に", preR: "えに", mean: "Menyentuh lukisan (touch the painting)", meanNeg: "Tidak menyentuh lukisan (not touch the painting)", meanPast: "Sudah menyentuh lukisan (touched the painting)", meanPastNeg: "Belum menyentuh lukisan (did not touch the painting)", meanPotential: "Bisa menyentuh lukisan (can touch the painting)" } },
   { id: 292, word: "投げる", reading: "なげる", meaning: "melempar", meaningEn: "to throw", type: "ichidan",
-    carrier: { pre: "ボールを", preR: "ぼーるを", mean: "Melempar bola (throw a ball)" } },
+    carrier: { pre: "ボールを", preR: "ぼーるを", mean: "Melempar bola (throw a ball)", meanNeg: "Tidak melempar bola (not throw a ball)", meanPast: "Sudah melempar bola (threw a ball)", meanPastNeg: "Belum melempar bola (did not throw a ball)", meanPotential: "Bisa melempar bola (can throw a ball)" } },
   { id: 293, word: "曲がる", reading: "まがる", meaning: "membelok", meaningEn: "to turn, bend", type: "godan",
-    carrier: { pre: "右に", preR: "みぎに", mean: "Belok kanan (turn right)" } },
+    carrier: { pre: "右に", preR: "みぎに", mean: "Belok kanan (turn right)", meanNeg: "Tidak belok kanan (not turn right)", meanPast: "Sudah belok kanan (turned right)", meanPastNeg: "Belum belok kanan (did not turn right)", meanPotential: "Bisa belok kanan (can turn right)" } },
   { id: 294, word: "塩", reading: "しお", meaning: "garam", meaningEn: "salt", type: "noun",
     sentences: [
       { form: "〜を", jp: "塩を入れる。", reading: "しおをいれる。", meaning: "Menambah garam. (Add salt.)" },
@@ -2573,17 +2573,17 @@ const RAW = [
       { form: "〜が", jp: "この料理は塩が強い。", reading: "このりょうりはしおがつよい。", meaning: "Masakan ini asin. (This dish is very salty.)" }
     ] },
   { id: 295, word: "甘い", reading: "あまい", meaning: "manis", meaningEn: "sweet", type: "i-adj",
-    carrier: { pre: "ケーキが", preR: "けーきが", mean: "Kue manis (the cake is sweet)" } },
+    carrier: { pre: "ケーキが", preR: "けーきが", mean: "Kue manis (the cake is sweet)", meanNeg: "Kue tidak manis (the cake is not sweet)", meanPast: "Kue dulu manis (the cake was sweet)", meanPastNeg: "Kue dulu tidak manis (the cake was not sweet)" } },
   { id: 296, word: "辛い", reading: "からい", meaning: "pedas", meaningEn: "spicy, hot", type: "i-adj",
-    carrier: { pre: "カレーが", preR: "かれーが", mean: "Kari pedas (the curry is spicy)" } },
+    carrier: { pre: "カレーが", preR: "かれーが", mean: "Kari pedas (the curry is spicy)", meanNeg: "Kari tidak pedas (the curry is not spicy)", meanPast: "Kari dulu pedas (the curry was spicy)", meanPastNeg: "Kari dulu tidak pedas (the curry was not spicy)" } },
   { id: 297, word: "苦い", reading: "にがい", meaning: "pahit", meaningEn: "bitter", type: "i-adj",
-    carrier: { pre: "薬が", preR: "くすりが", mean: "Obat pahit (the medicine is bitter)" } },
+    carrier: { pre: "薬が", preR: "くすりが", mean: "Obat pahit (the medicine is bitter)", meanNeg: "Obat tidak pahit (the medicine is not bitter)", meanPast: "Obat dulu pahit (the medicine was bitter)", meanPastNeg: "Obat dulu tidak pahit (the medicine was not bitter)" } },
   { id: 298, word: "細い", reading: "ほそい", meaning: "ramping, kurus", meaningEn: "thin, slender", type: "i-adj",
-    carrier: { pre: "指が", preR: "ゆびが", mean: "Jari ramping (the finger is slender)" } },
+    carrier: { pre: "指が", preR: "ゆびが", mean: "Jari ramping (the finger is slender)", meanNeg: "Jari tidak ramping (the finger is not slender)", meanPast: "Jari dulu ramping (the finger was slender)", meanPastNeg: "Jari dulu tidak ramping (the finger was not slender)" } },
   { id: 299, word: "踊る", reading: "おどる", meaning: "menari", meaningEn: "to dance", type: "godan",
-    carrier: { pre: "音楽で", preR: "おんがくで", mean: "Menari diiringi musik (dance to music)" } },
+    carrier: { pre: "音楽で", preR: "おんがくで", mean: "Menari diiringi musik (dance to music)", meanNeg: "Tidak menari diiringi musik (not dance to music)", meanPast: "Sudah menari diiringi musik (danced to music)", meanPastNeg: "Belum menari diiringi musik (did not dance to music)", meanPotential: "Bisa menari diiringi musik (can dance to music)" } },
   { id: 300, word: "手伝う", reading: "てつだう", meaning: "membantu", meaningEn: "to help", type: "godan",
-    carrier: { pre: "母を", preR: "ははを", mean: "Membantu ibu (help mother)" } }
+    carrier: { pre: "母を", preR: "ははを", mean: "Membantu ibu (help mother)", meanNeg: "Tidak membantu ibu (not help mother)", meanPast: "Sudah membantu ibu (helped mother)", meanPastNeg: "Belum membantu ibu (did not help mother)", meanPotential: "Bisa membantu ibu (can help mother)" } }
 ];
 
 const TYPE_LABELS = {
@@ -2596,6 +2596,22 @@ const TYPE_LABELS = {
 };
 
 const CONJUGATABLE = new Set(["godan", "ichidan", "suru", "i-adj", "na-adj"]);
+
+// Each conjugate.js form key maps to one of a carrier's four translated
+// variants (a fifth, meanPotential, covers the verb-only "potential" form).
+// This is what makes e.g. the -nai form show "the station is NOT far"
+// instead of the un-negated base gloss with a bolted-on "— negative" tag.
+const NEG_FORM_KEYS = new Set(["nai", "negPolite", "masen"]);
+const PAST_FORM_KEYS = new Set(["ta", "mashita", "pastPolite"]);
+const PAST_NEG_FORM_KEYS = new Set(["nakatta", "pastNeg", "pastNegPolite"]);
+
+function carrierMeaning(carrier, formKey) {
+  if (formKey === "potential") return carrier.meanPotential || carrier.mean;
+  if (NEG_FORM_KEYS.has(formKey)) return carrier.meanNeg || carrier.mean;
+  if (PAST_FORM_KEYS.has(formKey)) return carrier.meanPast || carrier.mean;
+  if (PAST_NEG_FORM_KEYS.has(formKey)) return carrier.meanPastNeg || carrier.mean;
+  return carrier.mean;
+}
 
 // ---- Flatten RAW into the 400-card deck -------------------------------------
 function buildCards() {
@@ -2624,7 +2640,7 @@ function buildCards() {
         out.push(Object.assign({}, meta, {
           mode: "sentence", form: f.label,
           jp, sentReading: e.carrier.preR + f.kana + "。",
-          sentMeaning: e.carrier.mean + (FORM_MEANING_TAG[f.key] || ""),
+          sentMeaning: carrierMeaning(e.carrier, f.key),
           target: f.disp, targetKana: f.kana,
           audioFile: `${e.id}-${i + 1}.m4a`, audioText: jp
         }));
