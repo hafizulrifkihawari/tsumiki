@@ -1,6 +1,6 @@
 /* Service worker — offline cache for the N4 flashcard PWA. */
 
-const CACHE_NAME = "kanji-n4-v14";
+const CACHE_NAME = "kanji-n4-v15";
 const FONT_ORIGINS = ["https://fonts.googleapis.com", "https://fonts.gstatic.com"];
 const ASSETS = [
   "./",
@@ -20,7 +20,11 @@ const ASSETS = [
   "./kotoba-data.js",
   "./kotoba-app.js",
   "./manage.html",
-  "./manage.js"
+  "./manage.js",
+  "./bunpou.html",
+  "./bunpou.css",
+  "./bunpou-data.js",
+  "./bunpou-app.js"
 ];
 
 self.addEventListener("install", (event) => {

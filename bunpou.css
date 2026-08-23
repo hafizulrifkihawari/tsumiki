@@ -1,0 +1,144 @@
+/* 文法 Bunpou — additive styles only (styles.css supplies tokens & base layout) */
+
+.back-link {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 13px; font-weight: 600; color: var(--text-dim);
+  text-decoration: none; padding: 8px 4px; border-radius: 10px;
+  transition: color 0.18s;
+}
+.back-link:hover { color: var(--accent); }
+
+/* ---------- Browse view ---------- */
+.mastery-legend { font-size: 11.5px; }
+
+.bunpou-groups { display: flex; flex-direction: column; gap: 16px; }
+.bunpou-group {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 14px 14px 8px;
+}
+.bunpou-group-title {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 13px; font-weight: 700; color: var(--text-dim);
+  margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.03em;
+}
+.bunpou-group-title .badge { text-transform: none; letter-spacing: 0; }
+
+.bunpou-points { display: flex; flex-direction: column; gap: 6px; }
+.bunpou-point-row {
+  display: flex; align-items: center; gap: 10px;
+  width: 100%; text-align: left;
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: 12px; padding: 10px 12px; margin-bottom: 6px;
+  cursor: pointer; transition: border-color 0.15s, background 0.15s;
+  font: inherit; color: inherit;
+}
+.bunpou-point-row:hover { border-color: var(--accent); }
+.bunpou-point-row .dot { flex-shrink: 0; }
+.bp-pattern {
+  font-family: var(--font-jp); font-size: 16px; font-weight: 700;
+  white-space: nowrap;
+}
+.bp-meaning { font-size: 12.5px; color: var(--text-dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+
+/* ---------- Study view ---------- */
+.study-topbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 4px; }
+
+.study-content {
+  background: linear-gradient(165deg, var(--surface), var(--surface-2));
+  border: 1px solid var(--border); border-radius: var(--radius);
+  box-shadow: var(--shadow); padding: 22px 22px 26px;
+  display: flex; flex-direction: column; gap: 18px;
+}
+.study-header { display: flex; flex-direction: column; gap: 6px; }
+.study-level-badge { align-self: flex-start; }
+.study-pattern { font-family: var(--font-jp); font-size: clamp(30px, 8vw, 40px); font-weight: 700; }
+.study-reading { font-family: var(--font-jp); font-size: 15px; color: var(--accent); }
+.study-meaning { font-size: 16px; font-weight: 600; }
+
+.study-section h4 {
+  font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
+  color: var(--text-faint); margin-bottom: 6px;
+}
+.study-section p { font-size: 14px; line-height: 1.65; color: var(--text-dim); }
+.study-section p strong { color: var(--text); }
+
+.formation-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.formation-table th, .formation-table td {
+  text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--border);
+}
+.formation-table th { color: var(--text-faint); font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 0.03em; }
+.formation-table td:first-child { color: var(--text-dim); white-space: nowrap; }
+.formation-table td.formation-ex { font-family: var(--font-jp); color: var(--accent); }
+
+.kanji-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.kanji-chip { font-family: var(--font-jp); }
+
+.example-list { display: flex; flex-direction: column; gap: 10px; }
+.example-list .example { margin-top: 0; }
+.example-index { font-size: 10.5px; color: var(--text-faint); font-weight: 700; margin-bottom: 2px; }
+
+/* ---------- Quiz view ---------- */
+.quiz-topbar { flex-wrap: wrap; row-gap: 10px; }
+.quiz-scene { perspective: none; }
+.quiz-face {
+  position: relative;
+  background: linear-gradient(165deg, var(--surface), var(--surface-2));
+  border: 1px solid var(--border); border-radius: var(--radius);
+  box-shadow: var(--shadow); padding: 22px 22px 26px;
+  min-height: 340px;
+  display: flex; flex-direction: column; gap: 16px;
+}
+
+.quiz-type-badge { align-self: flex-start; }
+.quiz-jp {
+  font-family: var(--font-jp);
+  font-size: clamp(20px, 5.6vw, 27px);
+  font-weight: 600; line-height: 1.6; color: var(--text);
+}
+.quiz-translation { font-size: 15px; font-weight: 600; color: var(--text); line-height: 1.5; }
+
+.reveal-panel { display: flex; flex-direction: column; gap: 8px; }
+.reveal-panel[hidden] { display: none; }
+.quiz-pattern-note {
+  font-size: 13px; color: var(--text-dim); background: var(--surface-2);
+  border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px;
+}
+.quiz-pattern-note strong { color: var(--accent); font-family: var(--font-jp); }
+
+.quiz-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+/* MCQ */
+.mcq-options { display: flex; flex-direction: column; gap: 8px; }
+.mcq-opt {
+  width: 100%; text-align: left; justify-content: flex-start;
+  font-family: var(--font-jp); font-size: 16px; padding: 12px 14px;
+}
+.mcq-opt.is-correct { background: rgba(86, 214, 160, 0.18); border-color: var(--good); color: var(--good); }
+.mcq-opt.is-wrong { background: rgba(255, 124, 174, 0.18); border-color: var(--accent-2); color: var(--accent-2); }
+.mcq-opt[disabled] { cursor: default; }
+.mcq-feedback { font-size: 13.5px; line-height: 1.6; color: var(--text-dim); }
+.mcq-feedback[hidden] { display: none; }
+
+/* Sentence building */
+.build-row { display: flex; flex-wrap: wrap; gap: 8px; min-height: 46px; padding: 8px; border-radius: 12px; }
+.build-answer { background: var(--surface-2); border: 1px dashed var(--border); }
+.build-bank { border: 1px solid transparent; }
+.build-chunk {
+  font-family: var(--font-jp); font-size: 15px; font-weight: 600;
+  background: var(--surface); border: 1px solid var(--border); color: var(--text);
+  padding: 9px 14px; border-radius: 10px; cursor: pointer;
+  transition: border-color 0.15s, transform 0.1s;
+}
+.build-chunk:hover { border-color: var(--accent); }
+.build-chunk:active { transform: scale(0.96); }
+.build-feedback { font-size: 13.5px; line-height: 1.6; color: var(--text-dim); }
+.build-feedback[hidden] { display: none; }
+.build-feedback.is-correct { color: var(--good); }
+.build-feedback.is-wrong { color: var(--accent-2); }
+
+@media (max-width: 560px) {
+  .study-content, .quiz-face { padding: 18px 16px 20px; }
+  .study-topbar { flex-direction: column; align-items: stretch; }
+  .quiz-topbar { flex-direction: column; align-items: stretch; }
+  .answerbar-stats { justify-content: center; }
+}

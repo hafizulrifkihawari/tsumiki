@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>文法 Bunpou — Grammar Practice</title>
+  <meta name="theme-color" content="#171a2e" />
+  <link rel="icon" href="icon-192.png" />
+  <link rel="apple-touch-icon" href="icon-apple-touch.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="文法 Bunpou" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="bunpou.css" />
+</head>
+<body>
+  <div class="app">
+    <a class="back-link" href="index.html">← 漢字 N4</a>
+
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-kanji">文法</span>
+        <div class="brand-text">
+          <h1>Bunpou Practice</h1>
+          <p><span id="pointCount">0</span> grammar points · <span id="dueCount">0</span> due</p>
+        </div>
+      </div>
+      <div class="topbar-actions" id="topActions">
+        <button class="btn btn-flip" id="reviewBtn" type="button">▶ Latihan</button>
+        <a class="btn btn-ghost" href="kotoba.html" title="Kotoba vocabulary flashcards">言葉 Kotoba</a>
+        <button class="btn btn-ghost" id="updateBtn" type="button" title="Force refresh to the newest version (clears the app cache)">
+          <span class="btn-icon">↻</span> <span class="update-label">Force Update</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- ============ BROWSE VIEW ============ -->
+    <section id="browseView">
+      <section class="controls">
+        <div class="control-group">
+          <div class="segmented" id="levelSeg" role="tablist" aria-label="Filter by level">
+            <button class="seg-btn is-active" data-level="all">Semua</button>
+            <button class="seg-btn" data-level="N5">N5</button>
+            <button class="seg-btn" data-level="N4">N4</button>
+          </div>
+        </div>
+        <div class="control-group mastery-legend">
+          <span><span class="dot dot-new"></span> Baru</span>
+          <span><span class="dot dot-learning"></span> Belajar</span>
+          <span><span class="dot dot-mature"></span> Mahir</span>
+        </div>
+      </section>
+
+      <div id="groupList" class="bunpou-groups"><!-- rendered by bunpou-app.js --></div>
+    </section>
+
+    <!-- ============ STUDY VIEW ============ -->
+    <section id="studyView" hidden>
+      <div class="study-topbar">
+        <button class="btn btn-ghost" id="studyBackBtn" type="button">← Kembali</button>
+        <button class="btn btn-flip" id="studyReviewBtn" type="button">Latihan poin ini →</button>
+      </div>
+      <div id="studyContent" class="study-content"><!-- rendered by bunpou-app.js --></div>
+    </section>
+
+    <!-- ============ QUIZ VIEW ============ -->
+    <section id="quizView" hidden>
+      <header class="topbar quiz-topbar">
+        <button class="btn btn-ghost" id="quizBackBtn" type="button">← Kembali</button>
+        <div class="progress-wrap">
+          <div class="progress-count">
+            <span id="posNow">1</span> / <span id="posTotal">1</span>
+            <span class="queue-badge" id="queueBadge" hidden title="Item dijawab salah, akan muncul lagi sesi ini">↺ <span id="queueCount">0</span></span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+        </div>
+        <div class="answerbar-stats">
+          <div class="score" id="score" title="Benar sesi ini"><span class="score-icon">✓</span><span id="scoreCount">0</span></div>
+          <div class="miss" id="miss" title="Salah sesi ini"><span class="miss-icon">✗</span><span id="missCount">0</span></div>
+        </div>
+      </header>
+
+      <main class="stage">
+        <div class="card-scene quiz-scene" id="quizScene">
+          <div class="card-face quiz-face" id="quizFace"><!-- rendered per-item by bunpou-app.js --></div>
+        </div>
+      </main>
+
+      <div class="finished-screen" id="quizEmpty" hidden>
+        <div class="finished-title">Tidak ada yang perlu di-review 🎉</div>
+        <p class="finished-sub">Semua poin sudah <span>up to date</span>. Buka salah satu poin untuk belajar hal baru, atau kembali lagi nanti.</p>
+        <button class="btn btn-flip" id="quizEmptyBackBtn" type="button">← Kembali ke daftar</button>
+      </div>
+    </section>
+  </div>
+
+  <div class="update-toast" id="updateToast" hidden>
+    <span class="update-toast-msg">New version available</span>
+    <button class="btn btn-flip update-toast-btn" type="button" id="updateToastRefresh">Refresh</button>
+    <button class="update-toast-dismiss" type="button" id="updateToastDismiss" aria-label="Dismiss">×</button>
+  </div>
+
+  <script src="srs.js"></script>
+  <script src="bunpou-data.js"></script>
+  <script src="bunpou-app.js"></script>
+  <script>
+    // Inline (see index.html/kotoba.html) so this still works even if bunpou-app.js fails to load.
+    if ("serviceWorker" in navigator) {
+      var swHadController = !!navigator.serviceWorker.controller;
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("sw.js").then(function (reg) {
+          document.addEventListener("visibilitychange", function () {
+            if (document.visibilityState === "visible") reg.update().catch(function () {});
+          });
+        }).catch(() => {});
+      });
+
+      navigator.serviceWorker.addEventListener("controllerchange", function () {
+        if (!swHadController) { swHadController = true; return; }
+        var toast = document.getElementById("updateToast");
+        if (toast) toast.hidden = false;
+      });
+    }
+
+    (function () {
+      var toast = document.getElementById("updateToast");
+      var refreshBtn = document.getElementById("updateToastRefresh");
+      var dismissBtn = document.getElementById("updateToastDismiss");
+      if (refreshBtn) refreshBtn.addEventListener("click", function () { location.reload(); });
+      if (dismissBtn) dismissBtn.addEventListener("click", function () { if (toast) toast.hidden = true; });
+    })();
+
+    (function () {
+      var btn = document.getElementById("updateBtn");
+      if (!btn) return;
+      btn.addEventListener("click", async function () {
+        btn.disabled = true;
+        var label = btn.querySelector(".update-label");
+        if (label) label.textContent = "Updating…";
+        try {
+          if ("serviceWorker" in navigator) {
+            var regs = await navigator.serviceWorker.getRegistrations();
+            await Promise.all(regs.map(function (r) { return r.unregister(); }));
+          }
+          if (window.caches) {
+            var keys = await caches.keys();
+            await Promise.all(keys.map(function (k) { return caches.delete(k); }));
+          }
+        } catch (e) { /* ignore — reload anyway */ }
+        var u = new URL(location.href);
+        u.searchParams.set("_v", Date.now());
+        location.replace(u.href);
+      });
+    })();
+  </script>
+</body>
+</html>
