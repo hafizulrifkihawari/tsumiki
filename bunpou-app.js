@@ -41,6 +41,9 @@
       (p.build || []).forEach((b, i) => {
         items.push({ type: "build", pointId: p.id, idx: i, key: p.id + "::build::" + i });
       });
+      (p.jlptBuild || []).forEach((b, i) => {
+        items.push({ type: "jlptbuild", pointId: p.id, idx: i, key: p.id + "::jlptbuild::" + i });
+      });
     }
     return items;
   }
@@ -75,8 +78,11 @@
     const p = pointsById.get(it.pointId);
     if (it.type === "cloze") return { point: p, example: p.examples[it.idx] };
     if (it.type === "mcq") return { point: p, mcq: p.mcq[it.idx] };
+    if (it.type === "jlptbuild") return { point: p, jlptBuild: p.jlptBuild[it.idx] };
     return { point: p, build: p.build[it.idx] };
   }
+
+  const LETTERS = ["A", "B", "C", "D"];
 
   // ---- Text helpers ----------------------------------------------------------
   function esc(s) {
@@ -426,11 +432,13 @@
   function renderMcq(it, data) {
     const p = data.point, m = data.mcq;
     quizFace.innerHTML =
-      '<span class="badge badge-type quiz-type-badge">Bentuk Tata Bahasa · ' + esc(p.level) + "</span>" +
+      '<span class="badge badge-type quiz-type-badge">文法1 · 文法形式の判断 · ' + esc(p.level) + "</span>" +
       '<div class="quiz-jp">' + esc(m.sentence) + "</div>" +
       '<div class="mcq-options">' +
         m.options.map((opt, i) =>
-          '<button class="btn mcq-opt" type="button" data-i="' + i + '">' + esc(opt) + "</button>"
+          '<button class="btn mcq-opt" type="button" data-i="' + i + '">' +
+            '<span class="opt-letter">' + LETTERS[i] + '</span><span class="opt-text">' + esc(opt) + "</span>" +
+          "</button>"
         ).join("") +
       "</div>" +
       '<div class="mcq-feedback" id="mcqFeedback" hidden></div>' +
@@ -450,9 +458,63 @@
         });
         const fb = el("mcqFeedback");
         fb.hidden = false;
-        fb.textContent = (correct ? "Benar! " : "Kurang tepat. ") + (m.explain || "");
+        fb.textContent = (correct ? "Benar! " : "Kurang tepat, jawaban yang benar: " + LETTERS[m.answer] + ". ") + (m.explain || "");
         el("mcqNextBtn").hidden = false;
         el("mcqNextBtn").addEventListener("click", () => grade(correct ? "good" : "again"), { once: true });
+      });
+    });
+  }
+
+  // Authentic JLPT 文法2 (文の組み立て) format: 4 chunks form one sentence,
+  // one slot is marked ★ — the learner mentally sorts all 4, then picks which
+  // lettered chunk belongs in the ★ slot (rather than manually dragging the
+  // whole sentence into place, like the free-arrange `build` mode above).
+  function renderJlptBuild(it, data) {
+    const p = data.point, b = data.jlptBuild;
+    const options = shuffleArray(b.chunks.map((c, i) => ({ text: c, uid: i })));
+    const correctText = b.chunks[b.starIndex];
+
+    const slotsHtml = b.chunks.map((c, i) =>
+      i === b.starIndex
+        ? '<span class="jlpt-slot jlpt-slot-star">★</span>'
+        : '<span class="jlpt-slot">＿＿＿</span>'
+    ).join("");
+
+    quizFace.innerHTML =
+      '<span class="badge badge-type quiz-type-badge">文法2 · 文の組み立て · ' + esc(p.level) + "</span>" +
+      (b.prefix ? '<div class="quiz-jp">' + esc(b.prefix) + "</div>" : "") +
+      '<div class="jlpt-slots">' + slotsHtml + (b.suffix ? esc(b.suffix) : "") + "</div>" +
+      '<p class="jlpt-hint">★ に入るのはどれですか。(Pilih pilihan yang masuk ke posisi ★.)</p>' +
+      '<div class="mcq-options">' +
+        options.map((o, i) =>
+          '<button class="btn mcq-opt" type="button" data-uid="' + o.uid + '">' +
+            '<span class="opt-letter">' + LETTERS[i] + '</span><span class="opt-text">' + esc(o.text) + "</span>" +
+          "</button>"
+        ).join("") +
+      "</div>" +
+      '<div class="mcq-feedback" id="jlptFeedback" hidden></div>' +
+      '<div class="quiz-actions"><button class="btn btn-flip" id="jlptNextBtn" type="button" hidden>Lanjut →</button></div>';
+
+    let answered = false;
+    quizFace.querySelectorAll(".mcq-opt").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        if (answered) return;
+        answered = true;
+        const uid = Number(btn.getAttribute("data-uid"));
+        const chosen = options.find((o) => o.uid === uid);
+        const correct = chosen.text === correctText;
+        quizFace.querySelectorAll(".mcq-opt").forEach((bt) => {
+          bt.disabled = true;
+          const u = Number(bt.getAttribute("data-uid"));
+          const optText = options.find((o) => o.uid === u).text;
+          if (optText === correctText) bt.classList.add("is-correct");
+          else if (u === uid) bt.classList.add("is-wrong");
+        });
+        const fb = el("jlptFeedback");
+        fb.hidden = false;
+        fb.textContent = "正しい文 (kalimat yang benar): " + b.chunks.join("") + (b.translation ? " — " + b.translation : "");
+        el("jlptNextBtn").hidden = false;
+        el("jlptNextBtn").addEventListener("click", () => grade(correct ? "good" : "again"), { once: true });
       });
     });
   }
@@ -463,7 +525,7 @@
     let bank = shuffleArray(b.chunks.map((c, i) => ({ text: c, uid: i })));
 
     quizFace.innerHTML =
-      '<span class="badge badge-type quiz-type-badge">Susun Kalimat · ' + esc(p.level) + "</span>" +
+      '<span class="badge badge-type quiz-type-badge">Susun Kalimat (Bebas) · ' + esc(p.level) + "</span>" +
       '<div class="quiz-translation">' + esc(b.translation || "") + "</div>" +
       '<div class="build-row build-answer" id="buildAnswer"></div>' +
       '<div class="build-row build-bank" id="buildBank"></div>' +
@@ -551,6 +613,7 @@
 
     if (it.type === "cloze") renderCloze(it, data);
     else if (it.type === "mcq") renderMcq(it, data);
+    else if (it.type === "jlptbuild") renderJlptBuild(it, data);
     else renderBuild(it, data);
   }
 

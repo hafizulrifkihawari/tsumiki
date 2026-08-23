@@ -352,7 +352,11 @@ const BUNPOU = [
     { jp: "この漢字は何と読みますか。", reading: "このかんじはなんとよみますか。", meaning: "Kanji ini dibaca apa? (How do you read this kanji?)", cloze: "と読みます" },
     { jp: "それは無理だと思います。", reading: "それはむりだとおもいます。", meaning: "Menurut saya itu tidak mungkin. (I think that's impossible.)", cloze: "と思います" },
     { jp: "先生は明日休むと言いました。", reading: "せんせいはあしたやすむといいました。", meaning: "Guru bilang besok akan libur. (The teacher said he'd be off tomorrow.)" }
-  ]
+  ],
+  mcq: [
+    { sentence: "明日は雨が降る＿＿思います。", options: ["と", "を", "に", "で"], answer: 0, explain: "Pendapat pribadi menempel dengan と + 思います (bentuk biasa + と思う)。" }
+  ],
+  jlptBuild: [{ chunks: ["明日は", "雨が", "降ると", "思います"], starIndex: 2, suffix: "。", translation: "Saya pikir besok akan hujan。" }]
 },
 
 {
@@ -377,7 +381,11 @@ const BUNPOU = [
     { jp: "その話は本当でしょうか。", reading: "そのはなしはほんとうでしょうか。", meaning: "Apakah cerita itu benar ya? (Is that story true, I wonder?)", cloze: "でしょうか" },
     { jp: "彼はもう知っているでしょう。", reading: "かれはもうしっているでしょう。", meaning: "Dia mungkin sudah tahu. (He probably already knows.)", cloze: "でしょう" },
     { jp: "駅から近いから、便利でしょう。", reading: "えきからちかいから、べんりでしょう。", meaning: "Karena dekat dari stasiun, mungkin praktis. (Since it's close to the station, it's probably convenient.)", cloze: "でしょう" }
-  ]
+  ],
+  mcq: [
+    { sentence: "たぶん彼は来ない＿＿。", options: ["でしょう", "です", "ます", "ました"], answer: 0, explain: "Perkiraan/tebakan memakai でしょう, bukan bentuk です biasa。" }
+  ],
+  jlptBuild: [{ chunks: ["たぶん", "彼は", "来ない", "でしょう"], starIndex: 2, suffix: "。", translation: "Mungkin dia tidak akan datang。" }]
 },
 
 // ---- Reasons & explanation ----
@@ -406,7 +414,8 @@ const BUNPOU = [
   ],
   mcq: [
     { sentence: "頭が痛い＿＿、薬を飲みました。", options: ["から", "のに", "し", "ても"], answer: 0, explain: "頭が痛い (alasan langsung) + から → 薬を飲みました (aksi yang diambil karena alasan itu)." }
-  ]
+  ],
+  jlptBuild: [{ chunks: ["雨が", "降っているから", "傘を", "持って行きます"], starIndex: 1, suffix: "。", translation: "Karena sedang hujan, saya akan bawa payung。" }]
 },
 
 {
@@ -441,7 +450,8 @@ const BUNPOU = [
   ],
   build: [
     { chunks: ["電車が", "遅れた", "ので", "遅刻しました"], answer: ["電車が", "遅れた", "ので", "遅刻しました"], translation: "Karena kereta terlambat, saya terlambat." }
-  ]
+  ],
+  jlptBuild: [{ chunks: ["頭が", "痛いので", "今日は", "休みます"], starIndex: 2, suffix: "。", translation: "Karena sakit kepala, hari ini saya izin。" }]
 },
 
 {
@@ -465,7 +475,11 @@ const BUNPOU = [
     { jp: "彼女は歌も上手だし、ダンスも上手です。", reading: "かのじょはうたもじょうずだし、だんすもじょうずです。", meaning: "Dia pandai menyanyi, pandai menari juga. (She's good at singing, and good at dancing too.)", cloze: "し" },
     { jp: "この町は便利だし、静かだし、住みやすいです。", reading: "このまちはべんりだし、しずかだし、すみやすいです。", meaning: "Kota ini praktis, tenang pula, jadi nyaman ditinggali. (This town is convenient, and quiet too, so it's easy to live in.)", cloze: "し" },
     { jp: "雨も降っているし、風も強いし、今日は出かけません。", reading: "あめもふっているし、かぜもつよいし、きょうはでかけません。", meaning: "Hujan turun, angin kencang pula, jadi hari ini saya tidak keluar. (It's raining, and windy too, so I won't go out today.)", cloze: "し" }
-  ]
+  ],
+  mcq: [
+    { sentence: "この店は安い＿＿、おいしいです。", options: ["し", "から", "ので", "のに"], answer: 0, explain: "Menyusun beberapa alasan sekaligus (masih ada alasan lain yang tersirat) → し。" }
+  ],
+  jlptBuild: [{ chunks: ["この店は", "安いし", "おいしいし", "よく来ます"], starIndex: 1, suffix: "。", translation: "Toko ini murah, enak pula, jadi saya sering ke sini。" }]
 },
 
 {
@@ -491,7 +505,11 @@ const BUNPOU = [
     { jp: "この漢字が読めないんです。", reading: "このかんじがよめないんです。", meaning: "Soalnya saya tidak bisa membaca kanji ini. (The thing is, I can't read this kanji.)", cloze: "んです" },
     { jp: "実はあまり好きじゃないんです。", reading: "じつはあまりすきじゃないんです。", meaning: "Sebenarnya saya tidak terlalu suka. (Actually, I don't really like it.)", cloze: "んです" },
     { jp: "実は、もう食べたんです。", reading: "じつは、もうたべたんです。", meaning: "Sebenarnya, saya sudah makan (tadi). (Actually, I've already eaten, you see.)", cloze: "んです" }
-  ]
+  ],
+  mcq: [
+    { sentence: "実は、来月結婚する＿＿。", options: ["んです", "です", "こと", "とき"], answer: 0, explain: "Menyatakan alasan/latar belakang secara kasual dari bentuk biasa + んです。" }
+  ],
+  jlptBuild: [{ chunks: ["実は", "来月", "結婚する", "んです"], starIndex: 3, suffix: "。", translation: "Sebenarnya, bulan depan saya akan menikah。" }]
 },
 
 // ---- Conditionals ----
@@ -520,7 +538,8 @@ const BUNPOU = [
   ],
   mcq: [
     { sentence: "雨が降っ＿＿、試合は中止です。", options: ["たら", "ば", "と", "なら"], answer: 0, explain: "Kejadian satu-kali di masa depan dengan hasil pasti → たら paling natural." }
-  ]
+  ],
+  jlptBuild: [{ chunks: ["家に", "着いたら", "すぐに", "電話します"], starIndex: 1, suffix: "。", translation: "Begitu sampai rumah, saya akan langsung telepon。" }]
 },
 
 {
@@ -549,7 +568,8 @@ const BUNPOU = [
   ],
   mcq: [
     { sentence: "練習すれ＿＿するほど、上手になります。", options: ["ば", "たら", "と", "なら"], answer: 0, explain: "Pola '〜ば〜ほど' (semakin...semakin) khusus memakai ば." }
-  ]
+  ],
+  jlptBuild: [{ chunks: ["たくさん", "練習すれば", "上手に", "なります"], starIndex: 1, suffix: "。", translation: "Kalau banyak berlatih, akan menjadi mahir。" }]
 },
 
 {
@@ -573,7 +593,11 @@ const BUNPOU = [
     { jp: "右に曲がると、コンビニが見えます。", reading: "みぎにまがると、こんびにがみえます。", meaning: "Kalau belok kanan, minimarket terlihat. (If you turn right, you'll see a convenience store.)", cloze: "と" },
     { jp: "夜になると、星が見えます。", reading: "よるになると、ほしがみえます。", meaning: "Kalau malam tiba, bintang terlihat. (When night falls, stars become visible.)", cloze: "と" },
     { jp: "塩を入れないと、おいしくなりません。", reading: "しおをいれないと、おいしくなりません。", meaning: "Kalau tidak dimasukkan garam, tidak akan enak. (If you don't add salt, it won't taste good.)", cloze: "と" }
-  ]
+  ],
+  mcq: [
+    { sentence: "春になる＿＿、桜が咲きます。", options: ["と", "なら", "ので", "けど"], answer: 0, explain: "Hubungan otomatis/berulang (musim semi → sakura mekar) → と。なら salah karena bukan merespons topik yang baru disebut。" }
+  ],
+  jlptBuild: [{ chunks: ["この", "ボタンを", "押すと", "電気がつきます"], starIndex: 2, suffix: "。", translation: "Kalau tombol ini ditekan, lampu menyala。" }]
 },
 
 {
@@ -601,7 +625,8 @@ const BUNPOU = [
   ],
   mcq: [
     { sentence: "田中さん＿＿、もう帰りましたよ。", options: ["なら", "たら", "と", "ば"], answer: 0, explain: "Merespons topik yang baru disebut (田中さん) → なら, bukan urutan waktu." }
-  ]
+  ],
+  jlptBuild: [{ chunks: ["京都へ", "行くなら", "この本が", "役に立ちます"], starIndex: 1, suffix: "。", translation: "Kalau mau pergi ke Kyoto, buku ini akan berguna。" }]
 },
 
 // ---- Potential ----
@@ -628,7 +653,11 @@ const BUNPOU = [
     { jp: "土曜日なら来られます。", reading: "どようびならこられます。", meaning: "Kalau hari Sabtu, saya bisa datang. (If it's Saturday, I can come.)", cloze: "来られます" },
     { jp: "この漢字は難しくて読めません。", reading: "このかんじはむずかしくてよめません。", meaning: "Kanji ini sulit sehingga tidak bisa dibaca. (This kanji is too difficult to read.)", cloze: "読めません" },
     { jp: "彼は自転車に乗れません。", reading: "かれはじてんしゃにのれません。", meaning: "Dia tidak bisa naik sepeda. (He can't ride a bicycle.)", cloze: "乗れません" }
-  ]
+  ],
+  mcq: [
+    { sentence: "私は漢字が＿＿。", options: ["書けます", "書きます", "書いてあります", "書かせます"], answer: 0, explain: "Bentuk potensial (bisa menulis) = 書けます, objek yang bisa dilakukan ditandai が。" }
+  ],
+  jlptBuild: [{ chunks: ["私は", "日本語が", "少し", "話せます"], starIndex: 2, suffix: "。", translation: "Saya bisa berbicara bahasa Jepang sedikit。" }]
 },
 
 {
@@ -652,7 +681,11 @@ const BUNPOU = [
     { jp: "会員はこの部屋を無料で使うことができます。", reading: "かいいんはこのへやをむりょうでつかうことができます。", meaning: "Anggota bisa memakai ruangan ini gratis. (Members can use this room for free.)", cloze: "ことができます" },
     { jp: "駅の前で自転車を借りることができます。", reading: "えきのまえでじてんしゃをかりることができます。", meaning: "Di depan stasiun bisa menyewa sepeda. (You can rent a bicycle in front of the station.)", cloze: "ことができます" },
     { jp: "この公園ではバーベキューをすることができません。", reading: "このこうえんではばーべきゅーをすることができません。", meaning: "Di taman ini tidak boleh/tidak bisa barbeku. (You can't have a barbecue in this park.)", cloze: "ことができません" }
-  ]
+  ],
+  mcq: [
+    { sentence: "図書館でパソコンを使う＿＿できます。", options: ["ことが", "ことを", "のが", "ように"], answer: 0, explain: "Pola ことができる memakai partikel が: 使うことができます。" }
+  ],
+  jlptBuild: [{ chunks: ["ここで", "写真を", "撮ることが", "できません"], starIndex: 2, suffix: "。", translation: "Di sini tidak bisa memotret。" }]
 },
 
 {
@@ -677,7 +710,11 @@ const BUNPOU = [
     { jp: "パソコンが使えるようになりたいです。", reading: "ぱそこんがつかえるようになりたいです。", meaning: "Saya ingin jadi bisa memakai komputer. (I want to become able to use a computer.)", cloze: "ようになりたい" },
     { jp: "毎日練習して、漢字が読めるようになりました。", reading: "まいにちれんしゅうして、かんじがよめるようになりました。", meaning: "Setelah berlatih tiap hari, saya jadi bisa membaca kanji. (After practicing every day, I became able to read kanji.)", cloze: "ようになりました" },
     { jp: "彼は最近、朝早く起きるようになりました。", reading: "かれはさいきん、あさはやくおきるようになりました。", meaning: "Belakangan ini dia jadi (terbiasa) bangun pagi. (Recently, he has come to wake up early.)", cloze: "ようになりました" }
-  ]
+  ],
+  mcq: [
+    { sentence: "練習して、泳げる＿＿なりました。", options: ["ように", "ために", "こと", "そう"], answer: 0, explain: "Perubahan bertahap dari tidak bisa menjadi bisa = 〜ようになる, bukan ために。" }
+  ],
+  jlptBuild: [{ chunks: ["練習して", "日本語が", "話せるように", "なりました"], starIndex: 2, suffix: "。", translation: "Setelah berlatih, saya jadi bisa berbicara bahasa Jepang。" }]
 },
 
 // ---- Passive / causative ----
@@ -704,7 +741,11 @@ const BUNPOU = [
     { jp: "このケーキは母によって作られました。", reading: "このけーきははははによってつくられました。", meaning: "Kue ini dibuat oleh ibu saya. (This cake was made by my mother.)", cloze: "作られました" },
     { jp: "宿題を忘れて、先生に注意されました。", reading: "しゅくだいをわすれて、せんせいにちゅういされました。", meaning: "Lupa mengerjakan PR, ditegur guru. (I forgot my homework and was warned by the teacher.)", cloze: "注意されました" },
     { jp: "この歌は若い人によく知られています。", reading: "このうたはわかいひとによくしられています。", meaning: "Lagu ini dikenal baik oleh anak muda. (This song is well known among young people.)", cloze: "知られています" }
-  ]
+  ],
+  mcq: [
+    { sentence: "先生に＿＿。", options: ["叱られました", "叱りました", "叱らせました", "叱ってあげました"], answer: 0, explain: "Subjek dikenai aksi oleh guru (pelaku ditandai に) → bentuk pasif 叱られました。" }
+  ],
+  jlptBuild: [{ chunks: ["この本は", "多くの", "人に", "読まれています"], starIndex: 2, suffix: "。", translation: "Buku ini dibaca oleh banyak orang。" }]
 },
 
 {
@@ -730,7 +771,11 @@ const BUNPOU = [
     { jp: "母は妹にピアノを習わせています。", reading: "はははいもうとにぴあのをならわせています。", meaning: "Ibu menyuruh adik perempuan belajar piano. (Mom has her younger sister learn piano.)", cloze: "習わせています" },
     { jp: "先生は学生に漢字を書かせました。", reading: "せんせいはがくせいにかんじをかかせました。", meaning: "Guru menyuruh murid menulis kanji. (The teacher had the students write kanji.)", cloze: "書かせました" },
     { jp: "親は子どもに毎日勉強させています。", reading: "おやはこどもにまいにちべんきょうさせています。", meaning: "Orang tua menyuruh anaknya belajar setiap hari. (The parents have their child study every day.)", cloze: "させています" }
-  ]
+  ],
+  mcq: [
+    { sentence: "母は子どもに野菜を＿＿。", options: ["食べさせました", "食べられました", "食べてあげました", "食べてもらいました"], answer: 0, explain: "Ibu MENYURUH anak makan sayur → kausatif させる, bukan pasif られる。" }
+  ],
+  jlptBuild: [{ chunks: ["先生は", "学生に", "本を", "読ませました"], starIndex: 2, suffix: "。", translation: "Guru menyuruh murid membaca buku。" }]
 },
 
 // ---- Giving & receiving ----
@@ -757,7 +802,11 @@ const BUNPOU = [
     { jp: "弟に自転車を直してあげました。", reading: "おとうとにじてんしゃをなおしてあげました。", meaning: "Saya membetulkan sepeda untuk adik. (I fixed my brother's bicycle for him.)", cloze: "直してあげました" },
     { jp: "隣の人が荷物を持ってくれました。", reading: "となりのひとがにもつをもってくれました。", meaning: "Orang di sebelah membawakan barang untuk saya. (The person next to me carried my luggage.)", cloze: "持ってくれました" },
     { jp: "子どもにおもちゃを買ってあげました。", reading: "こどもにおもちゃをかってあげました。", meaning: "Saya membelikan mainan untuk anak. (I bought a toy for the child.)", cloze: "買ってあげました" }
-  ]
+  ],
+  mcq: [
+    { sentence: "友だちが宿題を＿＿。", options: ["手伝ってくれました", "手伝ってあげました", "手伝ってもらいました", "手伝わせました"], answer: 0, explain: "Teman melakukan bantuan UNTUK saya (arah mendekat ke pembicara) → てくれる。" }
+  ],
+  jlptBuild: [{ chunks: ["友だちに", "空港まで", "送って", "もらいました"], starIndex: 2, suffix: "。", translation: "Saya diantar teman sampai bandara。" }]
 },
 
 // ---- Aspect helper て-forms ----
@@ -783,7 +832,11 @@ const BUNPOU = [
     { jp: "早くこの仕事を終わらせてしまいたいです。", reading: "はやくこのしごとをおわらせてしまいたいです。", meaning: "Saya ingin cepat-cepat menyelesaikan tuntas pekerjaan ini. (I want to finish this job completely, soon.)", cloze: "しまいたい" },
     { jp: "大切な約束を忘れてしまいました。", reading: "たいせつなやくそくをわすれてしまいました。", meaning: "Saya terlanjur lupa janji penting. (I ended up forgetting an important promise.)", cloze: "忘れてしまいました" },
     { jp: "もう全部話してしまいました。", reading: "もうぜんぶはなしてしまいました。", meaning: "Saya sudah menceritakan semuanya (tuntas). (I've already told everything.)", cloze: "話してしまいました" }
-  ]
+  ],
+  mcq: [
+    { sentence: "ケーキを全部＿＿。", options: ["食べてしまいました", "食べておきました", "食べてみました", "食べてあげました"], answer: 0, explain: "Selesai tuntas / disesalkan (kue habis semua) → てしまう。" }
+  ],
+  jlptBuild: [{ chunks: ["大事な", "写真を", "消して", "しまいました"], starIndex: 2, suffix: "。", translation: "Foto penting terlanjur terhapus。" }]
 },
 
 {
@@ -808,7 +861,11 @@ const BUNPOU = [
     { jp: "彼にメールを送っておきました。", reading: "かれにめーるをおくっておきました。", meaning: "Saya sudah mengirim email untuk dia terlebih dahulu. (I sent him an email in advance.)", cloze: "送っておきました" },
     { jp: "旅行の前に、荷物をまとめておきます。", reading: "りょこうのまえに、にもつをまとめておきます。", meaning: "Sebelum liburan, saya akan mengemasi barang terlebih dahulu. (Before the trip, I'll pack my luggage in advance.)", cloze: "まとめておきます" },
     { jp: "友だちが来る前に、部屋を掃除しておきました。", reading: "ともだちがくるまえに、へやをそうじしておきました。", meaning: "Sebelum teman datang, saya sudah bersih-bersih kamar terlebih dahulu. (Before my friend came, I cleaned the room in advance.)", cloze: "しておきました" }
-  ]
+  ],
+  mcq: [
+    { sentence: "会議の前に資料を＿＿ください。", options: ["読んでおいて", "読んでしまって", "読んでみて", "読まれて"], answer: 0, explain: "Persiapan sengaja untuk nanti (baca dokumen sebelum rapat) → ておく。" }
+  ],
+  jlptBuild: [{ chunks: ["旅行の", "前に", "お金を", "換えておきました"], starIndex: 3, suffix: "。", translation: "Sebelum liburan, saya sudah menukar uang terlebih dahulu。" }]
 },
 
 {
@@ -832,7 +889,11 @@ const BUNPOU = [
     { jp: "新しいレシピを試してみませんか。", reading: "あたらしいれしぴをためしてみませんか。", meaning: "Bagaimana kalau kita coba resep baru? (Why don't we try a new recipe?)", cloze: "試してみません" },
     { jp: "初めて日本料理を作ってみました。", reading: "はじめてにほんりょうりをつくってみました。", meaning: "Saya coba masak masakan Jepang untuk pertama kali. (I tried making Japanese food for the first time.)", cloze: "作ってみました" },
     { jp: "彼に本当のことを話してみます。", reading: "かれにほんとうのことをはなしてみます。", meaning: "Saya akan coba bicara hal yang sebenarnya padanya. (I'll try telling him the truth.)", cloze: "話してみます" }
-  ]
+  ],
+  mcq: [
+    { sentence: "この料理を＿＿ください。", options: ["食べてみて", "食べておいて", "食べてしまって", "食べさせて"], answer: 0, explain: "Mencoba melakukan untuk melihat hasilnya → てみる。" }
+  ],
+  jlptBuild: [{ chunks: ["一度", "富士山に", "登って", "みたいです"], starIndex: 2, suffix: "。", translation: "Saya ingin sekali-kali coba mendaki Gunung Fuji。" }]
 },
 
 // ---- Intentions & plans ----
@@ -858,7 +919,11 @@ const BUNPOU = [
     { jp: "そんなつもりで言ったのではありません。", reading: "そんなつもりでいったのではありません。", meaning: "Saya tidak bermaksud begitu waktu mengatakannya. (I didn't mean it that way when I said it.)", cloze: "つもり" },
     { jp: "今度の休みは旅行に行くつもりです。", reading: "こんどのやすみはりょこうにいくつもりです。", meaning: "Liburan berikutnya saya berniat pergi liburan. (I intend to go on a trip during the next holiday.)", cloze: "つもりです" },
     { jp: "彼女は大学院に進学するつもりだそうです。", reading: "かのじょはだいがくいんにしんがくするつもりだそうです。", meaning: "Katanya dia berniat melanjutkan ke pascasarjana. (I heard she intends to go on to graduate school.)", cloze: "つもり" }
-  ]
+  ],
+  mcq: [
+    { sentence: "来年、日本へ留学する＿＿です。", options: ["つもり", "はず", "よう", "そう"], answer: 0, explain: "Niat pribadi yang sudah dipikirkan cukup matang → つもり。" }
+  ],
+  jlptBuild: [{ chunks: ["夏休みに", "国へ", "帰る", "つもりです"], starIndex: 2, suffix: "。", translation: "Liburan musim panas saya berniat pulang kampung。" }]
 },
 
 {
@@ -883,7 +948,11 @@ const BUNPOU = [
     { jp: "今年こそ日本語を頑張ろうと思います。", reading: "ことしこそにほんごをがんばろうとおもいます。", meaning: "Tahun ini saya benar-benar berniat berjuang belajar bahasa Jepang. (This year, I'm determined to work hard at Japanese.)", cloze: "と思います" },
     { jp: "今日は早く帰ろうと思います。", reading: "きょうははやくかえろうとおもいます。", meaning: "Hari ini saya berpikir untuk pulang cepat. (I'm thinking of going home early today.)", cloze: "帰ろうと思います" },
     { jp: "週末に部屋を掃除しようと思っています。", reading: "しゅうまつにへやをそうじしようとおもっています。", meaning: "Akhir pekan saya berencana membersihkan kamar. (I've been thinking of cleaning my room this weekend.)", cloze: "しようと思っています" }
-  ]
+  ],
+  mcq: [
+    { sentence: "そろそろ寝＿＿と思います。", options: ["よう", "る", "ない", "た"], answer: 0, explain: "Niat yang baru terpikir memakai bentuk volitional + と思う: 寝よう + と思います。" }
+  ],
+  jlptBuild: [{ chunks: ["疲れたので", "少し", "休もうと", "思います"], starIndex: 2, suffix: "。", translation: "Karena lelah, saya berpikir untuk istirahat sebentar。" }]
 },
 
 // ---- Advice ----
@@ -912,7 +981,8 @@ const BUNPOU = [
   ],
   mcq: [
     { sentence: "熱があるなら、病院へ行っ＿＿いいです。", options: ["たほうが", "ほうが", "たら", "なら"], answer: 0, explain: "Saran positif selalu pakai bentuk lampau + ほうがいい: 行ったほうがいい。" }
-  ]
+  ],
+  jlptBuild: [{ chunks: ["熱が", "あるなら", "病院へ", "行ったほうがいいです"], starIndex: 1, suffix: "。", translation: "Kalau demam, sebaiknya pergi ke rumah sakit。" }]
 },
 
 // ---- Appearance & hearsay ----
@@ -939,7 +1009,11 @@ const BUNPOU = [
     { jp: "橋が今にも壊れそうです。", reading: "はしがいまにもこわれそうです。", meaning: "Jembatannya kelihatan seperti akan roboh sebentar lagi. (The bridge looks like it's about to collapse.)", cloze: "壊れそう" },
     { jp: "彼は忙しそうです。", reading: "かれはいそがしそうです。", meaning: "Dia kelihatannya sibuk. (He looks busy.)", cloze: "忙しそう" },
     { jp: "この犬はとても賢そうです。", reading: "このいぬはとてもかしこそうです。", meaning: "Anjing ini kelihatannya sangat pintar. (This dog looks very smart.)", cloze: "賢そう" }
-  ]
+  ],
+  mcq: [
+    { sentence: "このケーキはおいし＿＿です。", options: ["そう", "そうだ", "らしい", "ようだ"], answer: 0, explain: "Kesan visual langsung (kelihatan enak) dari いadj (hapus い) + そう: おいしそう。" }
+  ],
+  jlptBuild: [{ chunks: ["今にも", "雨が", "降り", "そうです"], starIndex: 2, suffix: "。", translation: "Kelihatannya sebentar lagi akan hujan。" }]
 },
 
 {
@@ -966,7 +1040,8 @@ const BUNPOU = [
   ],
   mcq: [
     { sentence: "天気予報によると、明日は雨が降る＿＿。", options: ["そうです", "そうでした", "そうな", "そう"], answer: 0, explain: "伝聞そう menempel bentuk biasa lengkap (降る) + そうです, tanpa berkonjugasi lagi." }
-  ]
+  ],
+  jlptBuild: [{ chunks: ["天気予報に", "よると", "明日は", "雨が降るそうです"], starIndex: 2, suffix: "。", translation: "Menurut ramalan cuaca, katanya besok akan hujan。" }]
 },
 
 {
@@ -992,7 +1067,11 @@ const BUNPOU = [
     { jp: "彼はまるで子どものように喜びました。", reading: "かれはまるでこどものようによろこびました。", meaning: "Dia senang sekali seperti anak kecil. (He was overjoyed just like a child.)", cloze: "ように" },
     { jp: "彼女は疲れているようです。", reading: "かのじょはつかれているようです。", meaning: "Sepertinya dia sedang lelah. (She seems to be tired.)", cloze: "ようです" },
     { jp: "まるで夢みたいな出来事でした。", reading: "まるでゆめみたいなできごとでした。", meaning: "Itu adalah kejadian yang seperti mimpi. (It was an event that felt just like a dream.)", cloze: "みたいな" }
-  ]
+  ],
+  mcq: [
+    { sentence: "空を見ると、雨が降っている＿＿です。", options: ["よう", "そう", "らしい", "はず"], answer: 0, explain: "Kesimpulan dari bukti yang dilihat sendiri (melihat langit) → よう。そう(伝聞) butuh sumber info dari luar, misalnya 天気予報によると。" }
+  ],
+  jlptBuild: [{ chunks: ["外は", "雨が", "降っている", "ようです"], starIndex: 2, suffix: "。", translation: "Sepertinya di luar sedang hujan。" }]
 },
 
 {
@@ -1017,7 +1096,11 @@ const BUNPOU = [
     { jp: "春らしい天気になりました。", reading: "はるらしいてんきになりました。", meaning: "Cuacanya jadi khas musim semi. (The weather has become spring-like.)", cloze: "らしい" },
     { jp: "隣の部屋には誰もいないらしいです。", reading: "となりのへやにはだれもいないらしいです。", meaning: "Kabarnya kamar sebelah tidak ada orang. (I heard there's no one in the next room.)", cloze: "らしいです" },
     { jp: "彼はこの分野に詳しいらしいです。", reading: "かれはこのぶんやにくわしいらしいです。", meaning: "Kabarnya dia ahli di bidang ini. (I heard he's knowledgeable in this field.)", cloze: "らしいです" }
-  ]
+  ],
+  mcq: [
+    { sentence: "うわさによると、彼はもう結婚している＿＿です。", options: ["らしい", "でしょう", "つもり", "はず"], answer: 0, explain: "うわさ (kabar angin) cocok dengan らしい yang menyampaikan info kurang pasti dari luar。" }
+  ],
+  jlptBuild: [{ chunks: ["彼は", "もう", "結婚している", "らしいです"], starIndex: 2, suffix: "。", translation: "Kabarnya dia sudah menikah。" }]
 },
 
 // ---- Time relations ----
@@ -1044,7 +1127,11 @@ const BUNPOU = [
     { jp: "疲れているとき、甘いものが食べたくなります。", reading: "つかれているとき、あまいものがたべたくなります。", meaning: "Saat lelah, saya jadi ingin makan yang manis. (When I'm tired, I crave something sweet.)", cloze: "とき" },
     { jp: "テレビを見ているとき、電話が鳴りました。", reading: "てれびをみているとき、でんわがなりました。", meaning: "Saat sedang menonton TV, telepon berdering. (While I was watching TV, the phone rang.)", cloze: "とき" },
     { jp: "分からないとき、先生に聞きます。", reading: "わからないとき、せんせいにききます。", meaning: "Saat tidak mengerti, saya bertanya ke guru. (When I don't understand, I ask the teacher.)", cloze: "とき" }
-  ]
+  ],
+  mcq: [
+    { sentence: "日本へ行った＿＿、写真をたくさん撮りました。", options: ["とき", "なら", "ので", "けど"], answer: 0, explain: "Menghubungkan dua kejadian berdasarkan waktu (sudah di Jepang) → とき, dengan bentuk た karena sudah terjadi。" }
+  ],
+  jlptBuild: [{ chunks: ["日本へ", "行った", "とき", "写真をたくさん撮りました"], starIndex: 2, suffix: "。", translation: "Waktu di Jepang, saya banyak memotret。" }]
 },
 
 // ---- Purpose & change ----
@@ -1072,7 +1159,11 @@ const BUNPOU = [
     { jp: "風邪をひかないように、気をつけています。", reading: "かぜをひかないように、きをつけています。", meaning: "Supaya tidak masuk angin, saya berhati-hati. (So as not to catch a cold, I'm being careful.)", cloze: "ように" },
     { jp: "太らないように、運動しています。", reading: "ふとらないように、うんどうしています。", meaning: "Supaya tidak gemuk, saya berolahraga. (So as not to gain weight, I exercise.)", cloze: "ように" },
     { jp: "夢を叶えるために、努力しています。", reading: "ゆめをかなえるために、どりょくしています。", meaning: "Demi mewujudkan impian, saya berusaha keras. (In order to make my dream come true, I'm making an effort.)", cloze: "ために" }
-  ]
+  ],
+  mcq: [
+    { sentence: "忘れない＿＿、メモしておきます。", options: ["ように", "ために", "から", "のに"], answer: 0, explain: "Kata kerja tak terkontrol/negatif (忘れない) + tujuan → ように, bukan ために。" }
+  ],
+  jlptBuild: [{ chunks: ["忘れない", "ように", "メモを", "しておきます"], starIndex: 1, suffix: "。", translation: "Supaya tidak lupa, saya catat dulu。" }]
 },
 
 // ---- Contrast & concession ----
@@ -1101,7 +1192,8 @@ const BUNPOU = [
   ],
   mcq: [
     { sentence: "たくさん勉強した＿＿、テストに失敗しました。", options: ["のに", "から", "ので", "し"], answer: 0, explain: "Hasil bertentangan dengan harapan (belajar banyak tapi gagal) → のに, bukan alasan biasa." }
-  ]
+  ],
+  jlptBuild: [{ chunks: ["たくさん", "勉強した", "のに", "失敗しました"], starIndex: 2, suffix: "。", translation: "Padahal sudah belajar banyak, tapi gagal。" }]
 },
 
 {
@@ -1130,7 +1222,11 @@ const BUNPOU = [
   ],
   build: [
     { chunks: ["いくら", "頑張っても", "うまく", "いきません"], answer: ["いくら", "頑張っても", "うまく", "いきません"], translation: "Sekeras apapun berusaha, tetap tidak berhasil." }
-  ]
+  ],
+  mcq: [
+    { sentence: "いくら頑張っ＿＿、うまくいきません。", options: ["ても", "たら", "と", "なら"], answer: 0, explain: "Meskipun berusaha (hipotetis, hasil tetap sama) → ても。" }
+  ],
+  jlptBuild: [{ chunks: ["いくら", "頑張っても", "うまく", "いきません"], starIndex: 1, suffix: "。", translation: "Sekeras apapun berusaha, tetap tidak berhasil。" }]
 }
 
 ];
