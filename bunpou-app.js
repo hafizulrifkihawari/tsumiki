@@ -170,8 +170,10 @@
         return (
           '<button class="bunpou-point-row" type="button" data-id="' + esc(p.id) + '">' +
             '<span class="dot dot-' + bucket + '"></span>' +
-            '<span class="bp-pattern">' + esc(p.pattern) + "</span>" +
-            '<span class="bp-meaning">' + esc(p.meaning) + "</span>" +
+            '<span class="bp-text">' +
+              '<span class="bp-pattern">' + esc(p.pattern) + "</span>" +
+              '<span class="bp-meaning">' + esc(p.meaning) + "</span>" +
+            "</span>" +
           "</button>"
         );
       }).join("");
@@ -255,8 +257,73 @@
 
   el("studyBackBtn").addEventListener("click", () => showView("browse"));
   el("studyReviewBtn").addEventListener("click", () => {
-    if (studyPointId) openQuiz(studyPointId);
+    if (studyPointId) showModeSheet(studyPointId);
   });
+
+  // ---- Mode picker (choose which drill type to focus a session on) -----------
+  // Each MODE_DEFS entry's `cls` also drives the color-coded badge on quiz
+  // cards (see renderCloze/renderMcq/renderJlptBuild/renderBuild), so the
+  // color the learner picks in the sheet stays consistent throughout the session.
+  const MODE_DEFS = [
+    { key: "all", cls: "all", icon: "🎲", label: "Semua Mode", desc: "Campuran semua jenis latihan." },
+    { key: "cloze", cls: "cloze", icon: "✏️", label: "Ingat (Isian)", desc: "Lihat kalimat berlubang, ingat sendiri jawabannya." },
+    { key: "mcq", cls: "mcq", icon: "🔤", label: "文法1 · Pilihan Ganda", desc: "Pilih bentuk/partikel yang paling tepat." },
+    { key: "jlptbuild", cls: "jlptbuild", icon: "🧩", label: "文法2 · Susun (★)", desc: "Urutkan 4 potongan, tebak posisi ★." },
+    { key: "build", cls: "build", icon: "🔀", label: "Susun Bebas", desc: "Susun seluruh kalimat dari potongan acak." }
+  ];
+  const MODE_BY_KEY = new Map(MODE_DEFS.map((m) => [m.key, m]));
+
+  const modeOverlay = el("modeOverlay");
+  const modeListEl = el("modeList");
+  const modeSheetTitle = el("modeSheetTitle");
+
+  function modeCounts(pointId, key) {
+    const pool = pointId ? ITEM_POOL.filter((it) => it.pointId === pointId) : ITEM_POOL;
+    const filtered = key === "all" ? pool : pool.filter((it) => it.type === key);
+    const now = Date.now();
+    let due = 0;
+    for (const it of filtered) {
+      const entry = srsMap[it.key];
+      if (entry && entry.box > 0 && isDue(entry, now)) due++;
+    }
+    return { total: filtered.length, due };
+  }
+
+  function renderModeList(pointId) {
+    const point = pointId ? pointsById.get(pointId) : null;
+    modeSheetTitle.textContent = point ? "Latihan: " + point.pattern : "Pilih Mode Latihan";
+    modeListEl.innerHTML = MODE_DEFS.map((m) => {
+      const c = modeCounts(pointId, m.key);
+      const disabled = c.total === 0;
+      const countText = disabled ? "Tidak ada" : (c.due > 0 ? c.due + " due · " : "") + c.total + " soal";
+      return (
+        '<button class="mode-row mode-row-' + m.cls + (disabled ? " is-disabled" : "") + '" type="button" data-mode="' + m.key + '"' + (disabled ? " disabled" : "") + ">" +
+          '<span class="mode-row-icon">' + m.icon + "</span>" +
+          '<span class="mode-row-text">' +
+            '<span class="mode-row-title">' + esc(m.label) + "</span>" +
+            '<span class="mode-row-desc">' + esc(m.desc) + "</span>" +
+          "</span>" +
+          '<span class="mode-row-count">' + esc(countText) + "</span>" +
+        "</button>"
+      );
+    }).join("");
+
+    modeListEl.querySelectorAll(".mode-row:not([disabled])").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        hideModeSheet();
+        openQuiz(pointId, btn.getAttribute("data-mode"));
+      });
+    });
+  }
+
+  function showModeSheet(pointId) {
+    renderModeList(pointId || null);
+    modeOverlay.hidden = false;
+  }
+  function hideModeSheet() { modeOverlay.hidden = true; }
+
+  modeOverlay.addEventListener("click", (e) => { if (e.target === modeOverlay) hideModeSheet(); });
+  el("modeCloseBtn").addEventListener("click", hideModeSheet);
 
   // ---- Quiz view -------------------------------------------------------------
   const quizFace = el("quizFace");
@@ -278,6 +345,7 @@
   let sessionMissed = 0;
   let againQueue = new Set();
   let scopePointId = null; // non-null when reviewing just one point
+  let scopeMode = "all"; // which MODE_DEFS key this session was filtered to
 
   function updateScore() {
     scoreCountEl.textContent = sessionCorrect;
@@ -287,6 +355,14 @@
     queueCountEl.textContent = againQueue.size;
     queueBadge.hidden = againQueue.size === 0;
   }
+  function updateModeTag() {
+    const tag = el("quizModeTag");
+    const m = MODE_BY_KEY.get(scopeMode);
+    if (!m || m.key === "all") { tag.hidden = true; return; }
+    tag.hidden = false;
+    tag.className = "quiz-mode-tag quiz-mode-tag-" + m.cls;
+    tag.textContent = m.icon + " " + m.label;
+  }
 
   const progressKeyFor = (u) => "bunpou.progress." + u;
 
@@ -295,7 +371,7 @@
       order: queue.map((it) => it.key),
       index, sessionCorrect, sessionMissed,
       againQueue: [...againQueue],
-      scopePointId
+      scopePointId, scopeMode
     };
     ls(false, progressKeyFor(currentUser), JSON.stringify(data));
   }
@@ -306,9 +382,11 @@
     try { return JSON.parse(raw); } catch (e) { return null; }
   }
 
-  function buildQueue(pointId) {
+  function buildQueue(pointId, modeKey) {
+    const mode = MODE_BY_KEY.has(modeKey) ? modeKey : "all";
     const now = Date.now();
-    const pool = pointId ? ITEM_POOL.filter((it) => it.pointId === pointId) : ITEM_POOL;
+    let pool = pointId ? ITEM_POOL.filter((it) => it.pointId === pointId) : ITEM_POOL;
+    if (mode !== "all") pool = pool.filter((it) => it.type === mode);
     const due = [];
     const fresh = [];
     for (const it of pool) {
@@ -328,8 +406,10 @@
     sessionMissed = 0;
     againQueue = new Set();
     scopePointId = pointId || null;
+    scopeMode = mode;
     updateScore();
     updateQueueBadge();
+    updateModeTag();
     updateDueCount();
     renderQuizItem();
     saveProgress();
@@ -345,19 +425,21 @@
     sessionMissed = saved.sessionMissed || 0;
     againQueue = new Set(saved.againQueue || []);
     scopePointId = saved.scopePointId || null;
+    scopeMode = saved.scopeMode || "all";
     updateScore();
     updateQueueBadge();
+    updateModeTag();
     updateDueCount();
     renderQuizItem();
     return true;
   }
 
-  function openQuiz(pointId) {
+  function openQuiz(pointId, modeKey) {
     showView("quiz");
-    buildQueue(pointId);
+    buildQueue(pointId, modeKey);
   }
 
-  el("reviewBtn").addEventListener("click", () => openQuiz(null));
+  el("reviewBtn").addEventListener("click", () => showModeSheet(null));
   el("quizBackBtn").addEventListener("click", () => { saveProgress(); showView("browse"); });
   el("quizEmptyBackBtn").addEventListener("click", () => showView("browse"));
 
@@ -404,8 +486,9 @@
   function renderCloze(it, data) {
     const p = data.point, ex = data.example;
     quizFace.innerHTML =
-      '<span class="badge badge-type quiz-type-badge">Ingat · ' + esc(p.level) + " · " + esc(p.pattern) + "</span>" +
+      '<span class="badge badge-type quiz-type-badge quiz-type-badge-cloze">Ingat · ' + esc(p.level) + " · " + esc(p.pattern) + "</span>" +
       '<div class="quiz-jp">' + blankTarget(ex.jp, ex.cloze) + "</div>" +
+      (ex.meaning ? '<div class="quiz-hint">💡 ' + esc(ex.meaning) + "</div>" : "") +
       '<div class="quiz-actions"><button class="btn btn-flip" id="revealBtn" type="button">Tunjukkan jawaban</button></div>' +
       '<div class="reveal-panel" id="revealPanel" hidden>' +
         '<div class="example-jp">' + highlightTarget(ex.jp, ex.cloze) + "</div>" +
@@ -432,7 +515,7 @@
   function renderMcq(it, data) {
     const p = data.point, m = data.mcq;
     quizFace.innerHTML =
-      '<span class="badge badge-type quiz-type-badge">文法1 · 文法形式の判断 · ' + esc(p.level) + "</span>" +
+      '<span class="badge badge-type quiz-type-badge quiz-type-badge-mcq">文法1 · 文法形式の判断 · ' + esc(p.level) + "</span>" +
       '<div class="quiz-jp">' + esc(m.sentence) + "</div>" +
       '<div class="mcq-options">' +
         m.options.map((opt, i) =>
@@ -481,7 +564,7 @@
     ).join("");
 
     quizFace.innerHTML =
-      '<span class="badge badge-type quiz-type-badge">文法2 · 文の組み立て · ' + esc(p.level) + "</span>" +
+      '<span class="badge badge-type quiz-type-badge quiz-type-badge-jlptbuild">文法2 · 文の組み立て · ' + esc(p.level) + "</span>" +
       (b.prefix ? '<div class="quiz-jp">' + esc(b.prefix) + "</div>" : "") +
       '<div class="jlpt-slots">' + slotsHtml + (b.suffix ? esc(b.suffix) : "") + "</div>" +
       '<p class="jlpt-hint">★ に入るのはどれですか。(Pilih pilihan yang masuk ke posisi ★.)</p>' +
@@ -525,7 +608,7 @@
     let bank = shuffleArray(b.chunks.map((c, i) => ({ text: c, uid: i })));
 
     quizFace.innerHTML =
-      '<span class="badge badge-type quiz-type-badge">Susun Kalimat (Bebas) · ' + esc(p.level) + "</span>" +
+      '<span class="badge badge-type quiz-type-badge quiz-type-badge-build">Susun Kalimat (Bebas) · ' + esc(p.level) + "</span>" +
       '<div class="quiz-translation">' + esc(b.translation || "") + "</div>" +
       '<div class="build-row build-answer" id="buildAnswer"></div>' +
       '<div class="build-row build-bank" id="buildBank"></div>' +

@@ -271,7 +271,7 @@ const BUNPOU = [
     { jp: "テストのとき、辞書を使ってもいいですか。", reading: "てすとのとき、じしょをつかってもいいですか。", meaning: "Waktu tes, bolehkah pakai kamus? (May I use a dictionary during the test?)" }
   ],
   mcq: [
-    { sentence: "ここでたばこを吸っ＿＿いけません。", options: ["ては", "ても", "たら", "なら"], answer: 0, explain: "Larangan = 〜てはいけません。〜てもいい = izin (kebalikannya)." }
+    { sentence: "ここでたばこを＿＿いけません。", options: ["吸っては", "吸っても", "吸ったら", "吸うなら"], answer: 0, explain: "Larangan = 〜てはいけません。〜てもいい = izin (kebalikannya)." }
   ]
 },
 
@@ -537,7 +537,7 @@ const BUNPOU = [
     { jp: "窓を開けたら、鳥が入ってきました。", reading: "まどをあけたら、とりがはいってきました。", meaning: "Begitu jendela dibuka, ternyata burung masuk. (When I opened the window, a bird came in.)" }
   ],
   mcq: [
-    { sentence: "雨が降っ＿＿、試合は中止です。", options: ["たら", "ば", "と", "なら"], answer: 0, explain: "Kejadian satu-kali di masa depan dengan hasil pasti → たら paling natural." }
+    { sentence: "雨が＿＿、試合は中止です。", options: ["降ったら", "降れば", "降ると", "降るなら"], answer: 0, explain: "Kejadian satu-kali di masa depan dengan hasil pasti → たら paling natural." }
   ],
   jlptBuild: [{ chunks: ["家に", "着いたら", "すぐに", "電話します"], starIndex: 1, suffix: "。", translation: "Begitu sampai rumah, saya akan langsung telepon。" }]
 },
@@ -567,7 +567,7 @@ const BUNPOU = [
     { jp: "電気を消せば、部屋が暗くなります。", reading: "でんきをけせば、へやがくらくなります。", meaning: "Kalau lampu dimatikan, ruangan akan gelap. (If you turn off the light, the room will get dark.)", cloze: "消せば" }
   ],
   mcq: [
-    { sentence: "練習すれ＿＿するほど、上手になります。", options: ["ば", "たら", "と", "なら"], answer: 0, explain: "Pola '〜ば〜ほど' (semakin...semakin) khusus memakai ば." }
+    { sentence: "練習＿＿するほど、上手になります。", options: ["すれば", "したら", "すると", "するなら"], answer: 0, explain: "Pola '〜ば〜ほど' (semakin...semakin) khusus memakai ば." }
   ],
   jlptBuild: [{ chunks: ["たくさん", "練習すれば", "上手に", "なります"], starIndex: 1, suffix: "。", translation: "Kalau banyak berlatih, akan menjadi mahir。" }]
 },
@@ -980,7 +980,7 @@ const BUNPOU = [
     { jp: "甘い物を食べすぎないほうがいいです。", reading: "あまいものをたべすぎないほうがいいです。", meaning: "Sebaiknya jangan makan makanan manis terlalu banyak. (You'd better not eat too many sweets.)", cloze: "食べすぎないほうがいい" }
   ],
   mcq: [
-    { sentence: "熱があるなら、病院へ行っ＿＿いいです。", options: ["たほうが", "ほうが", "たら", "なら"], answer: 0, explain: "Saran positif selalu pakai bentuk lampau + ほうがいい: 行ったほうがいい。" }
+    { sentence: "熱があるなら、病院へ＿＿いいです。", options: ["行ったほうが", "行くほうが", "行ったら", "行くなら"], answer: 0, explain: "Saran positif selalu pakai bentuk lampau + ほうがいい: 行ったほうがいい。 (行くほうが salah karena lupa bentuk lampau.)" }
   ],
   jlptBuild: [{ chunks: ["熱が", "あるなら", "病院へ", "行ったほうがいいです"], starIndex: 1, suffix: "。", translation: "Kalau demam, sebaiknya pergi ke rumah sakit。" }]
 },
@@ -1011,7 +1011,7 @@ const BUNPOU = [
     { jp: "この犬はとても賢そうです。", reading: "このいぬはとてもかしこそうです。", meaning: "Anjing ini kelihatannya sangat pintar. (This dog looks very smart.)", cloze: "賢そう" }
   ],
   mcq: [
-    { sentence: "このケーキはおいし＿＿です。", options: ["そう", "そうだ", "らしい", "ようだ"], answer: 0, explain: "Kesan visual langsung (kelihatan enak) dari いadj (hapus い) + そう: おいしそう。" }
+    { sentence: "このケーキは＿＿です。", options: ["おいしそう", "おいしそうだ", "おいしいらしい", "おいしいようだ"], answer: 0, explain: "Kesan visual langsung (kelihatan enak) dari いadj (hapus い) + そう: おいしそう。 (そうだ tidak bisa dobel dengan です; らしい/ようだ menempel di bentuk kamus lengkap, bukan makna 'kesan visual sendiri' di sini.)" }
   ],
   jlptBuild: [{ chunks: ["今にも", "雨が", "降り", "そうです"], starIndex: 2, suffix: "。", translation: "Kelihatannya sebentar lagi akan hujan。" }]
 },
@@ -1224,7 +1224,7 @@ const BUNPOU = [
     { chunks: ["いくら", "頑張っても", "うまく", "いきません"], answer: ["いくら", "頑張っても", "うまく", "いきません"], translation: "Sekeras apapun berusaha, tetap tidak berhasil." }
   ],
   mcq: [
-    { sentence: "いくら頑張っ＿＿、うまくいきません。", options: ["ても", "たら", "と", "なら"], answer: 0, explain: "Meskipun berusaha (hipotetis, hasil tetap sama) → ても。" }
+    { sentence: "いくら＿＿、うまくいきません。", options: ["頑張っても", "頑張ったら", "頑張ると", "頑張るなら"], answer: 0, explain: "Meskipun berusaha (hipotetis, hasil tetap sama) → ても。" }
   ],
   jlptBuild: [{ chunks: ["いくら", "頑張っても", "うまく", "いきません"], starIndex: 1, suffix: "。", translation: "Sekeras apapun berusaha, tetap tidak berhasil。" }]
 }

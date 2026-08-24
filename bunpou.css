@@ -1,5 +1,12 @@
 /* 文法 Bunpou — additive styles only (styles.css supplies tokens & base layout) */
 
+:root {
+  --mode-cloze: var(--accent);
+  --mode-mcq: var(--accent-2);
+  --mode-jlptbuild: var(--good);
+  --mode-build: #e0a72e;
+}
+
 .back-link {
   display: inline-flex; align-items: center; gap: 6px;
   font-size: 13px; font-weight: 600; color: var(--text-dim);
@@ -33,12 +40,13 @@
   font: inherit; color: inherit;
 }
 .bunpou-point-row:hover { border-color: var(--accent); }
-.bunpou-point-row .dot { flex-shrink: 0; }
+.bunpou-point-row .dot { flex-shrink: 0; margin-top: 6px; align-self: flex-start; }
+.bp-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
 .bp-pattern {
   font-family: var(--font-jp); font-size: 16px; font-weight: 700;
-  white-space: nowrap;
+  line-height: 1.3;
 }
-.bp-meaning { font-size: 12.5px; color: var(--text-dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+.bp-meaning { font-size: 12.5px; color: var(--text-dim); line-height: 1.4; }
 
 /* ---------- Study view ---------- */
 .study-topbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 4px; }
@@ -77,6 +85,52 @@
 .example-list .example { margin-top: 0; }
 .example-index { font-size: 10.5px; color: var(--text-faint); font-weight: 700; margin-bottom: 2px; }
 
+/* ---------- Mode picker sheet ---------- */
+.mode-list { display: flex; flex-direction: column; gap: 8px; }
+.mode-row {
+  display: flex; align-items: center; gap: 12px; width: 100%; text-align: left;
+  background: var(--surface-2); border: 1px solid var(--border); border-radius: 14px;
+  padding: 12px 14px; cursor: pointer; font: inherit; color: inherit;
+  transition: border-color 0.15s, background 0.15s, transform 0.1s;
+}
+.mode-row:hover { border-color: var(--mode-row-accent, var(--accent)); }
+.mode-row:active { transform: scale(0.98); }
+.mode-row.is-disabled { opacity: 0.4; cursor: not-allowed; }
+.mode-row-icon { flex-shrink: 0; font-size: 22px; line-height: 1; }
+.mode-row-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
+.mode-row-title { font-size: 14.5px; font-weight: 700; color: var(--text); }
+.mode-row-desc { font-size: 12px; color: var(--text-dim); line-height: 1.4; }
+.mode-row-count {
+  flex-shrink: 0; font-size: 11.5px; font-weight: 700; color: var(--text-faint);
+  text-align: right; white-space: nowrap;
+}
+.mode-row-all { --mode-row-accent: var(--accent); }
+.mode-row-cloze { --mode-row-accent: var(--mode-cloze); }
+.mode-row-mcq { --mode-row-accent: var(--mode-mcq); }
+.mode-row-jlptbuild { --mode-row-accent: var(--mode-jlptbuild); }
+.mode-row-build { --mode-row-accent: var(--mode-build); }
+.mode-row-cloze:not(.is-disabled), .mode-row-mcq:not(.is-disabled),
+.mode-row-jlptbuild:not(.is-disabled), .mode-row-build:not(.is-disabled) { border-left: 3px solid var(--mode-row-accent); }
+
+/* Color-coded type badges — same palette everywhere a mode shows up
+   (picker sheet, in-session tag, per-card badge) so learners recognize
+   the drill type at a glance instead of reading the label each time. */
+.quiz-type-badge-cloze { background: rgba(124, 140, 255, 0.16); color: var(--mode-cloze); border-color: var(--mode-cloze); }
+.quiz-type-badge-mcq { background: rgba(255, 124, 174, 0.16); color: var(--mode-mcq); border-color: var(--mode-mcq); }
+.quiz-type-badge-jlptbuild { background: rgba(86, 214, 160, 0.16); color: var(--mode-jlptbuild); border-color: var(--mode-jlptbuild); }
+.quiz-type-badge-build { background: rgba(224, 167, 46, 0.16); color: var(--mode-build); border-color: var(--mode-build); }
+
+.quiz-mode-tag {
+  font-size: 11.5px; font-weight: 700; padding: 5px 11px; border-radius: 99px;
+  border: 1px solid var(--border); background: var(--surface-2); color: var(--text-dim);
+  white-space: nowrap;
+}
+.quiz-mode-tag[hidden] { display: none; }
+.quiz-mode-tag-cloze { color: var(--mode-cloze); border-color: var(--mode-cloze); }
+.quiz-mode-tag-mcq { color: var(--mode-mcq); border-color: var(--mode-mcq); }
+.quiz-mode-tag-jlptbuild { color: var(--mode-jlptbuild); border-color: var(--mode-jlptbuild); }
+.quiz-mode-tag-build { color: var(--mode-build); border-color: var(--mode-build); }
+
 /* ---------- Quiz view ---------- */
 .quiz-topbar { flex-wrap: wrap; row-gap: 10px; }
 .quiz-scene { perspective: none; }
@@ -96,6 +150,11 @@
   font-weight: 600; line-height: 1.6; color: var(--text);
 }
 .quiz-translation { font-size: 15px; font-weight: 600; color: var(--text); line-height: 1.5; }
+.quiz-hint {
+  font-size: 13.5px; color: var(--text-dim); line-height: 1.5;
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: 12px; padding: 8px 12px;
+}
 
 .reveal-panel { display: flex; flex-direction: column; gap: 8px; }
 .reveal-panel[hidden] { display: none; }
@@ -164,4 +223,7 @@
   .study-topbar { flex-direction: column; align-items: stretch; }
   .quiz-topbar { flex-direction: column; align-items: stretch; }
   .answerbar-stats { justify-content: center; }
+  .quiz-mode-tag { align-self: flex-start; }
+  .mode-row { padding: 11px 12px; gap: 10px; }
+  .mode-row-icon { font-size: 20px; }
 }

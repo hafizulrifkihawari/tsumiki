@@ -70,6 +70,7 @@
     <section id="quizView" hidden>
       <header class="topbar quiz-topbar">
         <button class="btn btn-ghost" id="quizBackBtn" type="button">← Kembali</button>
+        <span class="quiz-mode-tag" id="quizModeTag" hidden></span>
         <div class="progress-wrap">
           <div class="progress-count">
             <span id="posNow">1</span> / <span id="posTotal">1</span>
@@ -95,6 +96,18 @@
         <button class="btn btn-flip" id="quizEmptyBackBtn" type="button">← Kembali ke daftar</button>
       </div>
     </section>
+  </div>
+
+  <div class="sheet-overlay" id="modeOverlay" hidden>
+    <div class="sheet-card">
+      <div class="sheet-header">
+        <h2 id="modeSheetTitle">Pilih Mode Latihan</h2>
+        <button class="sheet-close" id="modeCloseBtn" type="button" aria-label="Close">×</button>
+      </div>
+      <div class="sheet-body">
+        <div class="mode-list" id="modeList"><!-- rendered by bunpou-app.js --></div>
+      </div>
+    </div>
   </div>
 
   <div class="update-toast" id="updateToast" hidden>
