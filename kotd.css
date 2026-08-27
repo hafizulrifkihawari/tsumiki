@@ -1,0 +1,77 @@
+/* 今日の漢字 Kanji of the Day — additive styles only (styles.css supplies tokens & base layout) */
+
+.kotd-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-height: calc(100vh - 160px);
+  overflow-y: auto;
+  padding: 4px 2px 24px;
+}
+
+.kotd-card {
+  background: linear-gradient(165deg, var(--surface), var(--surface-2));
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.kotd-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.kotd-kanji {
+  font-family: var(--font-jp);
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.kotd-readings {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  font-size: 13.5px;
+  color: var(--text-dim);
+}
+
+.kotd-readings strong {
+  color: var(--text);
+  font-weight: 600;
+  margin-right: 4px;
+}
+
+.kotd-parts {
+  font-size: 12.5px;
+  color: var(--text-dim);
+}
+
+.kotd-meaning {
+  font-size: 15px;
+}
+
+.kotd-example {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.kotd-example-jp {
+  font-family: var(--font-jp);
+  font-size: 16px;
+}
+
+.kotd-example-reading,
+.kotd-example-meaning {
+  font-size: 12.5px;
+  color: var(--text-dim);
+}
