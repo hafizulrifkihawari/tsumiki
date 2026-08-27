@@ -30,6 +30,7 @@
       </div>
       <div class="topbar-actions" id="topActions">
         <button class="btn btn-flip" id="reviewBtn" type="button">▶ Latihan</button>
+        <button class="btn btn-ghost" id="examLaunchBtn" type="button" title="JLPT N4 mock exam">📝 模試 N4</button>
         <a class="btn btn-ghost" href="kotoba.html" title="Kotoba vocabulary flashcards">言葉 Kotoba</a>
         <button class="btn btn-ghost" id="updateBtn" type="button" title="Force refresh to the newest version (clears the app cache)">
           <span class="btn-icon">↻</span> <span class="update-label">Force Update</span>
@@ -96,6 +97,9 @@
         <button class="btn btn-flip" id="quizEmptyBackBtn" type="button">← Kembali ke daftar</button>
       </div>
     </section>
+
+    <!-- ============ EXAM VIEW (N4 模試) — rendered by n4sim.js ============ -->
+    <section id="examView" hidden></section>
   </div>
 
   <div class="sheet-overlay" id="modeOverlay" hidden>
@@ -119,6 +123,8 @@
   <script src="srs.js"></script>
   <script src="bunpou-data.js"></script>
   <script src="bunpou-app.js"></script>
+  <script src="n4sim-data.js"></script>
+  <script src="n4sim.js"></script>
   <script>
     // Inline (see index.html/kotoba.html) so this still works even if bunpou-app.js fails to load.
     if ("serviceWorker" in navigator) {
