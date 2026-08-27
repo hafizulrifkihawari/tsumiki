@@ -639,6 +639,336 @@ const N4_SIM = [
       ]
     }
   ]
+},
+
+/* ══════════════════════════════════════════════════════════════════════════
+ *  模試 E  (Set E)
+ * ════════════════════════════════════════════════════════════════════════ */
+{
+  id: "setE",
+  label: "模試 E",
+  durationMin: 80,
+  sections: [
+    {
+      key: "moji-goi",
+      name: "言語知識（文字・語彙）",
+      mondai: [
+        {
+          type: "kanji-reading",
+          instruction: "＿＿の ことばは ひらがなで どう かきますか。",
+          items: [
+            { sentence: "郵便局で 手紙を 出しました。", target: "郵便局", options: ["ゆうびんきょく", "ゆうびんきょうく", "ゆびんきょく", "ゆうべんきょく"], explain: "郵便局 = ゆうびんきょく (kantor pos)。" },
+            { sentence: "天気予報に よると、あしたは 晴れるそうです。", target: "天気予報", options: ["てんきよほう", "てんきよほ", "てんきようほう", "てんぎよほう"], explain: "天気予報 = てんきよほう (prakiraan cuaca)。" },
+            { sentence: "来月、新しい アパートに 引っ越します。", target: "引っ越します", options: ["ひっこします", "ひきこします", "ひっごします", "ひつこします"], explain: "引っ越す = ひっこす (pindah rumah)。" },
+            { sentence: "財布を どこかに 忘れて しまいました。", target: "財布", options: ["さいふ", "ざいふ", "さいぶ", "さいうふ"], explain: "財布 = さいふ (dompet)。" },
+            { sentence: "空港まで 電車で 一時間 かかります。", target: "空港", options: ["くうこう", "こうくう", "くうごう", "くこう"], explain: "空港 = くうこう (bandara)。" },
+            { sentence: "動物園で 子どもたちが 喜んで いました。", target: "動物園", options: ["どうぶつえん", "どうもつえん", "どうぶつえ", "どぶつえん"], explain: "動物園 = どうぶつえん (kebun binatang)。" },
+            { sentence: "祭りの 日は 道が こんで います。", target: "祭り", options: ["まつり", "さいり", "まづり", "まつい"], explain: "祭り = まつり (festival)。" }
+          ]
+        },
+        {
+          type: "orthography",
+          instruction: "＿＿の ことばは かんじで どう かきますか。",
+          items: [
+            { sentence: "つくえの うえに ねこが います。", target: "うえ", options: ["上", "下", "中", "外"], explain: "うえ = 上 (atas)。" },
+            { sentence: "わたしの ともだちは しんせつです。", target: "ともだち", options: ["友達", "友違", "反達", "友通"], explain: "ともだち = 友達 (teman)。" },
+            { sentence: "きょうは そらが くもりです。", target: "そら", options: ["空", "雲", "天", "風"], explain: "そら = 空 (langit)。" },
+            { sentence: "あの たてものは がっこうです。", target: "たてもの", options: ["建物", "建者", "健物", "立物"], explain: "たてもの = 建物 (gedung)。" },
+            { sentence: "がっこうの まえに こうえんが あります。", target: "まえ", options: ["前", "後", "中", "横"], explain: "まえ = 前 (depan)。" }
+          ]
+        },
+        {
+          type: "context-vocab",
+          instruction: "（　）に 何を 入れますか。いちばん いい ものを えらんで ください。",
+          items: [
+            { sentence: "風が 強いので、帽子が （　）しまいました。", options: ["とんで", "あるいて", "のって", "すわって"], explain: "風で 帽子が とぶ = topi tertiup angin。" },
+            { sentence: "この 荷物は 重いので、一人では （　）。", options: ["もてません", "たべません", "のみません", "みません"], explain: "持てません = tidak bisa membawa (berat)。" },
+            { sentence: "電気が 急に （　）、部屋が 暗く なりました。", options: ["きえて", "ついて", "あいて", "しまって"], explain: "電気が 消える = lampu padam。" },
+            { sentence: "試合に 負けて、とても （　）です。", options: ["くやしい", "うれしい", "たのしい", "やさしい"], explain: "悔しい = kecewa/menyesal。" },
+            { sentence: "電車が 止まって、（　）に なりました。", options: ["ちこく", "あんしん", "べんり", "しんぱい"], explain: "遅刻 = terlambat。" },
+            { sentence: "この 仕事は 一人では （　）ないので、手伝って ください。", options: ["でき", "はたらけ", "やすめ", "あそべ"], explain: "できない = tidak bisa (menyelesaikan sendiri)。" }
+          ]
+        },
+        {
+          type: "paraphrase",
+          instruction: "＿＿の 文と だいたい 同じ いみの 文を えらんで ください。",
+          items: [
+            { sentence: "この 道は せまいです。", options: ["この 道は ひろくないです。", "この 道は ひろいです。", "この 道は ながいです。", "この 道は みじかいです。"], explain: "せまい = sempit = ひろくない。" },
+            { sentence: "田中さんは 元気が ないようです。", options: ["田中さんは あまり 元気じゃないようです。", "田中さんは とても 元気なようです。", "田中さんは いそがしいようです。", "田中さんは うれしいようです。"], explain: "元気がない = kurang semangat = あまり元気じゃない。" },
+            { sentence: "この店は 今日 休みです。", options: ["この店は 今日 開いていません。", "この店は 今日 開いています。", "この店は 今日 新しいです。", "この店は 今日 安いです。"], explain: "休み = libur = 開いていない。" }
+          ]
+        },
+        {
+          type: "usage",
+          instruction: "つぎの ことばの 使い方が いちばん いい 文を えらんで ください。",
+          items: [
+            { word: "しんぱい（心配）", options: ["母は 私の 健康を しんぱいして います。", "しんぱいな 料理を 作りました。", "かれは しんぱいに 走ります。", "きょうは しんぱいな 天気です。"], explain: "しんぱい (khawatir) dipakai untuk orang/hal。" },
+            { word: "こしょう（故障）", options: ["エアコンが こしょうして、暑いです。", "こしょうな 人に 会いました。", "こしょうに 勉強します。", "こしょうを 食べました。"], explain: "こしょう = rusak (mesin/alat)。" },
+            { word: "むり（無理）", options: ["体調が 悪いので、今日は 無理を しないで ください。", "むりな 料理を 食べました。", "彼は むりに 話します。", "むりな 天気です。"], explain: "無理を する = memaksakan diri。" }
+          ]
+        }
+      ]
+    },
+    {
+      key: "bunpou",
+      name: "言語知識（文法）",
+      mondai: [
+        {
+          type: "grammar-form",
+          instruction: "＿＿に 何を 入れますか。いちばん いい ものを えらんで ください。",
+          items: [
+            { sentence: "今日中に レポートを 出さ＿＿ なりません。", options: ["なければ", "なくても", "たら", "ながら"], explain: "〜なければならない = harus (keharusan)。" },
+            { sentence: "明日は 休みなので、早く 起き＿＿ いいです。", options: ["なくても", "なければ", "たら", "ので"], explain: "〜なくてもいい = tidak wajib/tidak perlu。" },
+            { sentence: "この 本は 字が 小さくて、読み＿＿です。", options: ["にくい", "やすい", "すぎる", "そうな"], explain: "〜にくい = sulit untuk (dibaca)。" },
+            { sentence: "この ペンは 使い＿＿ので、好きです。", options: ["やすい", "にくい", "すぎる", "そうな"], explain: "〜やすい = mudah untuk (dipakai)。" },
+            { sentence: "彼女は 何も 言わない＿＿、部屋を 出て 行きました。", options: ["まま", "ながら", "ように", "ため"], explain: "〜まま = dalam keadaan tetap (tanpa berkata apa-apa)。" },
+            { sentence: "電車の 中に かさを 忘れて＿＿。", options: ["しまいました", "おきました", "あります", "みます"], explain: "〜てしまう = terlanjur/menyesal (lupa payung)。" },
+            { sentence: "来週、国へ 帰る＿＿ しました。", options: ["ことに", "ことが", "はずに", "ように"], explain: "〜ことにする = memutuskan untuk。" },
+            { sentence: "急に 雨が 降って＿＿、大変でした。", options: ["きて", "いって", "おいて", "しまって"], explain: "〜てくる = mulai terjadi (perubahan mendekat)。" },
+            { sentence: "田中さんは 会議に 出る＿＿、出ないか まだ わかりません。", options: ["か", "が", "も", "と"], explain: "〜か〜ないか = apakah … atau tidak。" },
+            { sentence: "彼は とても 疲れて いる＿＿だ。顔色が 悪い。", options: ["よう", "そう", "はず", "つもり"], explain: "〜ようだ = sepertinya (dugaan dari bukti/wajah)。" },
+            { sentence: "天気予報に よると、明日は 雪が 降る＿＿です。", options: ["そう", "よう", "はず", "つもり"], explain: "〜そうだ (伝聞) = katanya (dari yang didengar)。" },
+            { sentence: "母は 私に 野菜を 食べ＿＿。", options: ["させます", "されます", "できます", "なります"], explain: "使役 (menyuruh) = 食べさせます。" },
+            { sentence: "この 部屋は 静かなので、勉強し＿＿。", options: ["やすいです", "にくいです", "すぎます", "そうです"], explain: "〜やすい = mudah untuk (belajar)。" }
+          ]
+        },
+        {
+          type: "sentence-order",
+          instruction: "★に 入る ものは どれですか。ただしい 文を つくって、★の ことばを えらんで ください。",
+          items: [
+            { prefix: "これは", chunks: ["田中さんが", "作って", "くれた", "料理"], starIndex: 2, suffix: "です。", translation: "Ini masakan yang dibuatkan oleh Tanaka.", explain: "正しい文: これは 田中さんが 作って くれた 料理です。★ = くれた。" },
+            { prefix: "彼女は", chunks: ["日本語を", "教える", "ことに", "しました"], starIndex: 2, suffix: "。", translation: "Dia memutuskan untuk mengajar bahasa Jepang.", explain: "正しい文: 彼女は 日本語を 教える ことに しました。★ = ことに。" },
+            { prefix: "", chunks: ["宿題が", "終わって", "から", "遊びに"], starIndex: 2, suffix: "行きます。", translation: "Setelah PR selesai, saya pergi bermain.", explain: "正しい文: 宿題が 終わって から 遊びに 行きます。★ = から。" },
+            { prefix: "母は", chunks: ["私に", "野菜を", "食べる", "ように"], starIndex: 2, suffix: "言いました。", translation: "Ibu bilang agar saya makan sayur.", explain: "正しい文: 母は 私に 野菜を 食べる ように 言いました。★ = 食べる。" }
+          ]
+        },
+        {
+          type: "text-grammar",
+          instruction: "つぎの 文章を 読んで、（　）に 入る いちばん いい ものを えらんで ください。",
+          passage: "先週、友だちと 海へ 行きました。海（１）着いてから、みんなで 泳いだり、写真を とったり しました。天気が よかった（２）、とても 楽しかったです。お昼は 近くの 店で 魚料理を（３）。帰る 前に、お土産を 買い（４）と 思っています。",
+          items: [
+            { label: "（１）", options: ["に", "で", "を", "へ"], explain: "海に 着く = tiba di laut (partikel に untuk titik tujuan)。" },
+            { label: "（２）", options: ["ので", "のに", "でも", "より"], explain: "よかったので = karena cuacanya bagus。" },
+            { label: "（３）", options: ["食べました", "食べます", "食べたい", "食べて"], explain: "食べました = sudah makan (laporan kegiatan)。" },
+            { label: "（４）", options: ["たい", "ました", "ましょう", "そう"], explain: "買いたいと 思って います = ingin membeli。" }
+          ]
+        }
+      ]
+    },
+    {
+      key: "dokkai",
+      name: "読解",
+      mondai: [
+        {
+          type: "reading",
+          title: "短文①",
+          instruction: "つぎの メモを 読んで、質問に 答えて ください。",
+          passage: "山本さん\n\n会議の 時間が 変わりました。3時からではなく、4時からに なりました。場所は 同じです。よろしく お願いします。\n佐藤",
+          items: [
+            { question: "会議は 何時から ですか。", options: ["4時から", "3時から", "5時から", "2時から"], explain: "「4時からに なりました」とある。" },
+            { question: "会議の 場所は どう なりましたか。", options: ["変わりません。", "変わりました。", "わかりません。", "なくなりました。"], explain: "「場所は 同じです」とある。" }
+          ]
+        },
+        {
+          type: "reading",
+          title: "短文②",
+          instruction: "つぎの 文章を 読んで、質問に 答えて ください。",
+          passage: "わたしは 毎朝 コーヒーを 飲みます。でも、今朝は 時間が なかったので、飲みませんでした。会社で 眠くなって、大変でした。",
+          items: [
+            { question: "この人は 今朝、何を しませんでしたか。", options: ["コーヒーを 飲まなかった。", "会社に 行かなかった。", "朝ごはんを 食べなかった。", "早く 起きなかった。"], explain: "「今朝は…飲みませんでした」とある。" },
+            { question: "会社で どう なりましたか。", options: ["眠く なった。", "元気に なった。", "うれしく なった。", "いそがしく なった。"], explain: "「会社で 眠くなって、大変でした」とある。" }
+          ]
+        },
+        {
+          type: "reading",
+          title: "中文",
+          instruction: "つぎの 文章を 読んで、質問に 答えて ください。",
+          passage: "先月、わたしは はじめて 一人で 旅行を しました。行き先は 京都です。新幹線に 乗るのは はじめてで、少し 緊張しました。京都に 着いてから、有名な お寺を いくつか まわりました。人が とても 多かったですが、景色は 本当に きれいでした。夜は 小さな 食堂で 京料理を 食べました。少し 高かったですが、とても おいしかったです。次の日は 雨が 降って いましたが、傘を 差して 町を 歩きました。一人旅は はじめてで 少し 心配でしたが、思っていたより ずっと 楽しかったです。また 一人で どこかへ 行きたいと 思います。",
+          items: [
+            { question: "この人は 何に 乗るのが はじめてでしたか。", options: ["新幹線", "飛行機", "バス", "船"], explain: "「新幹線に 乗るのは はじめてで」とある。" },
+            { question: "夜は 何を しましたか。", options: ["食堂で 京料理を 食べた。", "お寺を まわった。", "ホテルで 休んだ。", "買い物を した。"], explain: "「夜は 小さな 食堂で 京料理を 食べました」とある。" },
+            { question: "この人は 旅行を どう 思いましたか。", options: ["思っていたより 楽しかった。", "つまらなかった。", "高かったので 後悔した。", "もう 行きたくない。"], explain: "「思っていたより ずっと 楽しかった」とある。" }
+          ]
+        },
+        {
+          type: "reading",
+          title: "情報検索",
+          instruction: "つぎの お知らせを 見て、質問に 答えて ください。",
+          passage: "【日本語 スピーチ大会】\n・日にち：11月20日（金）\n・時間：午後2時〜4時\n・場所：市民ホール\n・参加費：無料\n・申し込み：11月10日までに、メールで お願いします。\n・注意：発表は 一人 5分までです。",
+          items: [
+            { question: "スピーチ大会は いつ ありますか。", options: ["11月20日", "11月10日", "12月20日", "11月2日"], explain: "「日にち：11月20日」とある。" },
+            { question: "参加費は いくらですか。", options: ["無料です。", "1,000円です。", "500円です。", "わかりません。"], explain: "「参加費：無料」とある。" },
+            { question: "申し込みは どうやって しますか。", options: ["メールで します。", "電話で します。", "市民ホールへ 行きます。", "手紙を 書きます。"], explain: "「メールで お願いします」とある。" }
+          ]
+        }
+      ]
+    }
+  ]
+},
+
+/* ══════════════════════════════════════════════════════════════════════════
+ *  模試 F  (Set F)
+ * ════════════════════════════════════════════════════════════════════════ */
+{
+  id: "setF",
+  label: "模試 F",
+  durationMin: 80,
+  sections: [
+    {
+      key: "moji-goi",
+      name: "言語知識（文字・語彙）",
+      mondai: [
+        {
+          type: "kanji-reading",
+          instruction: "＿＿の ことばは ひらがなで どう かきますか。",
+          items: [
+            { sentence: "来週は 妹の 誕生日です。", target: "誕生日", options: ["たんじょうび", "だんじょうび", "たんじょうひ", "たんしょうび"], explain: "誕生日 = たんじょうび (ulang tahun)。" },
+            { sentence: "お金を 銀行に 預けます。", target: "預けます", options: ["あずけます", "あづけます", "よけます", "あすけます"], explain: "預ける = あずける (menitipkan)。" },
+            { sentence: "週末に 家族で キャンプに 行きます。", target: "家族", options: ["かぞく", "がぞく", "かそく", "かぞうく"], explain: "家族 = かぞく (keluarga)。" },
+            { sentence: "自動販売機で ジュースを 買いました。", target: "自動販売機", options: ["じどうはんばいき", "じとうはんばいき", "じどうばんばいき", "じどうはんばいぎ"], explain: "自動販売機 = じどうはんばいき (mesin penjual otomatis)。" },
+            { sentence: "空港で 友達を 迎えました。", target: "迎えました", options: ["むかえました", "おかえました", "むかいました", "まかえました"], explain: "迎える = むかえる (menjemput)。" },
+            { sentence: "運動会は 来月の 土曜日です。", target: "運動会", options: ["うんどうかい", "うんとうかい", "うんどうがい", "うんどかい"], explain: "運動会 = うんどうかい (acara olahraga sekolah)。" },
+            { sentence: "引っ越しを 友達に 手伝って もらいました。", target: "手伝って", options: ["てつだって", "てづだって", "てつたって", "でつだって"], explain: "手伝う = てつだう (membantu)。" }
+          ]
+        },
+        {
+          type: "orthography",
+          instruction: "＿＿の ことばは かんじで どう かきますか。",
+          items: [
+            { sentence: "きょうは いもうとの たんじょうびです。", target: "いもうと", options: ["妹", "姉", "兄", "弟"], explain: "いもうと = 妹 (adik perempuan)。" },
+            { sentence: "がっこうの うんどうかいは たのしいです。", target: "たのしい", options: ["楽しい", "苦しい", "悲しい", "忙しい"], explain: "たのしい = 楽しい (menyenangkan)。" },
+            { sentence: "この みちを まっすぐ 行くと、こうえんが あります。", target: "みち", options: ["道", "首", "通", "進"], explain: "みち = 道 (jalan)。" },
+            { sentence: "つよい かぜが ふいて います。", target: "かぜ", options: ["風", "雨", "雪", "空"], explain: "かぜ = 風 (angin)。" },
+            { sentence: "でんしゃの なかで ほんを よみます。", target: "なか", options: ["中", "外", "上", "下"], explain: "なか = 中 (dalam)。" }
+          ]
+        },
+        {
+          type: "context-vocab",
+          instruction: "（　）に 何を 入れますか。いちばん いい ものを えらんで ください。",
+          items: [
+            { sentence: "毎月、少しずつ お金を （　）います。", options: ["ためて", "つかって", "かりて", "かえして"], explain: "貯める = menabung。" },
+            { sentence: "自動販売機で のみものを （　）。", options: ["かいました", "つくりました", "もらいました", "かりました"], explain: "買いました = membeli (dari vending machine)。" },
+            { sentence: "雨が 降って いたので、友だちに 傘を （　）もらいました。", options: ["かして", "かりて", "あげて", "くれて"], explain: "貸して もらう = dipinjami (payung)。" },
+            { sentence: "ギターを 習い始めて、少しずつ （　）ように なりました。", options: ["ひける", "ひけない", "ひかない", "ひいた"], explain: "弾けるように なる = jadi bisa memainkan (gitar)。" },
+            { sentence: "キャンプで テントを （　）のは 大変でした。", options: ["たてる", "たべる", "きる", "のる"], explain: "テントを 立てる = mendirikan tenda。" },
+            { sentence: "空港で 友だちを （　）、うれしかったです。", options: ["むかえて", "おくって", "わすれて", "さがして"], explain: "友だちを 迎える = menjemput teman。" }
+          ]
+        },
+        {
+          type: "paraphrase",
+          instruction: "＿＿の 文と だいたい 同じ いみの 文を えらんで ください。",
+          items: [
+            { sentence: "この 仕事は かんたんでは ありません。", options: ["この 仕事は むずかしいです。", "この 仕事は やさしいです。", "この 仕事は はやいです。", "この 仕事は あんぜんです。"], explain: "かんたんではない = tidak mudah = むずかしい。" },
+            { sentence: "彼は お金を たくさん もって います。", options: ["彼は お金持ちです。", "彼は びんぼうです。", "彼は けちです。", "彼は しんせつです。"], explain: "お金を たくさん 持って いる = お金持ち (kaya)。" },
+            { sentence: "きのうの パーティーは にぎやかでした。", options: ["きのうの パーティーは 人が 多くて 楽しかったです。", "きのうの パーティーは しずかでした。", "きのうの パーティーは つまらなかったです。", "きのうの パーティーは さびしかったです。"], explain: "にぎやか = ramai = 人が多くて楽しい。" }
+          ]
+        },
+        {
+          type: "usage",
+          instruction: "つぎの ことばの 使い方が いちばん いい 文を えらんで ください。",
+          items: [
+            { word: "たのむ（頼む）", options: ["友だちに 荷物を 運ぶのを 頼みました。", "本を 頼んで 読みます。", "道を 頼んで 歩きます。", "時間を 頼んで 待ちます。"], explain: "頼む = meminta tolong。" },
+            { word: "しゅうかん（習慣）", options: ["朝、散歩を するのが 私の 習慣です。", "習慣な 料理を 食べました。", "彼は 習慣に 走ります。", "きょうは 習慣な 天気です。"], explain: "習慣 = kebiasaan。" },
+            { word: "こわれる（壊れる）", options: ["古い 時計が 壊れて、動きません。", "時計が 壊れて、おいしいです。", "時計を 壊れて、走ります。", "時計が 壊れて、はやいです。"], explain: "壊れる = rusak (barang/mesin)。" }
+          ]
+        }
+      ]
+    },
+    {
+      key: "bunpou",
+      name: "言語知識（文法）",
+      mondai: [
+        {
+          type: "grammar-form",
+          instruction: "＿＿に 何を 入れますか。いちばん いい ものを えらんで ください。",
+          items: [
+            { sentence: "この ボタンを 押す＿＿、ドアが 開きます。", options: ["と", "なら", "ので", "のに"], explain: "〜と = jika (kondisi yang pasti terjadi)。" },
+            { sentence: "図書館では 大きい 声で 話し＿＿。", options: ["てはいけません", "てもいいです", "ています", "ました"], explain: "〜てはいけない = dilarang (larangan)。" },
+            { sentence: "疲れたら、少し 休ん＿＿いいですよ。", options: ["でも", "では", "でが", "でと"], explain: "〜てもいい = boleh (izin)。" },
+            { sentence: "この 料理は 作った＿＿なので、まだ 熱いです。", options: ["ばかり", "まま", "ところ", "とおり"], explain: "〜たばかり = baru saja selesai。" },
+            { sentence: "旅行の 前に、切符を 買って＿＿ ましょう。", options: ["おき", "み", "しまい", "あり"], explain: "〜ておく = melakukan sesuatu untuk persiapan。" },
+            { sentence: "一度、その 映画を 見て＿＿たいです。", options: ["み", "おき", "しまい", "あり"], explain: "〜てみる = mencoba melakukan。" },
+            { sentence: "弟は まだ 子どもな＿＿、よく 泣きます。", options: ["ので", "けど", "でも", "より"], explain: "子どもなので = karena masih anak-anak。" },
+            { sentence: "一生懸命 練習した＿＿、上手に なりませんでした。", options: ["のに", "ので", "から", "なら"], explain: "〜のに = padahal sudah berlatih keras。" },
+            { sentence: "会議は 午後3時＿＿ 始まります。", options: ["から", "まで", "より", "でも"], explain: "〜から = mulai dari jam 3。" },
+            { sentence: "母は 忙しい＿＿、いつも 笑顔です。", options: ["のに", "ので", "から", "けど"], explain: "忙しいのに = padahal sibuk (kontras)。" },
+            { sentence: "この 薬を 飲め＿＿、すぐ 治りますよ。", options: ["ば", "ても", "のに", "から"], explain: "〜ば = kalau (syarat dengan hasil positif)。" },
+            { sentence: "彼女は 日本に 住んだ＿＿が あります。", options: ["こと", "もの", "とき", "ため"], explain: "〜たことがある = pernah (pengalaman)。" },
+            { sentence: "忘れ物を しない＿＿、もう一度 かばんの 中を 確認して ください。", options: ["ように", "ために", "ながら", "のに"], explain: "〜ないように = agar tidak (lupa membawa barang)。" }
+          ]
+        },
+        {
+          type: "sentence-order",
+          instruction: "★に 入る ものは どれですか。ただしい 文を つくって、★の ことばを えらんで ください。",
+          items: [
+            { prefix: "この", chunks: ["ボタンを", "押す", "と", "電気が"], starIndex: 2, suffix: "つきます。", translation: "Kalau menekan tombol ini, lampu menyala.", explain: "正しい文: この ボタンを 押す と 電気が つきます。★ = と。" },
+            { prefix: "図書館では", chunks: ["大きい", "声で", "話しては", "いけません"], starIndex: 2, suffix: "。", translation: "Di perpustakaan tidak boleh berbicara dengan suara keras.", explain: "正しい文: 図書館では 大きい 声で 話しては いけません。★ = 話しては。" },
+            { prefix: "旅行の", chunks: ["前に", "切符を", "買って", "おきます"], starIndex: 2, suffix: "。", translation: "Sebelum bepergian, saya membeli tiket terlebih dahulu.", explain: "正しい文: 旅行の 前に 切符を 買って おきます。★ = 買って。" },
+            { prefix: "彼女は", chunks: ["日本に", "住んだ", "ことが", "あります"], starIndex: 2, suffix: "。", translation: "Dia pernah tinggal di Jepang.", explain: "正しい文: 彼女は 日本に 住んだ ことが あります。★ = ことが。" }
+          ]
+        },
+        {
+          type: "text-grammar",
+          instruction: "つぎの 文章を 読んで、（　）に 入る いちばん いい ものを えらんで ください。",
+          passage: "先週の 日曜日は 妹の 誕生日でした。家族（１）レストランへ 行って、お祝いを しました。妹は とても 喜んで いました。食事の（２）、みんなで 写真を とりました。来年も また 楽しい 誕生日に（３）と 思います。妹に プレゼントを 買う（４）、いろいろな 店を 見て 回りました。",
+          items: [
+            { label: "（１）", options: ["と", "で", "を", "へ"], explain: "家族と = bersama keluarga。" },
+            { label: "（２）", options: ["あとで", "まえに", "ながら", "ように"], explain: "食事の あとで = setelah makan。" },
+            { label: "（３）", options: ["したい", "します", "しました", "しよう"], explain: "したいと 思います = ingin menjadikannya (harapan)。" },
+            { label: "（４）", options: ["ために", "ように", "のに", "から"], explain: "買う ために = demi/untuk membeli (tujuan)。" }
+          ]
+        }
+      ]
+    },
+    {
+      key: "dokkai",
+      name: "読解",
+      mondai: [
+        {
+          type: "reading",
+          title: "短文①",
+          instruction: "つぎの メモを 読んで、質問に 答えて ください。",
+          passage: "鈴木さん\n\n明日の 練習は 雨の ため、中止に なりました。次の 練習は 来週の 土曜日です。場所は いつもと 同じ 体育館です。\n木村",
+          items: [
+            { question: "明日の 練習は どう なりましたか。", options: ["中止に なりました。", "時間が 変わりました。", "場所が 変わりました。", "そのまま 行われます。"], explain: "「中止に なりました」とある。" },
+            { question: "次の 練習は いつですか。", options: ["来週の 土曜日", "明日", "今週の 土曜日", "来月"], explain: "「次の 練習は 来週の 土曜日です」とある。" }
+          ]
+        },
+        {
+          type: "reading",
+          title: "短文②",
+          instruction: "つぎの 文章を 読んで、質問に 答えて ください。",
+          passage: "わたしは 先月から 銀行で お金を ためて います。毎月 5千円ずつ 入れて、旅行の お金に する つもりです。まだ 少ししか たまって いませんが、少しずつ 頑張ります。",
+          items: [
+            { question: "この人は 何を して いますか。", options: ["お金を ためて いる。", "旅行に 行って いる。", "銀行で 働いて いる。", "お金を 借りて いる。"], explain: "「銀行で お金を ためて います」とある。" },
+            { question: "貯めた お金は 何に 使う つもりですか。", options: ["旅行の お金", "家の お金", "学校の お金", "車の お金"], explain: "「旅行の お金に する つもりです」とある。" }
+          ]
+        },
+        {
+          type: "reading",
+          title: "中文",
+          instruction: "つぎの 文章を 読んで、質問に 答えて ください。",
+          passage: "先週の 週末、わたしは 友だちと 山へ キャンプに 行きました。テントを 立てるのは はじめてで、少し 難しかったですが、友だちが 手伝って くれたので、なんとか できました。夜は みんなで 火を 囲んで、料理を 作りました。星が とても きれいで、感動しました。次の日の 朝は 少し 寒かったですが、鳥の 声で 気持ちよく 目が覚めました。キャンプは 大変な ことも ありましたが、自然の 中で 過ごす 時間は とても 楽しかったです。また 機会が あれば、行きたいと 思います。",
+          items: [
+            { question: "テントを 立てるのは どうでしたか。", options: ["はじめてで、少し 難しかった。", "かんたんだった。", "友だちが 全部した。", "できなかった。"], explain: "「テントを 立てるのは はじめてで、少し 難しかった」とある。" },
+            { question: "キャンプの 夜は 何を して 過ごしましたか。", options: ["火を 囲んで 料理を 作った。", "すぐ 寝た。", "山を 下りた。", "本を 読んだ。"], explain: "「夜は みんなで 火を 囲んで、料理を 作りました」とある。" },
+            { question: "この人は キャンプを どう 思いましたか。", options: ["自然の 中で 過ごす 時間が 楽しかった。", "二度と 行きたくない。", "つまらなかった。", "寒くて 大変だっただけだった。"], explain: "「自然の 中で 過ごす 時間は とても 楽しかった」とある。" }
+          ]
+        },
+        {
+          type: "reading",
+          title: "情報検索",
+          instruction: "つぎの お知らせを 見て、質問に 答えて ください。",
+          passage: "【市民 テニス教室】\n・日にち：毎週 水曜日\n・時間：午後6時〜7時30分\n・場所：市民 テニスコート\n・対象：初めての 方でも 大丈夫です。\n・持ち物：ラケット（貸出も あります）、運動できる 服\n・料金：一回 800円\n・申し込み：当日 会場で 受け付けます。",
+          items: [
+            { question: "テニス教室は いつ ありますか。", options: ["毎週水曜日", "毎週日曜日", "毎月一回", "毎週土曜日"], explain: "「日にち：毎週 水曜日」とある。" },
+            { question: "ラケットを 持って いない人は どうしますか。", options: ["会場で 借りる ことが できる。", "教室に 参加できない。", "自分で 買わなければ ならない。", "友だちに 借りる。"], explain: "「ラケット（貸出も あります）」とある。" },
+            { question: "申し込みは いつ しますか。", options: ["当日、会場でする。", "前の日までにする。", "1週間前までにする。", "電話でする。"], explain: "「申し込み：当日 会場で 受け付けます」とある。" }
+          ]
+        }
+      ]
+    }
+  ]
 }
 
 ];

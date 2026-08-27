@@ -373,7 +373,8 @@
     })[q.type] || q.type;
   }
 
-  function renderStem(q) {
+  function renderStem(q, opts) {
+    opts = opts || {};
     switch (q.type) {
       case "kanji-reading":
       case "orthography":
@@ -394,7 +395,7 @@
         }
         return (q.prefix ? '<span class="quiz-jp">' + esc(q.prefix) + " </span>" : "") +
           '<div class="jlpt-slots">' + slots + (q.suffix ? " " + esc(q.suffix) : "") + "</div>" +
-          '<p class="jlpt-hint">★に 入る ものを えらんで ください。' + (q.translation ? "（" + esc(q.translation) + "）" : "") + "</p>";
+          '<p class="jlpt-hint">★に 入る ものを えらんで ください。' + (opts.review && q.translation ? "（" + esc(q.translation) + "）" : "") + "</p>";
       }
       case "text-grammar":
         return '<div class="quiz-jp exam-blank-focus">' + esc(q.label) + " に 入る ことば</div>";
@@ -537,7 +538,7 @@
           '<span class="exam-review-mark">' + (ok ? "✓" : "✗") + "</span>" +
         "</div>" +
         (q.passage ? '<div class="exam-passage exam-passage-sm">' + nl2br(q.passage) + "</div>" : "") +
-        '<div class="exam-stem">' + renderStem(q) + "</div>" +
+        '<div class="exam-stem">' + renderStem(q, { review: true }) + "</div>" +
         renderOptions(q, { selectedIndex: sel, review: true }) +
         '<div class="exam-review-ans">あなたの 回答: ' + yourAns +
           " ／ 正解: " + LETTERS[q.answer] + ". " + esc(q.options[q.answer]) + "</div>" +
