@@ -43,10 +43,11 @@
   ];
 
   // ---- Bunpou views to hide while the exam is on screen ----------------------
-  const otherViews = ["browseView", "studyView", "quizView"].map(el).filter(Boolean);
+  const otherViews = ["browseView", "studyView", "quizView", "choukaiView"].map(el).filter(Boolean);
   const reviewBtn = el("reviewBtn");
 
   function showExam(on) {
+    if (on && window.__choukaiStop) window.__choukaiStop();
     examView.hidden = !on;
     otherViews.forEach((v) => { v.hidden = on; });
     if (reviewBtn) reviewBtn.hidden = on;
@@ -162,6 +163,9 @@
   let timerId = null;
 
   function stopTimer() { if (timerId) { clearInterval(timerId); timerId = null; } }
+  // Guarded hook so choukai.js can pause this exam's timer if the learner
+  // switches to 聴解 mode mid-session without exiting cleanly.
+  window.__n4simStop = stopTimer;
   function startTimer() {
     stopTimer();
     timerId = setInterval(() => {
