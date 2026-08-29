@@ -1,0 +1,29 @@
+/* 言葉 Kotoba manage page — additive styles only (styles.css supplies tokens & base layout) */
+
+.back-link {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 13px; font-weight: 600; color: var(--text-dim);
+  text-decoration: none; padding: 8px 4px; border-radius: 10px;
+  transition: color 0.18s;
+}
+.back-link:hover { color: var(--accent); }
+
+.lesson-list { display: flex; flex-direction: column; gap: 10px; }
+
+.lesson-row {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 16px; border-radius: var(--radius);
+  background: var(--surface); border: 1px solid var(--border);
+  cursor: pointer; transition: opacity 0.15s, border-color 0.15s;
+}
+.lesson-row:hover { border-color: var(--accent); }
+.lesson-row.is-off { opacity: 0.5; }
+
+.lesson-check {
+  width: 20px; height: 20px; accent-color: var(--accent); cursor: pointer; flex: none;
+}
+
+.lesson-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
+.lesson-title { font-weight: 700; font-size: 15px; }
+.lesson-row.is-off .lesson-title { text-decoration: line-through; }
+.lesson-meta { font-size: 12px; color: var(--text-faint); }

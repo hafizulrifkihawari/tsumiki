@@ -52,6 +52,19 @@
   KOTOBA.forEach((c, i) => { c.key = "k-" + c.lesson + "-" + i; });
   const cardsByKey = new Map(KOTOBA.map((c) => [c.key, c]));
 
+  // Lessons unchecked on kotoba-manage.html — read fresh on every load since
+  // that page is a separate full navigation, not a live-synced panel.
+  const DISABLED_LESSONS_KEY = "kotoba.disabledLessons";
+  function loadDisabledLessons() {
+    try {
+      const raw = localStorage.getItem(DISABLED_LESSONS_KEY);
+      if (raw) return new Set(JSON.parse(raw));
+    } catch (e) { /* ignore */ }
+    return new Set();
+  }
+  const disabledLessons = loadDisabledLessons();
+  const activeCards = () => KOTOBA.filter((c) => !disabledLessons.has(c.lesson));
+
   let srsMap = loadSrs(KOTOBA_DECK, currentUser);
   let sessionCorrect = 0;
   let sessionMissed = 0;
@@ -73,7 +86,7 @@
   function updateDueCount() {
     const now = Date.now();
     let due = 0;
-    for (const c of KOTOBA) {
+    for (const c of activeCards()) {
       const entry = srsMap[c.key];
       if (entry && entry.box > 0 && isDue(entry, now)) due++;
     }
@@ -87,7 +100,8 @@
     const data = {
       order: deck.map((c) => c.key),
       index, sessionCorrect, sessionMissed,
-      againQueue: [...againQueue]
+      againQueue: [...againQueue],
+      disabledLessons: [...disabledLessons].sort((a, b) => a - b)
     };
     ls(false, progressKeyFor(currentUser), JSON.stringify(data));
   }
@@ -100,6 +114,13 @@
 
   function restoreProgress(saved) {
     if (!saved || !Array.isArray(saved.order) || !saved.order.length) return false;
+    // A session saved under a different Manage-page lesson filter is stale —
+    // rebuild fresh instead of replaying a deck that no longer matches it.
+    const savedFilter = (saved.disabledLessons || []).slice().sort((a, b) => a - b);
+    const currentFilter = [...disabledLessons].sort((a, b) => a - b);
+    if (savedFilter.length !== currentFilter.length || savedFilter.some((v, i) => v !== currentFilter[i])) {
+      return false;
+    }
     const restored = saved.order.map((k) => cardsByKey.get(k)).filter(Boolean);
     if (!restored.length) return false;
     deck = restored;
@@ -107,7 +128,7 @@
     sessionCorrect = saved.sessionCorrect || 0;
     sessionMissed = saved.sessionMissed || 0;
     againQueue = new Set(saved.againQueue || []);
-    wordCount.textContent = KOTOBA.length;
+    wordCount.textContent = activeCards().length;
     updateScore();
     updateQueueBadge();
     updateDueCount();
@@ -130,7 +151,8 @@
     const now = Date.now();
     const dueCards = [];
     const newCards = [];
-    for (const c of KOTOBA) {
+    const pool = activeCards();
+    for (const c of pool) {
       const entry = srsMap[c.key];
       if (entry && entry.box > 0) {
         if (isDue(entry, now)) dueCards.push({ c, due: entry.due });
@@ -147,7 +169,7 @@
     sessionCorrect = 0;
     sessionMissed = 0;
     againQueue = new Set();
-    wordCount.textContent = KOTOBA.length;
+    wordCount.textContent = pool.length;
     updateScore();
     updateQueueBadge();
     updateDueCount();
