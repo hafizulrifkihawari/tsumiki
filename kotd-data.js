@@ -21,6 +21,11 @@
  *
  * `id` is a stable key independent of array position — used by kotd.js's
  * daily-rotation math and by compound entries' `parts` references.
+ *
+ * If you edit RAW, re-run `node scripts/build-kotd-widget-data.js` and rebuild
+ * both native widget targets (android/, ios/) before shipping — the Android
+ * and iOS KOTD widgets bundle their own copy of this data and compute "today"
+ * on-device rather than syncing from the web app.
  */
 const RAW = [
   { id: 1, type: "single", kanji: "一", onyomi: "イチ", kunyomi: "ひと(つ)", meaning: "satu", meaningEn: "one", level: "N5",

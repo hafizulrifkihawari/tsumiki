@@ -1,0 +1,9 @@
+{
+  "appId": "com.hafizulrifkihawari.jpflashcard",
+  "appName": "JP Flashcards",
+  "webDir": "www",
+  "server": {
+    "url": "https://hafizulrifkihawari.github.io/jp-flashcard/",
+    "cleartext": false
+  }
+}

@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">JP Flashcards</string>
+    <string name="title_activity_main">JP Flashcards</string>
+    <string name="package_name">com.hafizulrifkihawari.jpflashcard</string>
+    <string name="custom_url_scheme">com.hafizulrifkihawari.jpflashcard</string>
+    <string name="kotd_widget_description">Shows today\'s featured kanji/word with its example sentence — tap the speaker to hear it.</string>
+</resources>

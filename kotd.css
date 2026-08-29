@@ -65,6 +65,11 @@
   gap: 3px;
 }
 
+.kotd-example-top {
+  position: relative;
+  padding-right: 44px; /* room for the absolutely-positioned .speak-btn */
+}
+
 .kotd-example-jp {
   font-family: var(--font-jp);
   font-size: 16px;

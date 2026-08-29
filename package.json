@@ -1,0 +1,13 @@
+{
+  "name": "jp-flashcard-shell",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Capacitor native shell (Android/iOS) wrapping the deployed jp-flashcard PWA, for the KOTD home-screen widgets. Not a build system for the site itself — GitHub Pages keeps deploying the repo root directly.",
+  "dependencies": {
+    "@capacitor/android": "^8.5.0",
+    "@capacitor/app": "^8.1.1",
+    "@capacitor/cli": "^8.5.0",
+    "@capacitor/core": "^8.5.0",
+    "@capacitor/ios": "^8.5.0"
+  }
+}

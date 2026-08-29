@@ -1,4 +1,32 @@
 # Implementation Plan: Cross-Platform Home Screen Widgets via Capacitor
+
+> **Superseded.** This draft predates the actual KOTD data model (example
+> sentences, compound entries) and TTS. It's kept for history, not as a guide
+> — see `~/.claude/plans/for-the-kotd-section-compressed-rivest.md` for the
+> plan that was actually executed (android/, ios/, scripts/build-kotd-widget-data.js,
+> kotd.js's TTS/deep-link additions). Concrete corrections made along the way:
+> - **Bundled, self-computing data instead of app-synced.** The widgets bundle
+>   their own copy of kotd-data.js (as JSON) and compute "today" on-device via
+>   a Kotlin/Swift port of pickDaily()/todayStamp(), so they stay correct even
+>   on days the app isn't opened. This plan's `capacitor-widget-bridge` +
+>   `WidgetBridge.setItem()`/`current_kanji` sync-on-open approach was dropped
+>   entirely — there's no data left to push once the widget computes its own
+>   pick, and `capacitor-widget-bridge`'s Android path also needs an explicit
+>   `setRegisteredWidgets()` call this draft omitted (it would have silently
+>   failed to refresh).
+> - **`.systemMedium` on iOS, not `.systemSmall`** — too small once the
+>   example sentence is added.
+> - **TTS added** — Android speaks the example sentence in place via a
+>   `PendingIntent`/`BroadcastReceiver`/`TextToSpeech`, no app launch needed.
+>   iOS can't do that (WidgetKit extensions aren't allowed to play audio at
+>   all), so it deep-links into the app instead, which plays it via the
+>   existing Web Speech API pattern (`app.js`) newly added to `kotd.js`.
+> - **No App Group needed** — since data is bundled and computed on-device,
+>   there's no cross-process state to share with the main app.
+> - **`policy: .never` → forward-window timeline.** iOS `TimelineProvider`
+>   pre-computes the next 8 UTC days' entries with `policy: .after(nextMidnight)`
+>   instead of `.never`, so it actually refreshes.
+
 **Target Repository:** `https://hafizulrifkihawari.github.io/jp-flashcard/`
 **Objective:** Deploy native home screen widgets displaying "Kanji of the Day" using Capacitor while keeping web deployment on GitHub Pages.
 

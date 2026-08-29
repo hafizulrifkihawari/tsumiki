@@ -2,3 +2,16 @@
 Kotoba Minna no Nihongo II.pdf
 .DS_Store
 .claude
+
+# Capacitor native shell (KOTD widgets) — see package.json / capacitor.config.json
+node_modules/
+android/app/build/
+android/.gradle/
+android/local.properties
+android/**/build/
+android/captures/
+ios/App/Pods/
+ios/App/build/
+ios/App/DerivedData/
+*.xcuserstate
+xcuserdata/

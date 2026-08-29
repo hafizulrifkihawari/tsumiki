@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  KOTD ("Kanji of the Day") home-screen widget. Mirrors the fields shown on
+  kotd.html's cards (headline, readings, meaning, example sentence) minus the
+  compound "built from X + Y" breakdown, which doesn't fit this footprint —
+  see KotdWidgetProvider.kt for what's populated at render time.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#FFFFFF"
+    android:padding="14dp">
+
+    <TextView
+        android:id="@+id/kotd_widget_headline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="漢"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        android:textColor="#171A2E" />
+
+    <TextView
+        android:id="@+id/kotd_widget_reading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:text="Reading"
+        android:textSize="12sp"
+        android:textColor="#666666" />
+
+    <TextView
+        android:id="@+id/kotd_widget_meaning"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:text="Meaning"
+        android:textSize="13sp"
+        android:textStyle="italic"
+        android:textColor="#424242" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:background="#F1F2F8"
+        android:padding="10dp">
+
+        <TextView
+            android:id="@+id/kotd_widget_example_jp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toStartOf="@id/kotd_widget_speak_btn"
+            android:text="例文"
+            android:textSize="14sp"
+            android:textColor="#171A2E" />
+
+        <TextView
+            android:id="@+id/kotd_widget_example_reading"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/kotd_widget_example_jp"
+            android:layout_toStartOf="@id/kotd_widget_speak_btn"
+            android:layout_marginTop="2dp"
+            android:text=""
+            android:textSize="11sp"
+            android:textColor="#666666" />
+
+        <TextView
+            android:id="@+id/kotd_widget_speak_btn"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_alignParentEnd="true"
+            android:background="@drawable/kotd_speak_btn_bg"
+            android:gravity="center"
+            android:text="🔊"
+            android:textSize="14sp"
+            android:contentDescription="Play example sentence" />
+
+    </RelativeLayout>
+
+</LinearLayout>
