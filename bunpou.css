@@ -437,6 +437,7 @@
 .choukai-play-btn.is-played,
 .choukai-play-btn[disabled] { opacity: 0.65; cursor: default; }
 .choukai-lock-note { font-size: 11.5px; color: var(--text-faint); margin-top: -8px; }
+.choukai-credit { font-size: 11px; color: var(--text-faint); text-align: center; margin-top: 20px; }
 
 .choukai-num-options { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
 .choukai-num-opt {

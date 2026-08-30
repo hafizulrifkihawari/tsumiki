@@ -1,6 +1,6 @@
 /* Service worker — offline cache for the N4 flashcard PWA. */
 
-const CACHE_NAME = "kanji-n4-v20";
+const CACHE_NAME = "kanji-n4-v21";
 const FONT_ORIGINS = ["https://fonts.googleapis.com", "https://fonts.gstatic.com"];
 const ASSETS = [
   "./",
@@ -44,11 +44,20 @@ self.addEventListener("install", (event) => {
       .then((cache) =>
         cache.addAll(ASSETS).then(() =>
           // Pre-cache every pre-rendered audio clip so cards work offline
-          // even before they've ever been played.
-          fetch("./audio/manifest.json")
-            .then((r) => r.json())
-            .then((files) => cache.addAll(files.map((f) => `./audio/${f}`)))
-            .catch(() => {}) // offline on first install: audio caches lazily via fetch handler instead
+          // even before they've ever been played. The 聴解 clips live under
+          // audio/choukai/<hash>.m4a with their own hash-list manifest. Both
+          // are tolerant: a missing manifest (e.g. clips not generated yet) or
+          // an offline first install just lets the fetch handler cache lazily.
+          Promise.all([
+            fetch("./audio/manifest.json")
+              .then((r) => r.json())
+              .then((files) => cache.addAll(files.map((f) => `./audio/${f}`)))
+              .catch(() => {}),
+            fetch("./audio/choukai/manifest.json")
+              .then((r) => (r.ok ? r.json() : []))
+              .then((hashes) => cache.addAll(hashes.map((h) => `./audio/choukai/${h}.m4a`)))
+              .catch(() => {}),
+          ])
         )
       )
       .then(() => self.skipWaiting())

@@ -6,9 +6,11 @@
  * transcribed from any real/copyrighted past paper (which JEES does not
  * publish anyway).
  *
- * Audio is produced live in-browser via choukai.js (Web Speech API) — there is
- * no pre-rendered audio here, so every spoken line is plain text with a
- * `speaker` tag ("M" | "F" | "N" for narrator) that choukai.js voices aloud.
+ * Audio: every spoken line is plain text with a `speaker` tag ("M" | "F" | "N"
+ * for narrator). scripts/generate-choukai-audio.js pre-renders each line to a
+ * natural VOICEVOX voice (a distinct voice per speaker tag) under
+ * audio/choukai/. choukai.js plays those clips and falls back to the live Web
+ * Speech API for any line with no clip.
  * The engine deliberately renders NO visible transcript for lines/options
  * during a live question — only the specific text this repo's real N4 booklet
  * would print (see the table in the plan) is ever shown before you answer;

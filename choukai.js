@@ -4,7 +4,11 @@
  * IIFE — own #choukaiView, own localStorage keys, own /60 scorecard. Separate
  * from the 模試 N4 text exam by design (see plan): scoring is not merged.
  *
- * Audio is produced live via the Web Speech API — no pre-rendered files. Voice
+ * Audio: each spoken line is pre-rendered at build time to a natural VOICEVOX
+ * voice — a DISTINCT voice per speaker role (男性 / 女性 / ナレーター) — by
+ * scripts/generate-choukai-audio.js into audio/choukai/<hash>.m4a. Clips are
+ * content-addressed by fnv1a(speaker + text). If a clip is missing (no manifest,
+ * failed fetch), the line falls back to the live Web Speech API — voice
  * selection is copied verbatim from app.js/kotoba-app.js's proven pattern
  * (VOICE_PRIORITY list, onvoiceschanged hook, iOS polling fallback).
  *
@@ -82,12 +86,59 @@
     if (choukaiView.dataset.view === "start") renderStart();
   }
 
+  // ---- Pre-rendered audio (VOICEVOX) -------------------------------------
+  // audio/choukai/<hash>.m4a clips, one per spoken line, with a distinct voice
+  // per speaker role baked in. Content-addressed by the SAME fnv1a hash the
+  // build script (scripts/generate-choukai-audio.js) uses. The manifest is a
+  // list of the hashes present; if it fails to load the set stays empty and
+  // every line falls back to Web Speech (i.e. the original behavior).
+  const clipSet = new Set();
+  let currentAudio = null;
+  // Settler for the in-flight clip promise. pause() fires no 'ended'/'error',
+  // so cancelSpeech calls this to resolve a clip it interrupts (otherwise the
+  // awaiting speakSequence would hang forever).
+  let settleClip = null;
+
+  // FNV-1a (32-bit) — must stay byte-for-byte identical to the build script.
+  function fnv1a(str) {
+    let h = 0x811c9dc5;
+    for (let i = 0; i < str.length; i++) {
+      h ^= str.charCodeAt(i);
+      h = Math.imul(h, 0x01000193);
+    }
+    return (h >>> 0).toString(16).padStart(8, "0");
+  }
+
+  fetch("audio/choukai/manifest.json")
+    .then((r) => (r.ok ? r.json() : []))
+    .then((list) => { if (Array.isArray(list)) list.forEach((h) => clipSet.add(h)); })
+    .catch(() => {});
+
   // ---- Sequential TTS playback queue ------------------------------------
   // A mutable token guards against stale chains continuing to speak after the
   // learner navigates away mid-playback (Prev/Next/Back/Submit all bump it).
   const playToken = { value: 0 };
 
-  function speakLine(line) {
+  // Plays the pre-rendered clip for a line. Resolves true when it finishes,
+  // false if it fails to load or is interrupted by cancelSpeech.
+  function playClip(hash) {
+    return new Promise((resolve) => {
+      const audio = new Audio("audio/choukai/" + hash + ".m4a");
+      currentAudio = audio;
+      const done = (ok) => {
+        if (settleClip !== done) return; // already settled
+        settleClip = null;
+        if (currentAudio === audio) { currentAudio.pause(); currentAudio = null; }
+        resolve(ok);
+      };
+      settleClip = done;
+      audio.addEventListener("ended", () => done(true));
+      audio.addEventListener("error", () => done(false));
+      audio.play().catch(() => done(false));
+    });
+  }
+
+  function speakDevice(line) {
     return new Promise((resolve) => {
       if (!ttsSupported) { resolve(); return; }
       const utter = new SpeechSynthesisUtterance(line.text);
@@ -98,6 +149,19 @@
       utter.onerror = () => resolve();
       window.speechSynthesis.speak(utter);
     });
+  }
+
+  async function speakLine(line) {
+    const myToken = playToken.value;
+    const hash = fnv1a(line.speaker + "␟" + line.text);
+    if (clipSet.has(hash)) {
+      const ok = await playClip(hash);
+      if (ok) return;
+      // ok === false: either the clip failed to load (fall back to Web Speech)
+      // or cancelSpeech interrupted it (token changed — abort, do NOT speak).
+      if (playToken.value !== myToken) return;
+    }
+    await speakDevice(line);
   }
 
   // Resolves true if the whole sequence played to completion, false if a
@@ -115,6 +179,8 @@
 
   function cancelSpeech() {
     playToken.value++;
+    if (settleClip) settleClip(false);
+    else if (currentAudio) { currentAudio.pause(); currentAudio = null; }
     if (ttsSupported) window.speechSynthesis.cancel();
   }
 
@@ -307,6 +373,7 @@
         (saved ? '<div class="exam-resume-banner">前回の「🎧 ' + esc(saved.label) + '」が途中です。<button class="btn btn-flip" id="choukaiResumeBtn" type="button">続きから</button><button class="btn btn-ghost" id="choukaiDiscardBtn" type="button">やめる</button></div>' : "") +
         '<div class="exam-set-list">' + cards + "</div>" +
         history +
+        '<p class="choukai-credit">音声 VOICEVOX：青山龍星・春日部つむぎ・九州そら</p>' +
       "</div>";
 
     el("choukaiExitBtn").addEventListener("click", exitToBrowse);
