@@ -147,22 +147,29 @@
 
   // Due reviews first (oldest-overdue first), then never-graded cards fill
   // the rest — same due-based approach as the kanji deck's buildDeck().
-  function buildDeck(shuffle) {
+  // includeAll skips the due filter entirely (the "Study all" button), so
+  // the whole enabled-lesson pool is studyable regardless of due dates.
+  function buildDeck(shuffle, includeAll) {
     const now = Date.now();
-    const dueCards = [];
-    const newCards = [];
     const pool = activeCards();
-    for (const c of pool) {
-      const entry = srsMap[c.key];
-      if (entry && entry.box > 0) {
-        if (isDue(entry, now)) dueCards.push({ c, due: entry.due });
-      } else {
-        newCards.push(c);
+    let ordered;
+    if (includeAll) {
+      ordered = pool.slice();
+    } else {
+      const dueCards = [];
+      const newCards = [];
+      for (const c of pool) {
+        const entry = srsMap[c.key];
+        if (entry && entry.box > 0) {
+          if (isDue(entry, now)) dueCards.push({ c, due: entry.due });
+        } else {
+          newCards.push(c);
+        }
       }
+      dueCards.sort((a, b) => a.due - b.due);
+      const orderedNew = shuffle ? shuffleArray(newCards) : newCards;
+      ordered = dueCards.map((d) => d.c).concat(orderedNew);
     }
-    dueCards.sort((a, b) => a.due - b.due);
-    const orderedNew = shuffle ? shuffleArray(newCards) : newCards;
-    const ordered = dueCards.map((d) => d.c).concat(orderedNew);
 
     deck = shuffle ? shuffleArray(ordered) : ordered;
     index = 0;
@@ -353,6 +360,7 @@
   el("prevBtn").addEventListener("click", prev);
   el("shuffleBtn").addEventListener("click", () => buildDeck(true));
   el("resetBtn").addEventListener("click", () => buildDeck(false));
+  el("studyAllBtn").addEventListener("click", () => buildDeck(true, true));
   speakFrontBtn.addEventListener("click", (e) => { e.stopPropagation(); speakCurrent(); });
 
   againBtn.addEventListener("click", () => grade("again"));

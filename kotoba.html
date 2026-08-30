@@ -29,7 +29,7 @@
         </div>
       </div>
       <div class="progress-wrap">
-        <div class="progress-count">
+        <div class="progress-count" title="Cards due for review right now — tap Study all to see every word in the selected lesson(s)">
           <span id="posNow">1</span> / <span id="posTotal">1</span>
           <span class="queue-badge" id="queueBadge" hidden title="Cards graded Again, waiting to come back this session">↺ <span id="queueCount">0</span></span>
         </div>
@@ -118,6 +118,9 @@
       </button>
       <button class="btn btn-ghost" id="resetBtn" title="Study in order (un-shuffle)">
         <span class="btn-icon">↺</span> In order
+      </button>
+      <button class="btn btn-ghost" id="studyAllBtn" title="Study every enabled word in this lesson, including ones not due yet">
+        <span class="btn-icon">📚</span> Study all
       </button>
       <div class="spacer"></div>
       <button class="btn btn-flip" id="flipBtn">Flip card</button>
