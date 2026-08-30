@@ -91,6 +91,15 @@ function collectLines(sim) {
   return byHash;
 }
 
+// The data spaces words apart for on-screen readability, but VOICEVOX treats
+// every space as an accent-phrase boundary and inserts a pause there — which
+// makes it read word-by-word. Strip the separator spaces before synthesis; the
+// 、。 punctuation still gives natural pauses. (The clip hash stays on the
+// original spaced text, so the runtime lookup in choukai.js is unaffected.)
+function forTts(text) {
+  return text.replace(/[ \t　]+/g, "");
+}
+
 async function synthWav(text, speakerId) {
   const q = await fetch(
     `${VOICEVOX}/audio_query?text=${encodeURIComponent(text)}&speaker=${speakerId}`,
@@ -125,7 +134,7 @@ async function main() {
     const speakerId = ROLE_SPEAKER[line.speaker] != null ? ROLE_SPEAKER[line.speaker] : ROLE_SPEAKER.N;
     const tmpWav = path.join(os.tmpdir(), `choukai-${process.pid}-${i}.wav`);
     try {
-      fs.writeFileSync(tmpWav, await synthWav(line.text, speakerId));
+      fs.writeFileSync(tmpWav, await synthWav(forTts(line.text), speakerId));
       execFileSync("afconvert", ["-f", "m4af", "-d", "aac", "-b", "64000", tmpWav, outPath], { stdio: "pipe" });
       done++;
     } catch (err) {
