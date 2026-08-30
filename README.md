@@ -33,6 +33,26 @@ python3 -m http.server 8000
 
 then visit `http://localhost:8000`.
 
+## Regenerating the 聴解 listening audio
+
+The Bunpou page's 聴解 (listening) practice sets (`choukai-data.js`) play pre-rendered [VOICEVOX](https://github.com/VOICEVOX/voicevox_engine) clips from `audio/choukai/`, one distinct voice per speaker role (男性 = 青山龍星 `13`, 女性 = 春日部つむぎ `8`, ナレーター = 九州そら `16`). Re-run these steps only when a set's spoken text changes. Any line with no clip falls back to the Web Speech API, so the sets still work before you regenerate.
+
+1. **Start the VOICEVOX engine.** It must serve `http://127.0.0.1:50021`. With Docker:
+   ```
+   docker run --rm --name voicevox-engine -p 50021:50021 voicevox/voicevox_engine:cpu-latest
+   ```
+   The `cpu-latest` image runs natively on Apple Silicon (arm64). The VOICEVOX desktop app works too.
+2. **Generate the clips.** In a second terminal:
+   ```
+   node scripts/generate-choukai-audio.js        # natural speed
+   node scripts/generate-choukai-audio.js 0.9    # slower, for learners
+   ```
+   The script renders every line, skips clips that already exist, and writes `audio/choukai/manifest.json`. CPU synthesis is slow — a full run of ~380 lines takes about 15 minutes.
+3. **Bump the cache.** Increase `CACHE_NAME` in `sw.js` (for example `kanji-n4-v23` → `v24`) so visitors get the new clips.
+4. **Commit** `audio/choukai/` and `sw.js`, then stop the engine (`docker stop voicevox-engine` or `Ctrl+C`).
+
+**Docker credential note:** if a pull fails with `docker-credential-desktop ... not found`, your `~/.docker/config.json` has a stale `"credsStore": "desktop"` from Docker Desktop. Remove that line — public image pulls need no credentials.
+
 ## Files
 
 | File | Purpose |
@@ -45,5 +65,8 @@ then visit `http://localhost:8000`.
 | `manage.html` / `manage.js` | Page for enabling/disabling individual kanji |
 | `kotoba.html` / `kotoba-app.js` / `kotoba-data.js` / `kotoba.css` | Separate Kotoba vocabulary flashcard section |
 | `audio/` | Pre-rendered per-card audio files + manifest |
+| `audio/choukai/` | Pre-rendered 聴解 listening clips (VOICEVOX) + manifest |
 | `scripts/generate-audio.js` | One-time (macOS `say`) script that pre-renders `audio/` from `data.js` |
+| `scripts/generate-choukai-audio.js` | One-time (VOICEVOX) script that pre-renders `audio/choukai/` from `choukai-data.js` |
+| `bunpou.html` / `bunpou-app.js` / `bunpou-data.js` / `bunpou.css` | Bunpou grammar section, plus the 模試 N4 and 聴解 modes (`n4sim.js`, `choukai.js`) |
 | `manifest.json` / `sw.js` | PWA install & offline support |
