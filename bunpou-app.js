@@ -27,6 +27,30 @@
   // ---- Build a stable id -> point map and the flat drill-item pool ----------
   const pointsById = new Map(BUNPOU.map((p) => [p.id, p]));
 
+  // bunpou-quiz-data.js holds the bulk drill bank. Appending (never splicing in
+  // front) keeps every existing SRS key — pointId::mcq::N — pointed at the same
+  // question it was scheduled against. Guarded so the page still runs if that
+  // script fails to load.
+  if (typeof BUNPOU_QUIZ !== "undefined") {
+    for (const p of BUNPOU) {
+      const extraMcq = (BUNPOU_QUIZ.mcq || {})[p.id];
+      const extraJlpt = (BUNPOU_QUIZ.jlptBuild || {})[p.id];
+      const extraBuild = (BUNPOU_QUIZ.build || {})[p.id];
+      if (extraMcq && extraMcq.length) p.mcq = (p.mcq || []).concat(extraMcq);
+      if (extraJlpt && extraJlpt.length) p.jlptBuild = (p.jlptBuild || []).concat(extraJlpt);
+      if (extraBuild && extraBuild.length) {
+        // `chunks` is authored in the correct order; renderBuild grades against
+        // `answer`, so derive it here rather than duplicating the array in the
+        // data file where the two copies could silently drift apart.
+        p.build = (p.build || []).concat(extraBuild.map((b) => ({
+          chunks: b.chunks,
+          answer: b.answer || b.chunks.slice(),
+          translation: b.translation,
+        })));
+      }
+    }
+  }
+
   const RANK = { new: 0, learning: 1, mature: 2 };
 
   function buildItemPool() {
@@ -103,6 +127,19 @@
     const i = jp.indexOf(target);
     if (i === -1) return esc(jp);
     return esc(jp.slice(0, i)) + '<span class="target target-cloze">＿＿＿</span>' + esc(jp.slice(i + target.length));
+  }
+
+  // ---- Furigana ---------------------------------------------------------------
+  // Questions author readings inline as 漢字[かんじ]. rubyize() turns each span
+  // into a <ruby> element; the furigana toggle then hides the <rt> purely in CSS
+  // (see .furi-off in bunpou.css), so flipping it never re-renders — and so it
+  // can't disturb a question the learner has already answered.
+  const FURIGANA_RE = /([一-鿿々ヶ]+)\[([^\][]*)\]/g;
+
+  // Escapes first, then wraps — the bracket syntax survives esc() untouched
+  // because esc() only rewrites & < >.
+  function rubyize(s) {
+    return esc(s).replace(FURIGANA_RE, (_, base, rt) => "<ruby>" + base + "<rt>" + rt + "</rt></ruby>");
   }
 
   function shuffleArray(arr) {
@@ -514,13 +551,21 @@
 
   function renderMcq(it, data) {
     const p = data.point, m = data.mcq;
+
+    // Options are authored with the correct answer first (answer: 0) and shuffled
+    // here, the same way n4sim.js and choukai.js do it. Without this the answer
+    // would sit on button A every single time and the drill would teach nothing.
+    const opts = shuffleArray(m.options.map((text, i) => ({ text, correct: i === m.answer })));
+    const answerAt = opts.findIndex((o) => o.correct);
+
     quizFace.innerHTML =
       '<span class="badge badge-type quiz-type-badge quiz-type-badge-mcq">文法1 · 文法形式の判断 · ' + esc(p.level) + "</span>" +
-      '<div class="quiz-jp">' + esc(m.sentence) + "</div>" +
+      '<div class="quiz-jp">' + rubyize(m.sentence) + "</div>" +
+      (m.translation ? '<div class="quiz-translation quiz-translation-q">' + esc(m.translation) + "</div>" : "") +
       '<div class="mcq-options">' +
-        m.options.map((opt, i) =>
+        opts.map((o, i) =>
           '<button class="btn mcq-opt" type="button" data-i="' + i + '">' +
-            '<span class="opt-letter">' + LETTERS[i] + '</span><span class="opt-text">' + esc(opt) + "</span>" +
+            '<span class="opt-letter">' + LETTERS[i] + '</span><span class="opt-text">' + rubyize(o.text) + "</span>" +
           "</button>"
         ).join("") +
       "</div>" +
@@ -533,15 +578,19 @@
         if (answered) return;
         answered = true;
         const i = Number(btn.getAttribute("data-i"));
-        const correct = i === m.answer;
+        const correct = i === answerAt;
         quizFace.querySelectorAll(".mcq-opt").forEach((b, bi) => {
           b.disabled = true;
-          if (bi === m.answer) b.classList.add("is-correct");
+          if (bi === answerAt) b.classList.add("is-correct");
           else if (bi === i) b.classList.add("is-wrong");
         });
+        // innerHTML (not textContent) so the explanation's own furigana renders.
         const fb = el("mcqFeedback");
         fb.hidden = false;
-        fb.textContent = (correct ? "Benar! " : "Kurang tepat, jawaban yang benar: " + LETTERS[m.answer] + ". ") + (m.explain || "");
+        fb.innerHTML =
+          (correct ? "Benar! " : "Kurang tepat, jawaban yang benar: " + LETTERS[answerAt] + ". ") +
+          rubyize(m.explain || "") +
+          (m.translation ? '<span class="quiz-translation quiz-translation-a">' + esc(m.translation) + "</span>" : "");
         el("mcqNextBtn").hidden = false;
         el("mcqNextBtn").addEventListener("click", () => grade(correct ? "good" : "again"), { once: true });
       });
@@ -565,13 +614,13 @@
 
     quizFace.innerHTML =
       '<span class="badge badge-type quiz-type-badge quiz-type-badge-jlptbuild">文法2 · 文の組み立て · ' + esc(p.level) + "</span>" +
-      (b.prefix ? '<div class="quiz-jp">' + esc(b.prefix) + "</div>" : "") +
+      (b.prefix ? '<div class="quiz-jp">' + rubyize(b.prefix) + "</div>" : "") +
       '<div class="jlpt-slots">' + slotsHtml + (b.suffix ? esc(b.suffix) : "") + "</div>" +
       '<p class="jlpt-hint">★ に入るのはどれですか。(Pilih pilihan yang masuk ke posisi ★.)</p>' +
       '<div class="mcq-options">' +
         options.map((o, i) =>
           '<button class="btn mcq-opt" type="button" data-uid="' + o.uid + '">' +
-            '<span class="opt-letter">' + LETTERS[i] + '</span><span class="opt-text">' + esc(o.text) + "</span>" +
+            '<span class="opt-letter">' + LETTERS[i] + '</span><span class="opt-text">' + rubyize(o.text) + "</span>" +
           "</button>"
         ).join("") +
       "</div>" +
@@ -595,7 +644,9 @@
         });
         const fb = el("jlptFeedback");
         fb.hidden = false;
-        fb.textContent = "正しい文 (kalimat yang benar): " + b.chunks.join("") + (b.translation ? " — " + b.translation : "");
+        fb.innerHTML =
+          "正しい文 (kalimat yang benar): " + rubyize(b.chunks.join("") + (b.suffix || "")) +
+          (b.translation ? '<span class="quiz-translation quiz-translation-a">' + esc(b.translation) + "</span>" : "");
         el("jlptNextBtn").hidden = false;
         el("jlptNextBtn").addEventListener("click", () => grade(correct ? "good" : "again"), { once: true });
       });
@@ -609,7 +660,10 @@
 
     quizFace.innerHTML =
       '<span class="badge badge-type quiz-type-badge quiz-type-badge-build">Susun Kalimat (Bebas) · ' + esc(p.level) + "</span>" +
-      '<div class="quiz-translation">' + esc(b.translation || "") + "</div>" +
+      // Deliberately NOT gated by the translation toggle: in this mode the
+      // Indonesian line is the question itself — hide it and there is nothing
+      // left telling the learner which sentence to assemble.
+      '<div class="quiz-translation quiz-translation-prompt">' + esc(b.translation || "") + "</div>" +
       '<div class="build-row build-answer" id="buildAnswer"></div>' +
       '<div class="build-row build-bank" id="buildBank"></div>' +
       '<div class="quiz-actions">' +
@@ -625,10 +679,10 @@
 
     function renderChunks() {
       bankEl.innerHTML = bank.map((c) =>
-        '<button class="build-chunk" type="button" data-uid="' + c.uid + '">' + esc(c.text) + "</button>"
+        '<button class="build-chunk" type="button" data-uid="' + c.uid + '">' + rubyize(c.text) + "</button>"
       ).join("");
       answerEl.innerHTML = answerSlots.map((c) =>
-        '<button class="build-chunk" type="button" data-uid="' + c.uid + '">' + esc(c.text) + "</button>"
+        '<button class="build-chunk" type="button" data-uid="' + c.uid + '">' + rubyize(c.text) + "</button>"
       ).join("");
       bankEl.querySelectorAll(".build-chunk").forEach((btn) => {
         btn.addEventListener("click", () => {
@@ -669,7 +723,10 @@
       const fb = el("buildFeedback");
       fb.hidden = false;
       fb.className = "build-feedback " + (correct ? "is-correct" : "is-wrong");
-      fb.textContent = correct ? "Benar! " + b.answer.join("") : "Urutan yang benar: " + b.answer.join("");
+      // innerHTML so the rebuilt sentence carries its furigana too.
+      fb.innerHTML =
+        (correct ? "Benar! " : "Urutan yang benar: ") + rubyize(b.answer.join("")) +
+        (b.translation ? '<span class="quiz-translation quiz-translation-a">' + esc(b.translation) + "</span>" : "");
       el("buildCheckBtn").hidden = true;
       el("buildNextBtn").hidden = false;
       el("buildNextBtn").addEventListener("click", () => grade(correct ? "good" : "again"), { once: true });
@@ -699,6 +756,46 @@
     else if (it.type === "jlptbuild") renderJlptBuild(it, data);
     else renderBuild(it, data);
   }
+
+  // ---- Display toggles (furigana / terjemahan) --------------------------------
+  // Deliberately NOT stored in srs.js's "kanji.prefs" blob: app.js rewrites that
+  // whole object in savePrefsFromUI(), so anything bunpou wrote there would be
+  // silently dropped the next time the kanji deck saved its own settings.
+  const BUNPOU_PREFS_KEY = "bunpou.prefs";
+
+  function loadDisplayPrefs() {
+    try { return JSON.parse(ls(true, BUNPOU_PREFS_KEY)) || {}; }
+    catch (e) { return {}; }
+  }
+
+  const furiToggle = el("furiganaToggle");
+  const transToggle = el("translateToggle");
+  const quizViewEl = el("quizView");
+
+  // The classes gate visibility in CSS only — see .furi-off / .trans-off.
+  function applyDisplayPrefs() {
+    quizViewEl.classList.toggle("furi-off", !furiToggle.checked);
+    quizViewEl.classList.toggle("trans-off", !transToggle.checked);
+  }
+
+  function saveDisplayPrefs() {
+    ls(false, BUNPOU_PREFS_KEY, JSON.stringify({
+      furigana: furiToggle.checked,
+      translate: transToggle.checked,
+    }));
+    applyDisplayPrefs();
+  }
+
+  (function initDisplayPrefs() {
+    const prefs = loadDisplayPrefs();
+    // Furigana defaults ON (this deck is read-heavy); translation defaults OFF so
+    // the meaning isn't given away before the learner has answered.
+    furiToggle.checked = prefs.furigana !== false;
+    transToggle.checked = prefs.translate === true;
+    applyDisplayPrefs();
+    furiToggle.addEventListener("change", saveDisplayPrefs);
+    transToggle.addEventListener("change", saveDisplayPrefs);
+  })();
 
   // ---- Init: resume a saved session if one exists, otherwise start on browse.
   bumpStreak(currentUser);

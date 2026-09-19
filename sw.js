@@ -1,6 +1,6 @@
 /* Service worker — offline cache for the N4 flashcard PWA. */
 
-const CACHE_NAME = "kanji-n4-v24";
+const CACHE_NAME = "kanji-n4-v25";
 const FONT_ORIGINS = ["https://fonts.googleapis.com", "https://fonts.gstatic.com"];
 const ASSETS = [
   "./",
@@ -27,6 +27,7 @@ const ASSETS = [
   "./bunpou.html",
   "./bunpou.css",
   "./bunpou-data.js",
+  "./bunpou-quiz-data.js",
   "./bunpou-app.js",
   "./n4sim-data.js",
   "./n4sim.js",

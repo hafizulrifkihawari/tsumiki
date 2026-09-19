@@ -12,7 +12,7 @@
   <meta name="apple-mobile-web-app-title" content="文法 Bunpou" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="bunpou.css" />
 </head>
@@ -87,6 +87,23 @@
         </div>
       </header>
 
+      <!-- Sits outside #quizFace on purpose: every renderer rewrites that
+           element's innerHTML, so a toggle placed inside would be destroyed on
+           each question. Both switches are pure CSS gates (.furi-off /
+           .trans-off on #quizView), so flipping one never re-renders. -->
+      <div class="quiz-display-toggles">
+        <label class="switch">
+          <input type="checkbox" id="furiganaToggle" />
+          <span class="switch-track"><span class="switch-thumb"></span></span>
+          <span class="switch-label">ふりがな</span>
+        </label>
+        <label class="switch">
+          <input type="checkbox" id="translateToggle" />
+          <span class="switch-track"><span class="switch-thumb"></span></span>
+          <span class="switch-label">Terjemahan</span>
+        </label>
+      </div>
+
       <main class="stage">
         <div class="card-scene quiz-scene" id="quizScene">
           <div class="card-face quiz-face" id="quizFace"><!-- rendered per-item by bunpou-app.js --></div>
@@ -127,6 +144,7 @@
 
   <script src="srs.js"></script>
   <script src="bunpou-data.js"></script>
+  <script src="bunpou-quiz-data.js"></script>
   <script src="bunpou-app.js"></script>
   <script src="n4sim-data.js"></script>
   <script src="n4sim.js"></script>

@@ -15,3 +15,5 @@ ios/App/build/
 ios/App/DerivedData/
 *.xcuserstate
 xcuserdata/
+# graphify knowledge-graph output (generated; rebuild with `graphify update .`)
+graphify-out/

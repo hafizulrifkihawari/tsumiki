@@ -462,3 +462,47 @@
   .choukai-num-opt { width: 48px; height: 48px; font-size: 17px; }
   .choukai-score-name { width: 96px; font-size: 11.5px; }
 }
+
+/* ---- Furigana + translation display toggles (文法1 / 文法2) ------------------
+ * Both toggles work purely by class on #quizView, never by re-rendering — a
+ * re-render would wipe the answered/disabled state of a question the learner
+ * has already tapped.
+ */
+.quiz-display-toggles {
+  display: flex; gap: 18px; flex-wrap: wrap;
+  justify-content: center; align-items: center;
+  padding: 2px 16px 10px;
+}
+
+/* <ruby> is native; these just keep the reading small and unobtrusive. */
+.quiz-face ruby { ruby-position: over; }
+.quiz-face rt {
+  font-size: 0.5em; font-weight: 600;
+  color: var(--text-faint); letter-spacing: 0.02em;
+  user-select: none;
+}
+/* Hiding rt collapses the ruby back to plain text. */
+#quizView.furi-off .quiz-face rt { display: none; }
+
+/* Question-side translation is a dimmer hint line under the sentence; the
+ * answer-side one sits inside the feedback block, so it needs to break. */
+.quiz-translation-q {
+  font-size: 13.5px; font-weight: 500; color: var(--text-dim);
+  line-height: 1.5; margin-top: -2px;
+}
+.quiz-translation-a {
+  display: block; margin-top: 6px;
+  font-size: 13px; font-weight: 500; color: var(--text-dim); line-height: 1.5;
+}
+#quizView.trans-off .quiz-translation-q,
+#quizView.trans-off .quiz-translation-a { display: none; }
+
+@media (max-width: 560px) {
+  .quiz-display-toggles { gap: 12px; padding-bottom: 8px; }
+  .quiz-face rt { font-size: 0.46em; }
+}
+
+/* Susun Bebas: the Indonesian line is the PROMPT (it states which sentence to
+ * assemble), so it is intentionally absent from the .trans-off rules above and
+ * stays visible with the translation toggle off. Do not add it there. */
+.quiz-translation-prompt { font-weight: 600; }
