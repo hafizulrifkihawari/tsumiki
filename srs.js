@@ -79,6 +79,35 @@ function saveSrs(deck, user, data) {
   ls(false, srsKey(deck, user), JSON.stringify(data));
 }
 
+// ---- "Sudah paham" — per-deck, per-user set of retired card ids -----------
+// A card the learner has marked as understood is excluded from that deck's
+// next shuffle/cycle without being deleted or touching its SRS history. Uses
+// the same id each deck already keys its SRS map by (kanji: audioFile;
+// kotoba: "k-<lesson>-<i>"; bunpou: item key; kotd: entry id).
+function knownKey(deck, user) { return "known." + deck + "." + user; }
+
+function loadKnown(deck, user) {
+  const raw = ls(true, knownKey(deck, user));
+  if (!raw) return new Set();
+  try {
+    const arr = JSON.parse(raw);
+    return new Set(Array.isArray(arr) ? arr : []);
+  } catch (e) { return new Set(); }
+}
+
+function saveKnown(deck, user, set) {
+  ls(false, knownKey(deck, user), JSON.stringify([...set]));
+}
+
+// Flips one id's membership and persists the result. Returns the new Set.
+function toggleKnown(deck, user, id) {
+  const set = loadKnown(deck, user);
+  if (set.has(id)) set.delete(id);
+  else set.add(id);
+  saveKnown(deck, user, set);
+  return set;
+}
+
 // ---- Toggle preferences (global, not per-user) ----------------------------
 const PREFS_KEY = "kanji.prefs";
 
@@ -127,6 +156,7 @@ function bumpStreak(user, now) {
 if (typeof module !== "undefined" && module.exports) {
   module.exports = {
     BOX_INTERVALS_DAYS, MAX_BOX, schedule, isDue, bucketOf,
-    loadSrs, saveSrs, loadPrefs, savePrefs, loadStreak, bumpStreak
+    loadSrs, saveSrs, loadPrefs, savePrefs, loadStreak, bumpStreak,
+    loadKnown, saveKnown, toggleKnown
   };
 }

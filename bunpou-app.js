@@ -6,7 +6,7 @@
  * overlays in app.js):
  *   #browseView  — grammar points grouped by level + function, with mastery pips
  *   #studyView   — full "how to use it" reference for one point
- *   #quizView    — due-first SRS queue mixing cloze / mcq / sentence-build items
+ *   #quizView    — due-first SRS queue mixing particle / mcq / sentence-build items
  */
 
 (function () {
@@ -56,9 +56,6 @@
   function buildItemPool() {
     const items = [];
     for (const p of BUNPOU) {
-      (p.examples || []).forEach((ex, i) => {
-        if (ex.cloze) items.push({ type: "cloze", pointId: p.id, idx: i, key: p.id + "::cloze::" + i });
-      });
       (p.mcq || []).forEach((m, i) => {
         items.push({ type: "mcq", pointId: p.id, idx: i, key: p.id + "::mcq::" + i });
       });
@@ -69,6 +66,14 @@
         items.push({ type: "jlptbuild", pointId: p.id, idx: i, key: p.id + "::jlptbuild::" + i });
       });
     }
+    // Particle drill bank (bunpou-particle-data.js) — global, not attached to
+    // any one grammar point, so pointId stays null. SRS keys are stable ids
+    // ("particle::<id>"), not positional, so the bank is safe to reorder.
+    if (typeof BUNPOU_PARTICLE !== "undefined") {
+      BUNPOU_PARTICLE.forEach((q, i) => {
+        items.push({ type: "particle", pointId: null, idx: i, key: "particle::" + q.id });
+      });
+    }
     return items;
   }
 
@@ -77,11 +82,15 @@
 
   const itemKeysByPoint = new Map();
   for (const it of ITEM_POOL) {
+    if (it.pointId == null) continue; // particle items aren't scoped to a point
     if (!itemKeysByPoint.has(it.pointId)) itemKeysByPoint.set(it.pointId, []);
     itemKeysByPoint.get(it.pointId).push(it.key);
   }
 
   let srsMap = loadSrs(BUNPOU_DECK, currentUser);
+  // Items marked "sudah paham" — excluded from future buildQueue() calls
+  // (see grep for "sudah paham" below). Keyed the same as srsMap: item.key.
+  let bunpouKnown = loadKnown(BUNPOU_DECK, currentUser);
 
   function pointBucket(p) {
     const keys = itemKeysByPoint.get(p.id) || [];
@@ -99,8 +108,8 @@
   }
 
   function itemData(it) {
+    if (it.type === "particle") return { particle: BUNPOU_PARTICLE[it.idx] };
     const p = pointsById.get(it.pointId);
-    if (it.type === "cloze") return { point: p, example: p.examples[it.idx] };
     if (it.type === "mcq") return { point: p, mcq: p.mcq[it.idx] };
     if (it.type === "jlptbuild") return { point: p, jlptBuild: p.jlptBuild[it.idx] };
     return { point: p, build: p.build[it.idx] };
@@ -119,14 +128,6 @@
     const i = jp.indexOf(target);
     if (i === -1) return esc(jp);
     return esc(jp.slice(0, i)) + '<span class="target">' + esc(target) + "</span>" + esc(jp.slice(i + target.length));
-  }
-
-  // Replaces the first occurrence of `target` inside `jp` with a blank marker.
-  function blankTarget(jp, target) {
-    if (!target) return esc(jp);
-    const i = jp.indexOf(target);
-    if (i === -1) return esc(jp);
-    return esc(jp.slice(0, i)) + '<span class="target target-cloze">＿＿＿</span>' + esc(jp.slice(i + target.length));
   }
 
   // ---- Furigana ---------------------------------------------------------------
@@ -156,6 +157,14 @@
   const studyView = el("studyView");
   const quizView = el("quizView");
   const reviewBtn = el("reviewBtn");
+  // n4sim.js's #examView and choukai.js's #choukaiView are siblings that
+  // those modules show/hide on their own — but only ever un-hide *their*
+  // own view plus this module's three (see showExam/showChoukai). showView
+  // is the single owner of "what's on screen": every switch here also hides
+  // both foreign views, and both modules route their exit back through
+  // window.__bunpouShowView instead of touching #browseView directly.
+  const examViewEl = el("examView");
+  const choukaiViewEl = el("choukaiView");
 
   let currentLevelFilter = "all";
   let studyPointId = null;
@@ -164,9 +173,12 @@
     browseView.hidden = name !== "browse";
     studyView.hidden = name !== "study";
     quizView.hidden = name !== "quiz";
+    if (examViewEl) examViewEl.hidden = true;
+    if (choukaiViewEl) choukaiViewEl.hidden = true;
     reviewBtn.hidden = name !== "browse";
     if (name === "browse") renderBrowse();
   }
+  window.__bunpouShowView = showView;
 
   // ---- Browse view -------------------------------------------------------------
   const groupList = el("groupList");
@@ -299,11 +311,11 @@
 
   // ---- Mode picker (choose which drill type to focus a session on) -----------
   // Each MODE_DEFS entry's `cls` also drives the color-coded badge on quiz
-  // cards (see renderCloze/renderMcq/renderJlptBuild/renderBuild), so the
+  // cards (see renderParticle/renderMcq/renderJlptBuild/renderBuild), so the
   // color the learner picks in the sheet stays consistent throughout the session.
   const MODE_DEFS = [
     { key: "all", cls: "all", icon: "🎲", label: "Semua Mode", desc: "Campuran semua jenis latihan." },
-    { key: "cloze", cls: "cloze", icon: "✏️", label: "Ingat (Isian)", desc: "Lihat kalimat berlubang, ingat sendiri jawabannya." },
+    { key: "particle", cls: "particle", icon: "🧷", label: "構造 · Partikel", desc: "Pilih partikel yang tepat untuk melengkapi kalimat." },
     { key: "mcq", cls: "mcq", icon: "🔤", label: "文法1 · Pilihan Ganda", desc: "Pilih bentuk/partikel yang paling tepat." },
     { key: "jlptbuild", cls: "jlptbuild", icon: "🧩", label: "文法2 · Susun (★)", desc: "Urutkan 4 potongan, tebak posisi ★." },
     { key: "build", cls: "build", icon: "🔀", label: "Susun Bebas", desc: "Susun seluruh kalimat dari potongan acak." }
@@ -419,11 +431,19 @@
     try { return JSON.parse(raw); } catch (e) { return null; }
   }
 
+  // Set when the pool would have had items but every one of them is marked
+  // "sudah paham" — renderQuizItem() shows a different #quizEmpty message
+  // (with a reset button) for this case than for a genuinely empty mode.
+  let quizAllKnownEmpty = false;
+
   function buildQueue(pointId, modeKey) {
     const mode = MODE_BY_KEY.has(modeKey) ? modeKey : "all";
     const now = Date.now();
     let pool = pointId ? ITEM_POOL.filter((it) => it.pointId === pointId) : ITEM_POOL;
     if (mode !== "all") pool = pool.filter((it) => it.type === mode);
+    const poolBeforeKnown = pool;
+    pool = pool.filter((it) => !bunpouKnown.has(it.key));
+    quizAllKnownEmpty = pool.length === 0 && poolBeforeKnown.length > 0;
     const due = [];
     const fresh = [];
     for (const it of pool) {
@@ -454,7 +474,7 @@
 
   function restoreProgress(saved) {
     if (!saved || !Array.isArray(saved.order) || !saved.order.length) return false;
-    const restored = saved.order.map((k) => itemsByKey.get(k)).filter(Boolean);
+    const restored = saved.order.map((k) => itemsByKey.get(k)).filter((it) => it && !bunpouKnown.has(it.key));
     if (!restored.length) return false;
     queue = restored;
     index = Math.min(Math.max(0, saved.index || 0), queue.length - 1);
@@ -487,7 +507,7 @@
 
   // Mirrors kotoba-app.js's grade(): schedule via srs.js, then either requeue
   // the item later this session ("again") or move on ("good"/"easy"). Used
-  // uniformly by cloze self-grading and by auto-graded mcq/build outcomes.
+  // uniformly by every mode's auto-graded (mcq/particle/build) outcome.
   function grade(level) {
     if (!queue.length) return;
     const it = queue[index];
@@ -520,50 +540,26 @@
   }
 
   // ---- Per-mode renderers ------------------------------------------------------
-  function renderCloze(it, data) {
-    const p = data.point, ex = data.example;
-    quizFace.innerHTML =
-      '<span class="badge badge-type quiz-type-badge quiz-type-badge-cloze">Ingat · ' + esc(p.level) + " · " + esc(p.pattern) + "</span>" +
-      '<div class="quiz-jp">' + blankTarget(ex.jp, ex.cloze) + "</div>" +
-      (ex.meaning ? '<div class="quiz-hint">💡 ' + esc(ex.meaning) + "</div>" : "") +
-      '<div class="quiz-actions"><button class="btn btn-flip" id="revealBtn" type="button">Tunjukkan jawaban</button></div>' +
-      '<div class="reveal-panel" id="revealPanel" hidden>' +
-        '<div class="example-jp">' + highlightTarget(ex.jp, ex.cloze) + "</div>" +
-        '<div class="example-reading">' + esc(ex.reading || "") + "</div>" +
-        '<div class="example-meaning">' + esc(ex.meaning || "") + "</div>" +
-        '<div class="quiz-pattern-note"><strong>' + esc(p.pattern) + "</strong> — " + esc(p.meaning) + "</div>" +
-      "</div>" +
-      '<div class="answerbar-buttons" id="clozeAnswerbar" hidden>' +
-        '<button class="btn btn-again" type="button" data-grade="again"><span class="btn-icon">↺</span> Again</button>' +
-        '<button class="btn btn-good" type="button" data-grade="good"><span class="btn-icon">✓</span> Good</button>' +
-        '<button class="btn btn-easy" type="button" data-grade="easy"><span class="btn-icon">⚡</span> Easy</button>' +
-      "</div>";
-
-    el("revealBtn").addEventListener("click", () => {
-      el("revealPanel").hidden = false;
-      el("clozeAnswerbar").hidden = false;
-      el("revealBtn").hidden = true;
-    });
-    el("clozeAnswerbar").querySelectorAll("button").forEach((b) => {
-      b.addEventListener("click", () => grade(b.getAttribute("data-grade")));
-    });
-  }
-
-  function renderMcq(it, data) {
-    const p = data.point, m = data.mcq;
+  // Shared engine behind renderMcq/renderParticle: both are single-shot
+  // multiple-choice cards that shuffle their options, lock in an answer, and
+  // reveal an explanation. Only the badge and question source differ.
+  function renderMcqCard(opts) {
+    const badgeCls = opts.badgeCls, badgeText = opts.badgeText;
+    const sentence = opts.sentence, options = opts.options, answer = opts.answer;
+    const explain = opts.explain, translation = opts.translation;
 
     // Options are authored with the correct answer first (answer: 0) and shuffled
     // here, the same way n4sim.js and choukai.js do it. Without this the answer
     // would sit on button A every single time and the drill would teach nothing.
-    const opts = shuffleArray(m.options.map((text, i) => ({ text, correct: i === m.answer })));
-    const answerAt = opts.findIndex((o) => o.correct);
+    const shuffled = shuffleArray(options.map((text, i) => ({ text, correct: i === answer })));
+    const answerAt = shuffled.findIndex((o) => o.correct);
 
     quizFace.innerHTML =
-      '<span class="badge badge-type quiz-type-badge quiz-type-badge-mcq">文法1 · 文法形式の判断 · ' + esc(p.level) + "</span>" +
-      '<div class="quiz-jp">' + rubyize(m.sentence) + "</div>" +
-      (m.translation ? '<div class="quiz-translation quiz-translation-q">' + esc(m.translation) + "</div>" : "") +
+      '<span class="badge badge-type quiz-type-badge quiz-type-badge-' + badgeCls + '">' + esc(badgeText) + "</span>" +
+      '<div class="quiz-jp">' + rubyize(sentence) + "</div>" +
+      (translation ? '<div class="quiz-translation quiz-translation-q">' + esc(translation) + "</div>" : "") +
       '<div class="mcq-options">' +
-        opts.map((o, i) =>
+        shuffled.map((o, i) =>
           '<button class="btn mcq-opt" type="button" data-i="' + i + '">' +
             '<span class="opt-letter">' + LETTERS[i] + '</span><span class="opt-text">' + rubyize(o.text) + "</span>" +
           "</button>"
@@ -589,11 +585,29 @@
         fb.hidden = false;
         fb.innerHTML =
           (correct ? "Benar! " : "Kurang tepat, jawaban yang benar: " + LETTERS[answerAt] + ". ") +
-          rubyize(m.explain || "") +
-          (m.translation ? '<span class="quiz-translation quiz-translation-a">' + esc(m.translation) + "</span>" : "");
+          rubyize(explain || "") +
+          (translation ? '<span class="quiz-translation quiz-translation-a">' + esc(translation) + "</span>" : "");
         el("mcqNextBtn").hidden = false;
         el("mcqNextBtn").addEventListener("click", () => grade(correct ? "good" : "again"), { once: true });
       });
+    });
+  }
+
+  function renderMcq(it, data) {
+    const p = data.point, m = data.mcq;
+    renderMcqCard({
+      badgeCls: "mcq", badgeText: "文法1 · 文法形式の判断 · " + p.level,
+      sentence: m.sentence, options: m.options, answer: m.answer,
+      explain: m.explain, translation: m.translation
+    });
+  }
+
+  function renderParticle(it, data) {
+    const q = data.particle;
+    renderMcqCard({
+      badgeCls: "particle", badgeText: "構造 · 助詞 · " + q.level + " · " + q.focus,
+      sentence: q.sentence, options: q.options, answer: q.answer,
+      explain: q.explain, translation: q.translation
     });
   }
 
@@ -740,6 +754,18 @@
       posTotal.textContent = 0;
       posNow.textContent = 0;
       progressFill.style.width = "0%";
+      // Distinguish "genuinely nothing to review" from "every item here is
+      // marked sudah paham" — the latter gets its own message + reset button.
+      const title = el("quizEmptyTitle"), sub = el("quizEmptySub"), resetBtn = el("quizEmptyResetKnownBtn");
+      if (quizAllKnownEmpty) {
+        title.textContent = "Semua item sudah ditandai paham 🎉";
+        sub.innerHTML = "Semua soal di sini sudah kamu tandai <span>sudah paham</span>. Tekan reset untuk memasukkannya lagi ke sesi berikutnya.";
+        resetBtn.hidden = false;
+      } else {
+        title.textContent = "Tidak ada yang perlu di-review 🎉";
+        sub.innerHTML = 'Semua poin sudah <span>up to date</span>. Buka salah satu poin untuk belajar hal baru, atau kembali lagi nanti.';
+        resetBtn.hidden = true;
+      }
       return;
     }
     quizScene.hidden = false;
@@ -750,12 +776,40 @@
     posNow.textContent = index + 1;
     posTotal.textContent = queue.length;
     progressFill.style.width = (((index + 1) / queue.length) * 100) + "%";
+    updateKnownBtn(it);
 
-    if (it.type === "cloze") renderCloze(it, data);
+    if (it.type === "particle") renderParticle(it, data);
     else if (it.type === "mcq") renderMcq(it, data);
     else if (it.type === "jlptbuild") renderJlptBuild(it, data);
     else renderBuild(it, data);
   }
+
+  // ---- "Sudah paham" toggle ----------------------------------------------
+  // Sits outside #quizFace (see the quiz-display-toggles comment in
+  // bunpou.html) so it survives every renderer rewriting that element's
+  // innerHTML — renderQuizItem() just re-syncs its pressed state per item.
+  const quizKnownBtn = el("quizKnownBtn");
+
+  function updateKnownBtn(it) {
+    const known = bunpouKnown.has(it.key);
+    quizKnownBtn.classList.toggle("is-active", known);
+    quizKnownBtn.textContent = known ? "✓ Paham" : "✓ Sudah Paham";
+  }
+
+  quizKnownBtn.addEventListener("click", () => {
+    if (!queue.length) return;
+    const it = queue[index];
+    if (bunpouKnown.has(it.key)) bunpouKnown.delete(it.key);
+    else bunpouKnown.add(it.key);
+    saveKnown(BUNPOU_DECK, currentUser, bunpouKnown);
+    updateKnownBtn(it);
+  });
+
+  el("quizEmptyResetKnownBtn").addEventListener("click", () => {
+    bunpouKnown = new Set();
+    saveKnown(BUNPOU_DECK, currentUser, bunpouKnown);
+    buildQueue(scopePointId, scopeMode);
+  });
 
   // ---- Display toggles (furigana / terjemahan) --------------------------------
   // Deliberately NOT stored in srs.js's "kanji.prefs" blob: app.js rewrites that

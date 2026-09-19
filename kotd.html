@@ -25,10 +25,15 @@
         <span class="brand-kanji">今日</span>
         <div class="brand-text">
           <h1>Kanji of the Day</h1>
-          <p><span id="kotdDate"></span> · <span id="kotdCount">0</span> of <span id="kotdTotal">0</span> kanji</p>
+          <p>
+            <span id="kotdDate"></span> · <span id="kotdCount">0</span> of <span id="kotdTotal">0</span> kanji ·
+            <span id="kotdKnownCount">0</span> paham · <span id="kotdRemainCount">0</span> tersisa
+          </p>
         </div>
       </div>
       <div class="topbar-actions">
+        <button class="btn btn-ghost" id="kotdShuffleAllBtn" type="button" title="Acak ulang ketiga kartu">🔀 Acak semua</button>
+        <button class="btn btn-ghost" id="kotdResetKnownBtn" type="button" title="Hapus semua tanda &quot;sudah paham&quot;">↺ Reset paham</button>
         <a class="btn btn-ghost" href="kotoba.html" title="Kotoba vocabulary flashcards">言葉 Kotoba</a>
         <a class="btn btn-ghost" href="bunpou.html" title="Japanese grammar practice">文法 Bunpou</a>
         <button class="btn btn-ghost" id="updateBtn" type="button" title="Force refresh to the newest version (clears the app cache)">
@@ -37,8 +42,13 @@
       </div>
     </header>
 
+    <p class="kotd-all-known-note" id="kotdAllKnownNote" hidden>
+      Semua kanji sudah ditandai paham 🎉 Kartu sekarang diambil dari seluruh daftar lagi.
+      Tekan "Reset paham" di atas untuk mulai siklus baru.
+    </p>
+
     <main class="kotd-list" id="kotdList">
-      <!-- rendered by kotd.js: today's 3 picks -->
+      <!-- rendered by kotd.js: today's picks -->
     </main>
   </div>
 

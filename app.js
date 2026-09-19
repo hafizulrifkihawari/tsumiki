@@ -37,6 +37,7 @@
   const frontMeaning = el("frontMeaning");
   const speakFrontBtn = el("speakFrontBtn");
   const speakBackBtn = el("speakBackBtn");
+  const knownBtn = el("knownBtn");
 
   // Login + session
   const loginOverlay = el("loginOverlay");
@@ -68,8 +69,10 @@
   const statDue = el("statDue");
   const statNew = el("statNew");
   const statStreak = el("statStreak");
+  const statKnown = el("statKnown");
   const masteryBar = el("masteryBar");
   const masteryGrid = el("masteryGrid");
+  const resetKnownBtn = el("resetKnownBtn");
 
   // Filter by the kanji's grammatical type
   const FILTERS = {
@@ -94,6 +97,8 @@
   let sessionMissed = 0;
   let srsMap = {};             // audioFile -> SRS entry, see srs.js
   let againQueue = new Set();  // audioFile keys graded "again" and not yet resolved this session
+  let kanjiKnown = new Set();  // audioFile keys marked "sudah paham" — excluded from future buildDeck() calls
+  let allKnownEmpty = false;   // see buildDeck() — distinguishes the two empty-deck causes for render()
 
   // ---- Users & persistent progress -----------------------------------------
   // "guest"           -> nothing is saved; every session is a fresh shuffle.
@@ -218,7 +223,7 @@
     const disabled = loadDisabledSet();
     const restored = saved.order
       .map((key) => cardsByAudioFile.get(key))
-      .filter((c) => c && !disabled.has(c.kanjiId));
+      .filter((c) => c && !disabled.has(c.kanjiId) && !kanjiKnown.has(c.audioFile));
     if (!restored.length) return false;
 
     filter = FILTERS[saved.filter] ? saved.filter : "all";
@@ -265,7 +270,11 @@
   // either way, since that's the point of spaced repetition.
   function buildDeck(shuffle) {
     const disabled = loadDisabledSet();
-    const base = CARDS.filter(FILTERS[filter]).filter((c) => !disabled.has(c.kanjiId));
+    const enabled = CARDS.filter(FILTERS[filter]).filter((c) => !disabled.has(c.kanjiId));
+    const base = enabled.filter((c) => !kanjiKnown.has(c.audioFile));
+    // Distinguishes "nothing enabled on the Manage page" from "everything
+    // enabled is marked sudah paham" for the empty-deck message in render().
+    allKnownEmpty = base.length === 0 && enabled.length > 0;
 
     const now = Date.now();
     const dueCards = [];
@@ -301,6 +310,19 @@
     updateQueueBadge();
     setFinished(false);
     render();
+  }
+
+  // Marks/unmarks the card currently on screen as "sudah paham". Doesn't
+  // touch the running session — it takes effect on the next buildDeck()
+  // (Shuffle, filter change, login, etc.), same as the Manage-page disabled
+  // set already does.
+  function toggleCurrentKnown() {
+    const c = deck[index];
+    if (!c) return;
+    if (kanjiKnown.has(c.audioFile)) kanjiKnown.delete(c.audioFile);
+    else kanjiKnown.add(c.audioFile);
+    saveKnown("kanji", currentUser, kanjiKnown);
+    knownBtn.classList.toggle("is-known", kanjiKnown.has(c.audioFile));
   }
 
   function updateScore() {
@@ -346,11 +368,14 @@
       frontWord.textContent = "—";
       frontSentence.textContent = "";
       frontRomaji.hidden = true;
-      frontNote.textContent = "No kanji enabled — open 管理 Manage to turn some on.";
+      frontNote.textContent = allKnownEmpty
+        ? "Semua kartu di sini sudah ditandai paham — reset dari layar Progress untuk memasukkannya lagi."
+        : "No kanji enabled — open 管理 Manage to turn some on.";
       frontFormHint.hidden = true;
       return;
     }
     unflip();
+    if (knownBtn) knownBtn.classList.toggle("is-known", kanjiKnown.has(c.audioFile));
 
     frontType.textContent = TYPE_LABELS[c.type] || c.type;
     backType.textContent = TYPE_LABELS[c.type] || c.type;
@@ -629,6 +654,7 @@
   function applyUser(name) {
     currentUser = name;
     srsMap = loadSrs("kanji", currentUser);
+    kanjiKnown = loadKnown("kanji", currentUser);
     seedFromLegacyStatsOnce();
     bumpStreak(name);
     userName.textContent = name;
@@ -687,6 +713,7 @@
     statDue.textContent = due;
     statNew.textContent = newCount;
     statStreak.textContent = loadStreak(currentUser).count;
+    if (statKnown) statKnown.textContent = kanjiKnown.size;
 
     const total = enabledCards.length || 1;
     masteryBar.innerHTML =
@@ -742,6 +769,7 @@
 
   speakFrontBtn.addEventListener("click", (e) => { e.stopPropagation(); speakFront(); });
   speakBackBtn.addEventListener("click", (e) => { e.stopPropagation(); speakBack(); });
+  if (knownBtn) knownBtn.addEventListener("click", (e) => { e.stopPropagation(); toggleCurrentKnown(); });
 
   againBtn.addEventListener("click", () => grade("again"));
   goodBtn.addEventListener("click", () => grade("good"));
@@ -760,6 +788,12 @@
   progressBtn.addEventListener("click", showProgress);
   progressCloseBtn.addEventListener("click", hideProgress);
   progressOverlay.addEventListener("click", (e) => { if (e.target === progressOverlay) hideProgress(); });
+  if (resetKnownBtn) resetKnownBtn.addEventListener("click", () => {
+    kanjiKnown = new Set();
+    saveKnown("kanji", currentUser, kanjiKnown);
+    renderProgress();
+    buildDeck(true);
+  });
 
   hintForm.addEventListener("change", () => { savePrefsFromUI(); render(); });
   clozeMode.addEventListener("change", () => { savePrefsFromUI(); render(); });
@@ -792,6 +826,7 @@
         e.preventDefault();
         card.classList.contains("is-flipped") ? speakBack() : speakFront();
         break;
+      case "k": case "K": e.preventDefault(); toggleCurrentKnown(); break;
     }
   });
 

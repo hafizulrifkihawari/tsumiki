@@ -102,6 +102,7 @@
           <span class="switch-track"><span class="switch-thumb"></span></span>
           <span class="switch-label">Terjemahan</span>
         </label>
+        <button class="btn btn-ghost quiz-known-btn" id="quizKnownBtn" type="button" title="Tandai item ini sudah dipahami — dikeluarkan dari sesi Latihan berikutnya">✓ Sudah Paham</button>
       </div>
 
       <main class="stage">
@@ -111,8 +112,9 @@
       </main>
 
       <div class="finished-screen" id="quizEmpty" hidden>
-        <div class="finished-title">Tidak ada yang perlu di-review 🎉</div>
-        <p class="finished-sub">Semua poin sudah <span>up to date</span>. Buka salah satu poin untuk belajar hal baru, atau kembali lagi nanti.</p>
+        <div class="finished-title" id="quizEmptyTitle">Tidak ada yang perlu di-review 🎉</div>
+        <p class="finished-sub" id="quizEmptySub">Semua poin sudah <span>up to date</span>. Buka salah satu poin untuk belajar hal baru, atau kembali lagi nanti.</p>
+        <button class="btn btn-ghost" id="quizEmptyResetKnownBtn" type="button" hidden>↺ Reset "sudah paham"</button>
         <button class="btn btn-flip" id="quizEmptyBackBtn" type="button">← Kembali ke daftar</button>
       </div>
     </section>
@@ -145,6 +147,7 @@
   <script src="srs.js"></script>
   <script src="bunpou-data.js"></script>
   <script src="bunpou-quiz-data.js"></script>
+  <script src="bunpou-particle-data.js"></script>
   <script src="bunpou-app.js"></script>
   <script src="n4sim-data.js"></script>
   <script src="n4sim.js"></script>

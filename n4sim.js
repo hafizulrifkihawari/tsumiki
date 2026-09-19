@@ -49,7 +49,10 @@
   function showExam(on) {
     if (on && window.__choukaiStop) window.__choukaiStop();
     examView.hidden = !on;
-    otherViews.forEach((v) => { v.hidden = on; });
+    // Only hide the other views when opening the exam. Un-hiding them here
+    // when closing would stack them under whatever bunpou-app.js is showing
+    // next — that's its job via showView()/__bunpouShowView, not ours.
+    if (on) otherViews.forEach((v) => { v.hidden = true; });
     if (reviewBtn) reviewBtn.hidden = on;
     window.scrollTo(0, 0);
   }
@@ -257,8 +260,10 @@
   function exitToBrowse() {
     stopTimer();
     showExam(false);
-    const bv = el("browseView");
-    if (bv) bv.hidden = false;
+    // Route through bunpou-app.js's own view owner so it can't drift out of
+    // sync with #reviewBtn and the other bunpou views (see showView()).
+    if (window.__bunpouShowView) window.__bunpouShowView("browse");
+    else { const bv = el("browseView"); if (bv) bv.hidden = false; }
   }
 
   // ============================ RUN AN EXAM ==================================

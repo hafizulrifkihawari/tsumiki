@@ -137,8 +137,11 @@
           <!-- BACK -->
           <div class="card-face card-back">
             <div class="card-top">
-              <span class="badge badge-type" id="backType">Noun</span>
-              <span class="badge badge-form" id="backForm">Basic</span>
+              <div class="card-top-badges">
+                <span class="badge badge-type" id="backType">Noun</span>
+                <span class="badge badge-form" id="backForm">Basic</span>
+              </div>
+              <button class="speak-btn known-btn" id="knownBtn" type="button" aria-label="Tandai sudah paham" title="Tandai sudah paham — dikeluarkan dari sesi berikutnya (K)">✓</button>
             </div>
             <div class="card-center">
               <div class="reading-row">
@@ -256,6 +259,7 @@
           <div class="stat-tile"><span class="stat-num" id="statDue">0</span><span class="stat-label">Due now</span></div>
           <div class="stat-tile"><span class="stat-num" id="statNew">0</span><span class="stat-label">New</span></div>
           <div class="stat-tile"><span class="stat-num" id="statStreak">0</span><span class="stat-label">Day streak</span></div>
+          <div class="stat-tile"><span class="stat-num" id="statKnown">0</span><span class="stat-label">Sudah paham</span></div>
         </div>
         <div class="mastery-bar-wrap">
           <div class="mastery-bar" id="masteryBar"></div>
@@ -265,6 +269,7 @@
             <span><i class="dot dot-mature"></i>Mature</span>
           </div>
         </div>
+        <button class="btn btn-ghost progress-reset-known-btn" id="resetKnownBtn" type="button">↺ Reset "sudah paham"</button>
         <div class="table-wrap">
           <table class="manage-table" id="masteryGrid"></table>
         </div>

@@ -24,6 +24,7 @@
   const wordCount = el("wordCount");
   const dueCountEl = el("dueCount");
   const speakFrontBtn = el("speakFrontBtn");
+  const knownBtn = el("knownBtn");
 
   // Graded answering (Again / Good / Easy) — same scheduling engine (srs.js)
   // and visual language as the N4 kanji deck, so studying here also builds
@@ -63,7 +64,10 @@
     return new Set();
   }
   const disabledLessons = loadDisabledLessons();
-  const activeCards = () => KOTOBA.filter((c) => !disabledLessons.has(c.lesson));
+  // "sudah paham" — cards excluded from the next buildDeck() cycle without
+  // touching their SRS history. Keyed the same as srsMap: c.key.
+  let kotobaKnown = loadKnown(KOTOBA_DECK, currentUser);
+  const activeCards = () => KOTOBA.filter((c) => !disabledLessons.has(c.lesson) && !kotobaKnown.has(c.key));
 
   let srsMap = loadSrs(KOTOBA_DECK, currentUser);
   let sessionCorrect = 0;
@@ -121,7 +125,7 @@
     if (savedFilter.length !== currentFilter.length || savedFilter.some((v, i) => v !== currentFilter[i])) {
       return false;
     }
-    const restored = saved.order.map((k) => cardsByKey.get(k)).filter(Boolean);
+    const restored = saved.order.map((k) => cardsByKey.get(k)).filter((c) => c && !kotobaKnown.has(c.key));
     if (!restored.length) return false;
     deck = restored;
     index = Math.min(Math.max(0, saved.index || 0), deck.length - 1);
@@ -208,6 +212,7 @@
     posTotal.textContent = deck.length;
     if (!c) return;
     unflip();
+    if (knownBtn) knownBtn.classList.toggle("is-known", kotobaKnown.has(c.key));
 
     frontLesson.textContent = "Pelajaran " + c.lesson;
     frontKana.textContent = c.kana;
@@ -352,6 +357,18 @@
     }, true);
   }
 
+  // Marks/unmarks the card on screen as "sudah paham". Doesn't touch the
+  // running deck — takes effect on the next buildDeck() (Shuffle/Reset/Study
+  // All), same as the lesson-disable filter from kotoba-manage.html.
+  function toggleCurrentKnown() {
+    const c = deck[index];
+    if (!c) return;
+    if (kotobaKnown.has(c.key)) kotobaKnown.delete(c.key);
+    else kotobaKnown.add(c.key);
+    saveKnown(KOTOBA_DECK, currentUser, kotobaKnown);
+    if (knownBtn) knownBtn.classList.toggle("is-known", kotobaKnown.has(c.key));
+  }
+
   // ---- Events ----
   card.addEventListener("click", flip);
   setupSwipe(cardScene, next, prev);
@@ -362,6 +379,7 @@
   el("resetBtn").addEventListener("click", () => buildDeck(false));
   el("studyAllBtn").addEventListener("click", () => buildDeck(true, true));
   speakFrontBtn.addEventListener("click", (e) => { e.stopPropagation(); speakCurrent(); });
+  if (knownBtn) knownBtn.addEventListener("click", (e) => { e.stopPropagation(); toggleCurrentKnown(); });
 
   againBtn.addEventListener("click", () => grade("again"));
   goodBtn.addEventListener("click", () => grade("good"));
@@ -388,6 +406,7 @@
       case "2": case "y": case "Y": case "ArrowUp": e.preventDefault(); grade("good"); break;
       case "3": e.preventDefault(); grade("easy"); break;
       case "p": case "P": e.preventDefault(); speakCurrent(); break;
+      case "k": case "K": e.preventDefault(); toggleCurrentKnown(); break;
     }
   });
 

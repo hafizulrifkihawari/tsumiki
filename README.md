@@ -9,6 +9,7 @@ A flashcard web app for studying N4 kanji and vocabulary, built so each word is 
 ### Kanji flashcards (`index.html`)
 - **300-word deck**, each flattened into ~10 cards: 1 card for the word alone, plus sentence cards — 9 conjugated-form cards for verbs/adjectives, or 9 hand-written usage-sentence cards for nouns.
 - **Login & spaced repetition** — sign in with a name (or stay a `guest` for a fresh shuffle every time). Logged-in progress is saved per-user in `localStorage`: answering "Yes"/"No" on a card tracks correct/wrong counts per kanji, and well-known kanji are sampled less often in future sessions while struggling ones show up more.
+- **"Sudah paham" mark** — the ✓ button on the back of a card retires that specific card (word/sentence/conjugated-form variant) from every future session without touching its SRS history. Reset the whole mark from the Progress screen. Shuffling still picks randomly from whatever remains.
 - **Sessions are capped at 100 rotating cards** — each shuffle/login/filter change samples a fresh 100-card slice from the full pool, with a "Session complete!" screen and a button to start a new one at the end.
 - **Manage page** (`manage.html`) — toggle individual kanji (or whole rows) off so they're excluded from every session.
 - **Pre-rendered audio** — each card's audio is pre-generated (see `scripts/generate-audio.js`) and served from `audio/`, so pronunciation is consistent across visitors instead of depending on whatever TTS voice is installed on their device; falls back to the Web Speech API if a file is missing.
@@ -18,6 +19,16 @@ A flashcard web app for studying N4 kanji and vocabulary, built so each word is 
 
 ### Kotoba vocabulary (`kotoba.html`)
 - A separate flashcard set for *Minna no Nihongo II* Pelajaran 26 vocabulary (`kotoba-data.js`), with its own simpler front/back card flow (`kotoba-app.js`).
+- Same "sudah paham" mark as the kanji deck (its own ✓ button, its own retired set).
+
+### Bunpou grammar (`bunpou.html`)
+- Grammar points grouped by level, each with a reference view plus a **Latihan** (practice) session mixing four drill modes: 構造・Partikel (multiple choice over ~150 particle questions — は/が, を, に/で, へ, と, から/まで, しか/だけ/ばかり, も, や, の, か/かどうか, ね/よ, より/ほど, and connector structure like ので/のに/ながら), 文法1 (multiple choice), 文法2 (JLPT-style 文の組み立て), and Susun Bebas (free sentence assembly). Also includes 模試 N4 (`n4sim.js`) and 聴解 N4 (`choukai.js`).
+- A ✓ Sudah Paham toggle on the quiz toolbar retires the current drill item from future sessions.
+
+### Kanji of the Day (`kotd.html`)
+- A rotating deck of kanji seen in daily life, split between N4/N5 textbook kanji and a wider everyday set (signage, transit, shopping, food, weather, health, housing, forms, calendar terms, devices — see `kotd-data.js`).
+- Picks are seeded per day (stable if you reopen the page), skipping anything marked "sudah paham". Reroll one card or all three on demand; a reroll persists for the rest of the day.
+- ✓ marks a card understood so it stops appearing; "Reset paham" brings the whole set back.
 
 ### Shared
 - **Installable PWA** — works offline once installed (`manifest.json` / `sw.js`); add it to your phone's home screen via the browser's "Install app" / "Add to Home Screen" option.
@@ -62,11 +73,13 @@ The Bunpou page's 聴解 (listening) practice sets (`choukai-data.js`) play pre-
 | `data.js` | The 300-word dataset, flattened into the full card deck |
 | `conjugate.js` | Verb/adjective conjugation engine |
 | `romaji.js` | Hiragana → romaji converter |
+| `srs.js` | Shared spaced-repetition engine, streak tracking, and the "sudah paham" (known-card) store used by every deck |
 | `manage.html` / `manage.js` | Page for enabling/disabling individual kanji |
 | `kotoba.html` / `kotoba-app.js` / `kotoba-data.js` / `kotoba.css` | Separate Kotoba vocabulary flashcard section |
 | `audio/` | Pre-rendered per-card audio files + manifest |
 | `audio/choukai/` | Pre-rendered 聴解 listening clips (VOICEVOX) + manifest |
 | `scripts/generate-audio.js` | One-time (macOS `say`) script that pre-renders `audio/` from `data.js` |
 | `scripts/generate-choukai-audio.js` | One-time (VOICEVOX) script that pre-renders `audio/choukai/` from `choukai-data.js` |
-| `bunpou.html` / `bunpou-app.js` / `bunpou-data.js` / `bunpou.css` | Bunpou grammar section, plus the 模試 N4 and 聴解 modes (`n4sim.js`, `choukai.js`) |
+| `bunpou.html` / `bunpou-app.js` / `bunpou-data.js` / `bunpou-quiz-data.js` / `bunpou-particle-data.js` / `bunpou.css` | Bunpou grammar section (drill modes incl. 構造・Partikel), plus the 模試 N4 and 聴解 modes (`n4sim.js`, `choukai.js`) |
+| `kotd.html` / `kotd.js` / `kotd-data.js` / `kotd.css` | Kanji of the Day — rotating daily picks from the N4/N5 + everyday kanji sets |
 | `manifest.json` / `sw.js` | PWA install & offline support |
