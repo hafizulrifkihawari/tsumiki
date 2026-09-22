@@ -174,13 +174,21 @@ body {
 .badge-type { background: var(--surface-2); color: var(--text-dim); border: 1px solid var(--border); }
 .badge-form { background: var(--accent-soft); color: var(--accent); border: 1px solid var(--accent); }
 
-.card-center { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 12px; position: relative; }
+.card-center {
+  flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center; gap: 12px; position: relative;
+  min-height: 0; overflow-y: auto;
+}
 
 .word-display {
   font-family: var(--font-jp);
   font-size: clamp(54px, 16vw, 94px);
   font-weight: 700; line-height: 1.05; letter-spacing: 0.01em;
 }
+/* Longer conjugated forms (e.g. 特別じゃないです) need a smaller size so
+   they don't push the rest of the card under the answerbar. */
+.word-display.is-long { font-size: clamp(36px, 11vw, 60px); }
+.word-display.is-xlong { font-size: clamp(28px, 8.5vw, 44px); }
 .front-sentence {
   font-family: var(--font-jp);
   font-size: clamp(19px, 5.2vw, 26px);

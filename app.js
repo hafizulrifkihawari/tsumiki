@@ -360,12 +360,23 @@
     }
   }
 
+  // Long conjugated forms (e.g. 特別じゃないです) overflow the fixed-size
+  // word display at the default font size and get covered by the answerbar.
+  // Shrink the font as the character count grows so the card never has to
+  // grow past its reserved height.
+  function setWordDisplay(elem, text) {
+    elem.textContent = text;
+    const len = [...text].length;
+    elem.classList.toggle("is-long", len > 4 && len <= 7);
+    elem.classList.toggle("is-xlong", len > 7);
+  }
+
   function render() {
     const c = deck[index];
     posTotal.textContent = deck.length;
     if (!c) {
       posNow.textContent = 0;
-      frontWord.textContent = "—";
+      setWordDisplay(frontWord, "—");
       frontSentence.textContent = "";
       frontRomaji.hidden = true;
       frontNote.textContent = allKnownEmpty
@@ -397,7 +408,7 @@
         frontNote.textContent = "recall the word & reading";
       } else {
         frontWord.hidden = false;
-        frontWord.textContent = c.word;
+        setWordDisplay(frontWord, c.word);
         frontSentence.textContent = "";
         setRomajiLine(frontRomaji, c.reading);
         frontMeaning.hidden = true;
@@ -426,7 +437,7 @@
         frontNote.textContent = "recall the word, reading & form to fill the blank";
       } else {
         frontWord.hidden = false;
-        frontWord.textContent = c.target;
+        setWordDisplay(frontWord, c.target);
         renderSentence(frontSentence, c.jp, c.target, clozeMode.checked);
         setRomajiLine(frontRomaji, c.sentReading);
         frontMeaning.hidden = true;
