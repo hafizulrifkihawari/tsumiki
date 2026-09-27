@@ -26,6 +26,16 @@
   const speakFrontBtn = el("speakFrontBtn");
   const knownBtn = el("knownBtn");
 
+  // Pelajaran word list (right-edge drawer)
+  const listTab = el("listTab");
+  const listBackdrop = el("listBackdrop");
+  const lessonDrawer = el("lessonDrawer");
+  const lessonPrevBtn = el("lessonPrevBtn");
+  const lessonNextBtn = el("lessonNextBtn");
+  const drawerLessonEl = el("drawerLesson");
+  const drawerMeta = el("drawerMeta");
+  const wordList = el("wordList");
+
   // Graded answering (Again / Good / Easy) — same scheduling engine (srs.js)
   // and visual language as the N4 kanji deck, so studying here also builds
   // the shared streak and behaves consistently across both decks.
@@ -235,6 +245,7 @@
     posNow.textContent = index + 1;
     const pct = deck.length ? ((index + 1) / deck.length) * 100 : 0;
     progressFill.style.width = pct + "%";
+    markCurrentRow();
   }
 
   // ---- Text-to-speech (device voice only — no pre-rendered audio for this deck yet) ----
@@ -369,6 +380,135 @@
     if (knownBtn) knownBtn.classList.toggle("is-known", kotobaKnown.has(c.key));
   }
 
+  // ---- Pelajaran word list (right-edge drawer) ----
+  // Lists every word of one Pelajaran, so the deck can be browsed and a single
+  // word reached directly. Every lesson in the data is listed, including ones
+  // switched off in kotoba-manage.html — this is a reference, not a study filter.
+  const LESSONS = [...new Set(KOTOBA.map((c) => c.lesson))].sort((a, b) => a - b);
+  let drawerLesson = LESSONS[0];
+  let drawerOpen = false;
+
+  // Rows are built with createElement/textContent, the same way
+  // kotoba-manage.js builds its lesson rows, so no HTML-escaping helper is needed.
+  function buildWordRow(c) {
+    const row = document.createElement("button");
+    row.type = "button";
+    row.className = "kotoba-word-row";
+    row.dataset.key = c.key;
+
+    if (kotobaKnown.has(c.key)) {
+      const mark = document.createElement("span");
+      mark.className = "kw-known";
+      mark.textContent = "✓";
+      mark.title = "Sudah paham";
+      row.appendChild(mark);
+    } else {
+      const pip = document.createElement("span");
+      pip.className = "dot dot-" + bucketOf(srsMap[c.key]); // bucketOf maps a missing entry to "new"
+      row.appendChild(pip);
+    }
+
+    const text = document.createElement("span");
+    text.className = "kw-text";
+
+    const word = document.createElement("span");
+    word.className = "kw-word";
+    word.textContent = c.kana;
+    if (c.kanji) {
+      const kanji = document.createElement("span");
+      kanji.className = "kw-kanji";
+      kanji.textContent = c.kanji;
+      word.appendChild(kanji);
+    }
+    text.appendChild(word);
+
+    const meaning = document.createElement("span");
+    meaning.className = "kw-meaning";
+    meaning.textContent = c.context ? c.context + " " + c.meaning : c.meaning;
+    text.appendChild(meaning);
+
+    row.appendChild(text);
+    return row;
+  }
+
+  function renderWordList() {
+    const words = KOTOBA.filter((c) => c.lesson === drawerLesson);
+    drawerLessonEl.textContent = "Pelajaran " + drawerLesson;
+    drawerMeta.textContent = words.length + " kata" +
+      (disabledLessons.has(drawerLesson) ? " · dimatikan di Manage" : "");
+
+    const at = LESSONS.indexOf(drawerLesson);
+    lessonPrevBtn.disabled = at <= 0;
+    lessonNextBtn.disabled = at >= LESSONS.length - 1;
+
+    const frag = document.createDocumentFragment();
+    words.forEach((c) => frag.appendChild(buildWordRow(c)));
+    wordList.replaceChildren(frag);
+    markCurrentRow();
+  }
+
+  // Highlights the card on screen. Called again from render() so the mark
+  // follows the deck while the drawer stays open.
+  function markCurrentRow() {
+    if (!drawerOpen) return;
+    const c = deck[index];
+    wordList.querySelectorAll(".kotoba-word-row").forEach((row) => {
+      row.classList.toggle("is-current", !!c && row.dataset.key === c.key);
+    });
+  }
+
+  function openDrawer() {
+    const c = deck[index];
+    drawerLesson = c ? c.lesson : LESSONS[0];
+    drawerOpen = true;
+    renderWordList();
+    listBackdrop.hidden = false;
+    lessonDrawer.classList.add("is-open");
+    listTab.classList.add("is-open");
+    listTab.textContent = "›";
+    listTab.setAttribute("aria-expanded", "true");
+    const current = wordList.querySelector(".is-current");
+    if (current) current.scrollIntoView({ block: "center" });
+  }
+
+  function closeDrawer() {
+    drawerOpen = false;
+    listBackdrop.hidden = true;
+    lessonDrawer.classList.remove("is-open");
+    listTab.classList.remove("is-open");
+    listTab.textContent = "‹";
+    listTab.setAttribute("aria-expanded", "false");
+  }
+
+  function stepLesson(delta) {
+    const at = LESSONS.indexOf(drawerLesson) + delta;
+    if (at < 0 || at >= LESSONS.length) return;
+    drawerLesson = LESSONS[at];
+    renderWordList();
+    wordList.scrollTop = 0;
+  }
+
+  // Moves the session to one word. A word can be missing from the running deck
+  // — it may be marked "sudah paham", sit in a lesson switched off in Manage,
+  // not be due in a due-first session, or belong to a Pelajaran the drawer was
+  // stepped to. Splice it in next to the current card rather than rebuilding,
+  // the same way grade("again") requeues a card. SRS history is left alone.
+  function jumpToCard(key) {
+    const c = cardsByKey.get(key);
+    if (!c) return;
+    const at = deck.indexOf(c);
+    if (at >= 0) {
+      index = at;
+    } else {
+      deck.splice(index + 1, 0, c);
+      index = Math.min(index + 1, deck.length - 1);
+    }
+    posTotal.textContent = deck.length;
+    closeDrawer();
+    render();
+    saveProgress();
+  }
+
   // ---- Events ----
   card.addEventListener("click", flip);
   setupSwipe(cardScene, next, prev);
@@ -380,6 +520,15 @@
   el("studyAllBtn").addEventListener("click", () => buildDeck(true, true));
   speakFrontBtn.addEventListener("click", (e) => { e.stopPropagation(); speakCurrent(); });
   if (knownBtn) knownBtn.addEventListener("click", (e) => { e.stopPropagation(); toggleCurrentKnown(); });
+
+  listTab.addEventListener("click", () => { if (drawerOpen) closeDrawer(); else openDrawer(); });
+  listBackdrop.addEventListener("click", closeDrawer);
+  lessonPrevBtn.addEventListener("click", () => stepLesson(-1));
+  lessonNextBtn.addEventListener("click", () => stepLesson(1));
+  wordList.addEventListener("click", (e) => {
+    const row = e.target.closest(".kotoba-word-row");
+    if (row) jumpToCard(row.dataset.key);
+  });
 
   againBtn.addEventListener("click", () => grade("again"));
   goodBtn.addEventListener("click", () => grade("good"));
@@ -396,6 +545,12 @@
 
   document.addEventListener("keydown", (e) => {
     if (e.target.tagName === "INPUT") return;
+    // While the word list is open it owns the keyboard. Without this, 1/2/3
+    // would grade the card hidden behind the drawer and ←/→ would move it.
+    if (drawerOpen) {
+      if (e.key === "Escape") { e.preventDefault(); closeDrawer(); }
+      return;
+    }
     switch (e.key) {
       case " ":
       case "Enter": e.preventDefault(); flip(); break;

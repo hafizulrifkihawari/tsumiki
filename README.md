@@ -18,7 +18,9 @@ A flashcard web app for studying N4 kanji and vocabulary, built so each word is 
 - Filters for verbs / adjectives / nouns, and keyboard shortcuts (Space to flip, ←/→ to navigate, S to shuffle, Y/↑ and N/↓ to answer, P to play audio).
 
 ### Kotoba vocabulary (`kotoba.html`)
-- A separate flashcard set for *Minna no Nihongo II* Pelajaran 26 vocabulary (`kotoba-data.js`), with its own simpler front/back card flow (`kotoba-app.js`).
+- A separate flashcard set for *Minna no Nihongo II* Pelajaran 26–32 vocabulary (`kotoba-data.js`), with its own simpler front/back card flow (`kotoba-app.js`).
+- A pull-tab arrow on the right edge opens the **Pelajaran word list** — every word of one lesson, each with a mastery pip. A `‹ ›` stepper moves between lessons, and a tap on a word jumps straight to its card without touching the SRS schedule.
+- `kotoba-manage.html` enables or disables whole Pelajaran; it discovers the lessons from `kotoba-data.js`, so a new lesson needs no change there.
 - Same "sudah paham" mark as the kanji deck (its own ✓ button, its own retired set).
 
 ### Bunpou grammar (`bunpou.html`)
@@ -75,7 +77,8 @@ The Bunpou page's 聴解 (listening) practice sets (`choukai-data.js`) play pre-
 | `romaji.js` | Hiragana → romaji converter |
 | `srs.js` | Shared spaced-repetition engine, streak tracking, and the "sudah paham" (known-card) store used by every deck |
 | `manage.html` / `manage.js` | Page for enabling/disabling individual kanji |
-| `kotoba.html` / `kotoba-app.js` / `kotoba-data.js` / `kotoba.css` | Separate Kotoba vocabulary flashcard section |
+| `kotoba.html` / `kotoba-app.js` / `kotoba-data.js` / `kotoba.css` | Separate Kotoba vocabulary flashcard section (Pelajaran 26–32), including the Pelajaran word-list drawer |
+| `kotoba-manage.html` / `kotoba-manage.js` / `kotoba-manage.css` | Page for enabling/disabling whole Pelajaran in the Kotoba deck |
 | `audio/` | Pre-rendered per-card audio files + manifest |
 | `audio/choukai/` | Pre-rendered 聴解 listening clips (VOICEVOX) + manifest |
 | `scripts/generate-audio.js` | One-time (macOS `say`) script that pre-renders `audio/` from `data.js` |

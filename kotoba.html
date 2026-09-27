@@ -130,6 +130,27 @@
     </footer>
   </div>
 
+  <!-- Pelajaran word list. Deliberately a sibling of .app, not a child of
+       #cardScene — the swipe handler lives on #cardScene, so markup inside it
+       would turn a scroll of this list into a next/prev card. -->
+  <button class="kotoba-tab" id="listTab" type="button"
+          aria-expanded="false" aria-controls="lessonDrawer"
+          title="Daftar kata Pelajaran ini">‹</button>
+
+  <div class="kotoba-backdrop" id="listBackdrop" hidden></div>
+
+  <aside class="kotoba-drawer" id="lessonDrawer" aria-label="Daftar kata Pelajaran">
+    <div class="kotoba-drawer-head">
+      <button class="nav-arrow" id="lessonPrevBtn" type="button" aria-label="Pelajaran sebelumnya">‹</button>
+      <div class="kotoba-drawer-title">
+        <span id="drawerLesson">Pelajaran 26</span>
+        <span class="kotoba-drawer-meta" id="drawerMeta">0 kata</span>
+      </div>
+      <button class="nav-arrow" id="lessonNextBtn" type="button" aria-label="Pelajaran berikutnya">›</button>
+    </div>
+    <div class="kotoba-word-list" id="wordList"></div>
+  </aside>
+
   <div class="update-toast" id="updateToast" hidden>
     <span class="update-toast-msg">New version available</span>
     <button class="btn btn-flip update-toast-btn" type="button" id="updateToastRefresh">Refresh</button>
