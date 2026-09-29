@@ -24,7 +24,6 @@
   const wordCount = el("wordCount");
   const dueCountEl = el("dueCount");
   const speakFrontBtn = el("speakFrontBtn");
-  const knownBtn = el("knownBtn");
 
   // Pelajaran word list (right-edge drawer)
   const listTab = el("listTab");
@@ -222,7 +221,6 @@
     posTotal.textContent = deck.length;
     if (!c) return;
     unflip();
-    if (knownBtn) knownBtn.classList.toggle("is-known", kotobaKnown.has(c.key));
 
     frontLesson.textContent = "Pelajaran " + c.lesson;
     frontKana.textContent = c.kana;
@@ -368,18 +366,6 @@
     }, true);
   }
 
-  // Marks/unmarks the card on screen as "sudah paham". Doesn't touch the
-  // running deck — takes effect on the next buildDeck() (Shuffle/Reset/Study
-  // All), same as the lesson-disable filter from kotoba-manage.html.
-  function toggleCurrentKnown() {
-    const c = deck[index];
-    if (!c) return;
-    if (kotobaKnown.has(c.key)) kotobaKnown.delete(c.key);
-    else kotobaKnown.add(c.key);
-    saveKnown(KOTOBA_DECK, currentUser, kotobaKnown);
-    if (knownBtn) knownBtn.classList.toggle("is-known", kotobaKnown.has(c.key));
-  }
-
   // ---- Pelajaran word list (right-edge drawer) ----
   // Lists every word of one Pelajaran, so the deck can be browsed and a single
   // word reached directly. Every lesson in the data is listed, including ones
@@ -519,7 +505,6 @@
   el("resetBtn").addEventListener("click", () => buildDeck(false));
   el("studyAllBtn").addEventListener("click", () => buildDeck(true, true));
   speakFrontBtn.addEventListener("click", (e) => { e.stopPropagation(); speakCurrent(); });
-  if (knownBtn) knownBtn.addEventListener("click", (e) => { e.stopPropagation(); toggleCurrentKnown(); });
 
   listTab.addEventListener("click", () => { if (drawerOpen) closeDrawer(); else openDrawer(); });
   listBackdrop.addEventListener("click", closeDrawer);
@@ -561,7 +546,6 @@
       case "2": case "y": case "Y": case "ArrowUp": e.preventDefault(); grade("good"); break;
       case "3": e.preventDefault(); grade("easy"); break;
       case "p": case "P": e.preventDefault(); speakCurrent(); break;
-      case "k": case "K": e.preventDefault(); toggleCurrentKnown(); break;
     }
   });
 

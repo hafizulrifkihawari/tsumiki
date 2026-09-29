@@ -21,7 +21,7 @@ A flashcard web app for studying N4 kanji and vocabulary, built so each word is 
 - A separate flashcard set for *Minna no Nihongo II* Pelajaran 26–32 vocabulary (`kotoba-data.js`), with its own simpler front/back card flow (`kotoba-app.js`).
 - A pull-tab arrow on the right edge opens the **Pelajaran word list** — every word of one lesson, each with a mastery pip. A `‹ ›` stepper moves between lessons, and a tap on a word jumps straight to its card without touching the SRS schedule.
 - `kotoba-manage.html` enables or disables whole Pelajaran; it discovers the lessons from `kotoba-data.js`, so a new lesson needs no change there.
-- Same "sudah paham" mark as the kanji deck (its own ✓ button, its own retired set).
+- Same "sudah paham" retired set as the kanji deck (its own set).
 
 ### Bunpou grammar (`bunpou.html`)
 - Grammar points grouped by level, each with a reference view plus a **Latihan** (practice) session mixing four drill modes: 構造・Partikel (multiple choice over ~150 particle questions — は/が, を, に/で, へ, と, から/まで, しか/だけ/ばかり, も, や, の, か/かどうか, ね/よ, より/ほど, and connector structure like ので/のに/ながら), 文法1 (multiple choice), 文法2 (JLPT-style 文の組み立て), and Susun Bebas (free sentence assembly). Also includes 模試 N4 (`n4sim.js`) and 聴解 N4 (`choukai.js`).

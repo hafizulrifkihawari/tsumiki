@@ -37,7 +37,6 @@
   const frontMeaning = el("frontMeaning");
   const speakFrontBtn = el("speakFrontBtn");
   const speakBackBtn = el("speakBackBtn");
-  const knownBtn = el("knownBtn");
 
   // Login + session
   const loginOverlay = el("loginOverlay");
@@ -312,19 +311,6 @@
     render();
   }
 
-  // Marks/unmarks the card currently on screen as "sudah paham". Doesn't
-  // touch the running session — it takes effect on the next buildDeck()
-  // (Shuffle, filter change, login, etc.), same as the Manage-page disabled
-  // set already does.
-  function toggleCurrentKnown() {
-    const c = deck[index];
-    if (!c) return;
-    if (kanjiKnown.has(c.audioFile)) kanjiKnown.delete(c.audioFile);
-    else kanjiKnown.add(c.audioFile);
-    saveKnown("kanji", currentUser, kanjiKnown);
-    knownBtn.classList.toggle("is-known", kanjiKnown.has(c.audioFile));
-  }
-
   function updateScore() {
     scoreCount.textContent = sessionCorrect;
     missCount.textContent = sessionMissed;
@@ -386,7 +372,6 @@
       return;
     }
     unflip();
-    if (knownBtn) knownBtn.classList.toggle("is-known", kanjiKnown.has(c.audioFile));
 
     frontType.textContent = TYPE_LABELS[c.type] || c.type;
     backType.textContent = TYPE_LABELS[c.type] || c.type;
@@ -780,7 +765,6 @@
 
   speakFrontBtn.addEventListener("click", (e) => { e.stopPropagation(); speakFront(); });
   speakBackBtn.addEventListener("click", (e) => { e.stopPropagation(); speakBack(); });
-  if (knownBtn) knownBtn.addEventListener("click", (e) => { e.stopPropagation(); toggleCurrentKnown(); });
 
   againBtn.addEventListener("click", () => grade("again"));
   goodBtn.addEventListener("click", () => grade("good"));
@@ -837,7 +821,6 @@
         e.preventDefault();
         card.classList.contains("is-flipped") ? speakBack() : speakFront();
         break;
-      case "k": case "K": e.preventDefault(); toggleCurrentKnown(); break;
     }
   });
 
