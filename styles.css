@@ -4,29 +4,34 @@
  * to the other theme when the hour changes (see "Pixel scene" below). */
 :root {
   /* Night (default) */
-  --bg: #0e1238;
-  --surface: #241f5c;
-  --surface-2: #2f2873;
-  --border: #0a0820;
-  --text: #f1eeff;
-  --text-dim: #b9b0ea;
-  --text-faint: #8479c4;
-  --accent: #9a6bf0;
-  --accent-2: #ff5f93;
+  --bg: #10201f;
+  --surface: #1c2b2a;
+  --surface-2: #24383a;
+  --border: #08110f;
+  --text: #e9f1e6;
+  --text-dim: #b0c2b0;
+  --text-faint: #93a796;
+  --accent: #6fd0b4;
+  --accent-2: #f29a6b;
   --accent-soft: color-mix(in srgb, var(--accent) 22%, transparent);
-  --good: #5fe0b0;
-  --on-good: #06251b;
-  --lip: #5a36a8;
-  --shadow: 6px 6px 0 rgba(5, 4, 20, 0.55);
+  /* "Learning" status: a lighter accent, so it differs from "mature" (--good) by lightness too. */
+  --learning: color-mix(in srgb, var(--accent) 55%, var(--surface));
+  --good: #a6e07a;
+  --on-good: #10240a;
+  --lip: #2b7a68;
+  /* Text on accent / accent-2 fills. Night fills are light, so the text is dark. */
+  --on-accent: #0b2420;
+  --on-accent-lip: transparent;
+  --shadow: 6px 6px 0 rgba(2, 10, 8, 0.55);
   --bevel: inset 0 -4px 0 rgba(0, 0, 0, 0.28), inset 0 -7px 0 rgba(255, 255, 255, 0.28);
   --radius: 6px;
   --r-sm: 4px;
   --bw: 2px;
   /* Sky / ground colours for the scene layer. */
-  --sky-1: #0b1035; --sky-2: #1a1e6b; --sky-3: #3a2a9a; --sky-4: #7a35b0; --sky-5: #e0507a;
-  --hill: #3b2a8f; --hill-2: #2a2070;
+  --sky-1: #0b1a24; --sky-2: #12303a; --sky-3: #1d4a52; --sky-4: #2f6b66; --sky-5: #d9a066;
+  --hill: #1f4a48; --hill-2: #163836;
   --grass-hi: #b8ffe6; --grass: #5fd6a8; --grass-lo: #2e8f73;
-  --soil: #1f1c52; --soil-2: #2d2a70;
+  --soil: #1d2a22; --soil-2: #26382c;
   /* Japanese study text stays in a clean sans so kanji strokes stay readable. */
   --font-jp: "Noto Sans JP", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", system-ui, sans-serif;
   /* UI chrome uses a pixel face; DotGothic16 covers any Japanese in the chrome. */
@@ -39,14 +44,16 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  min-height: 100vh;
+  --pad-top: max(24px, env(safe-area-inset-top));
+  --pad-bottom: calc(var(--ground-h) + 16px + env(safe-area-inset-bottom));
+  min-height: 100vh; min-height: 100dvh;
   font-family: var(--font-ui);
   color: var(--text);
   background: var(--bg);
   display: flex;
   justify-content: center;
-  padding: max(24px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right))
-    calc(var(--ground-h) + 64px + env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+  padding: var(--pad-top) max(16px, env(safe-area-inset-right))
+    var(--pad-bottom) max(16px, env(safe-area-inset-left));
 }
 button, input, select, textarea { font-family: inherit; }
 
@@ -56,6 +63,9 @@ button, input, select, textarea { font-family: inherit; }
   display: flex;
   flex-direction: column;
   gap: 18px;
+  /* Fill the window, so the study card can take the height that is left. */
+  min-height: calc(100vh - var(--pad-top) - var(--pad-bottom));
+  min-height: calc(100dvh - var(--pad-top) - var(--pad-bottom));
 }
 
 /* ---------- Top bar ---------- */
@@ -93,6 +103,19 @@ button, input, select, textarea { font-family: inherit; }
   padding: 12px 16px;
 }
 .control-group { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+/* Kanji page: the switches fold into an "Options" row to save height. */
+.controls-more[open] { flex-basis: 100%; }
+.controls-more[open] > .controls-summary { margin-bottom: 10px; }
+.controls-summary {
+  cursor: pointer; list-style: none; user-select: none;
+  font-size: 13px; font-weight: 600; color: var(--text-dim);
+  padding: 6px 2px;
+}
+.controls-summary::-webkit-details-marker { display: none; }
+.controls-summary::after { content: " ▸"; }
+.controls-more[open] > .controls-summary::after { content: " ▾"; }
+.controls-summary:hover { color: var(--text); }
+
 
 .switch { display: inline-flex; align-items: center; gap: 9px; cursor: pointer; user-select: none; }
 .switch input { position: absolute; opacity: 0; pointer-events: none; }
@@ -117,11 +140,19 @@ button, input, select, textarea { font-family: inherit; }
   transition: background 0.18s, color 0.18s;
 }
 .seg-btn:hover { color: var(--text); }
-.seg-btn.is-active { background: var(--accent); color: #fff; box-shadow: var(--bevel); }
+.seg-btn.is-active { background: var(--accent); color: var(--on-accent); box-shadow: var(--bevel); }
 
 /* ---------- Stage / card ---------- */
-.stage { display: flex; align-items: center; gap: 10px; }
-.card-scene { flex: 1; perspective: 1600px; position: relative; touch-action: pan-y; }
+/* The stage grows into the free height of .app. The card stretches with it,
+ * between its min-height and max-height, so the page fits the window when
+ * there is room and scrolls only when there is not. */
+.stage { flex: 1 0 auto; display: flex; align-items: stretch; gap: 10px; }
+.stage > .nav-arrow { align-self: center; }
+.card-scene {
+  flex: 1; perspective: 1600px; position: relative; touch-action: pan-y;
+  display: flex; flex-direction: column; justify-content: center;
+}
+.card-scene > .card { flex: 1 1 auto; max-height: 560px; }
 
 .card {
   position: relative;
@@ -317,7 +348,7 @@ button, input, select, textarea { font-family: inherit; }
 .btn-icon { font-size: 15px; }
 .btn-flip {
   background: var(--accent);
-  border-color: transparent; color: #fff;
+  border-color: transparent; color: var(--on-accent);
   box-shadow: var(--bevel);
 }
 .btn-flip:hover { filter: brightness(1.06); background: var(--accent); }
@@ -328,7 +359,7 @@ button, input, select, textarea { font-family: inherit; }
 .user-avatar {
   display: inline-flex; align-items: center; justify-content: center;
   width: 20px; height: 20px; border-radius: var(--r-sm); font-size: 12px;
-  background: var(--accent); color: #fff;
+  background: var(--accent); color: var(--on-accent);
 }
 
 /* ---------- Answer bar (Again / Good / Easy) ---------- */
@@ -436,7 +467,7 @@ body { padding-left: calc(var(--sidebar-w) + max(24px, env(safe-area-inset-left)
 .sidebar-logo {
   flex-shrink: 0; white-space: nowrap;
   font-size: 17px; font-weight: 800; line-height: 1; letter-spacing: -0.04em;
-  padding: 11px 8px; border-radius: var(--r-sm); color: #fff;
+  padding: 11px 8px; border-radius: var(--r-sm); color: var(--on-accent);
   background: var(--accent);
   box-shadow: var(--bevel);
 }
@@ -503,7 +534,7 @@ body { padding-left: calc(var(--sidebar-w) + max(24px, env(safe-area-inset-left)
 }
 
 @media (max-width: 900px) {
-  body { padding-left: max(16px, env(safe-area-inset-left)); padding-top: max(72px, env(safe-area-inset-top)); }
+  body { padding-left: max(16px, env(safe-area-inset-left)); --pad-top: max(72px, env(safe-area-inset-top)); }
   .sidebar {
     width: min(280px, 84vw);
     transform: translateX(-100%); visibility: hidden;
@@ -522,7 +553,7 @@ body { padding-left: calc(var(--sidebar-w) + max(24px, env(safe-area-inset-left)
   .sidebar, .sidebar.is-open, .sidebar-collapsed .sidebar { transition: none; }
 }
 
-/* ---------- Login overlay ---------- */
+/* ---------- Name picker overlay ---------- */
 .login-overlay {
   position: fixed; inset: 0; z-index: 50;
   display: flex; align-items: center; justify-content: center; padding: 22px;
@@ -535,10 +566,12 @@ body { padding-left: calc(var(--sidebar-w) + max(24px, env(safe-area-inset-left)
   border: var(--bw) solid var(--border); border-radius: var(--radius);
   box-shadow: var(--shadow); padding: 30px 26px;
   display: flex; flex-direction: column; align-items: center; gap: 12px;
+  position: relative;
 }
+.login-close { position: absolute; top: 10px; right: 10px; }
 .login-kanji {
   font-family: var(--font-jp); font-size: 32px; font-weight: 700; line-height: 1;
-  padding: 10px 12px; border-radius: var(--r-sm); color: #fff;
+  padding: 10px 12px; border-radius: var(--r-sm); color: var(--on-accent);
   background: var(--accent);
   box-shadow: var(--bevel);
 }
@@ -618,18 +651,19 @@ body { padding-left: calc(var(--sidebar-w) + max(24px, env(safe-area-inset-left)
 .mastery-bar { display: flex; height: 12px; border-radius: var(--r-sm); overflow: hidden; background: var(--surface-2); }
 .mastery-bar span { height: 100%; }
 .mastery-bar .seg-new { background: var(--border); }
-.mastery-bar .seg-learning { background: var(--accent); }
+.mastery-bar .seg-learning { background: var(--learning); }
 .mastery-bar .seg-mature { background: var(--good); }
 .mastery-legend { display: flex; gap: 14px; margin-top: 8px; font-size: 11px; color: var(--text-faint); }
 .mastery-legend span { display: inline-flex; align-items: center; gap: 5px; }
 .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
 .dot-new { background: var(--border); }
-.dot-learning { background: var(--accent); }
+.dot-learning { background: var(--learning); }
 .dot-mature { background: var(--good); }
 
-#masteryGrid .cell { cursor: default; min-width: 60px; }
+#masteryGrid .cell { display: flex; cursor: default; justify-content: center; padding: 7px 4px; }
+#masteryGrid tr { grid-template-columns: repeat(auto-fill, minmax(58px, 1fr)); gap: 6px; padding: 8px 0; }
 #masteryGrid .cell.bucket-new { opacity: 0.55; }
-#masteryGrid .cell.bucket-learning { border-color: var(--accent); }
+#masteryGrid .cell.bucket-learning { border-color: var(--learning); }
 #masteryGrid .cell.bucket-mature { border-color: var(--good); background: color-mix(in srgb, var(--good) 10%, transparent); }
 
 /* ---------- Manage page ---------- */
@@ -637,50 +671,72 @@ body { padding-left: calc(var(--sidebar-w) + max(24px, env(safe-area-inset-left)
   display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 4px 0 14px;
 }
 .manage-hint { font-size: 12.5px; color: var(--text-faint); }
+/* The manage page is wider than the study pages. Each group of 10 is a grid
+ * that wraps to the free width, so the list never scrolls sideways. */
+body[data-page="kanji-manage"] .app { max-width: 1180px; }
 .table-wrap {
-  overflow-x: auto;
   background: var(--surface); border: var(--bw) solid var(--border);
-  border-radius: var(--radius); padding: 8px;
+  border-radius: var(--radius); padding: 4px 14px;
+  container-type: inline-size;
 }
-.manage-table { border-collapse: separate; border-spacing: 6px; width: 100%; }
-.manage-table td { vertical-align: middle; }
-.row-head { width: 34px; text-align: center; }
+.manage-table, .manage-table tbody, .manage-table td { display: block; }
+.manage-table tr {
+  display: grid; gap: 8px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  padding: 12px 0 14px;
+}
+/* A group of 10 shows as 2, 5 or 10 per line, so it never breaks unevenly. */
+@container (min-width: 480px) { .manage-table tr { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
+@container (min-width: 1000px) { .manage-table tr { grid-template-columns: repeat(10, minmax(0, 1fr)); } }
+.manage-table tr + tr { border-top: var(--bw) dashed color-mix(in srgb, var(--text-faint) 45%, transparent); }
+.manage-table td:empty { display: none; }
+.row-head { grid-column: 1 / -1; }
+.row-label {
+  display: inline-flex; align-items: center; gap: 8px; cursor: pointer;
+  font-size: 13px; font-weight: 600; color: var(--text-dim);
+}
+.row-label:hover { color: var(--text); }
 .row-check, .cell-check {
   width: 17px; height: 17px; accent-color: var(--accent); cursor: pointer; flex: none;
 }
+/* Top line: checkbox and number. Below: the word, then its reading. */
 .cell {
-  display: flex; align-items: center; gap: 8px;
-  padding: 7px 9px; border-radius: var(--r-sm); cursor: pointer;
+  display: grid; grid-template-columns: auto 1fr; align-items: center;
+  grid-template-areas: "check id" "word word" "read read";
+  column-gap: 8px; row-gap: 4px; height: 100%;
+  padding: 10px 11px; border-radius: var(--r-sm); cursor: pointer;
   background: var(--surface-2); border: var(--bw) solid var(--border);
   transition: opacity 0.15s, border-color 0.15s, background 0.15s;
-  min-width: 92px;
 }
+.cell .cell-check { grid-area: check; }
+.cell-info { display: contents; }
 .cell:hover { border-color: var(--accent); }
-.cell-info { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
-.cell-kanji { font-family: var(--font-jp); font-size: 17px; font-weight: 600; line-height: 1.1; }
-.cell-meta { font-size: 10.5px; color: var(--text-faint); white-space: nowrap; }
-.cell.is-off { opacity: 0.4; background: transparent; }
+.cell-kanji { grid-area: word; font-family: var(--font-jp); font-size: 20px; font-weight: 600; line-height: 1.2; overflow-wrap: anywhere; }
+.cell-reading { grid-area: read; font-family: var(--font-jp); font-size: 13px; color: var(--text-dim); line-height: 1.3; overflow-wrap: anywhere; }
+.cell-meta { grid-area: id; font-size: 11px; color: var(--text-faint); text-align: right; }
+.cell.is-off { opacity: 0.45; background: transparent; }
 .cell.is-off .cell-kanji { text-decoration: line-through; }
 
 @media (max-width: 560px) {
-  .cell { min-width: 78px; padding: 6px 7px; }
-  .cell-kanji { font-size: 15px; }
-  .manage-table { border-spacing: 4px; }
+  .table-wrap { padding: 2px 10px; }
+  .manage-table tr { gap: 6px; }
+  .cell { padding: 8px 8px; gap: 7px; }
+  .cell-kanji { font-size: 18px; }
 }
 
 /* ---------- Day theme ---------- */
 :root[data-theme="day"] {
-  --bg: #7fb2ea;
-  --surface: #fbf8ff; --surface-2: #ece4fd; --border: #2b1d47;
-  --text: #24173d; --text-dim: #574775; --text-faint: #8a7bab;
-  --accent: #8a5ad9; --accent-2: #d93f6a; --good: #3d9e2e; --on-good: #fff;
-  --lip: #5d3a9e;
+  --bg: #9fd0c0;
+  --surface: #f7f4e8; --surface-2: #ebe6d2; --border: #22301f;
+  --text: #22301f; --text-dim: #4d5a45; --text-faint: #5e6957;
+  --accent: #26695a; --accent-2: #a8441f; --good: #2a6e33; --on-good: #fff;
+  --lip: #1f5a4c; --on-accent: #fff; --on-accent-lip: var(--lip);
   --accent-soft: color-mix(in srgb, var(--accent) 16%, transparent);
-  --shadow: 6px 6px 0 rgba(43, 29, 71, 0.28);
-  --sky-1: #6aa4e6; --sky-2: #7fb2ea; --sky-3: #96c4f0; --sky-4: #b4d8f6; --sky-5: #d6ecfb;
+  --shadow: 6px 6px 0 rgba(34, 48, 31, 0.28);
+  --sky-1: #7fbcd6; --sky-2: #92c9d8; --sky-3: #a8d6dc; --sky-4: #c3e4dc; --sky-5: #e2f1e4;
   --hill: #ffffff; --hill-2: #e2f0fc;
   --grass-hi: #9be34f; --grass: #5cbf2a; --grass-lo: #3c8a1f;
-  --soil: #6e2a32; --soil-2: #8b3a3a;
+  --soil: #6b4a2e; --soil-2: #7d5a38;
   color-scheme: light;
 }
 
@@ -688,33 +744,35 @@ body { padding-left: calc(var(--sidebar-w) + max(24px, env(safe-area-inset-left)
  * Registered colour tokens can animate. shell.js adds .theme-fading for one
  * fade when the hour crosses 06:00 or 18:00 while the page is open. A page
  * load picks its theme at once, with no fade. */
-@property --bg { syntax: "<color>"; inherits: true; initial-value: #0e1238; }
-@property --surface { syntax: "<color>"; inherits: true; initial-value: #241f5c; }
-@property --surface-2 { syntax: "<color>"; inherits: true; initial-value: #2f2873; }
-@property --border { syntax: "<color>"; inherits: true; initial-value: #0a0820; }
-@property --text { syntax: "<color>"; inherits: true; initial-value: #f1eeff; }
-@property --text-dim { syntax: "<color>"; inherits: true; initial-value: #b9b0ea; }
-@property --text-faint { syntax: "<color>"; inherits: true; initial-value: #8479c4; }
-@property --accent { syntax: "<color>"; inherits: true; initial-value: #9a6bf0; }
-@property --accent-2 { syntax: "<color>"; inherits: true; initial-value: #ff5f93; }
-@property --good { syntax: "<color>"; inherits: true; initial-value: #5fe0b0; }
-@property --on-good { syntax: "<color>"; inherits: true; initial-value: #06251b; }
-@property --lip { syntax: "<color>"; inherits: true; initial-value: #5a36a8; }
-@property --sky-1 { syntax: "<color>"; inherits: true; initial-value: #0b1035; }
-@property --sky-2 { syntax: "<color>"; inherits: true; initial-value: #1a1e6b; }
-@property --sky-3 { syntax: "<color>"; inherits: true; initial-value: #3a2a9a; }
-@property --sky-4 { syntax: "<color>"; inherits: true; initial-value: #7a35b0; }
-@property --sky-5 { syntax: "<color>"; inherits: true; initial-value: #e0507a; }
-@property --hill { syntax: "<color>"; inherits: true; initial-value: #3b2a8f; }
-@property --hill-2 { syntax: "<color>"; inherits: true; initial-value: #2a2070; }
+@property --bg { syntax: "<color>"; inherits: true; initial-value: #10201f; }
+@property --surface { syntax: "<color>"; inherits: true; initial-value: #1c2b2a; }
+@property --surface-2 { syntax: "<color>"; inherits: true; initial-value: #24383a; }
+@property --border { syntax: "<color>"; inherits: true; initial-value: #08110f; }
+@property --text { syntax: "<color>"; inherits: true; initial-value: #e9f1e6; }
+@property --text-dim { syntax: "<color>"; inherits: true; initial-value: #b0c2b0; }
+@property --text-faint { syntax: "<color>"; inherits: true; initial-value: #93a796; }
+@property --accent { syntax: "<color>"; inherits: true; initial-value: #6fd0b4; }
+@property --accent-2 { syntax: "<color>"; inherits: true; initial-value: #f29a6b; }
+@property --good { syntax: "<color>"; inherits: true; initial-value: #a6e07a; }
+@property --on-good { syntax: "<color>"; inherits: true; initial-value: #10240a; }
+@property --on-accent { syntax: "<color>"; inherits: true; initial-value: #0b2420; }
+@property --on-accent-lip { syntax: "<color>"; inherits: true; initial-value: transparent; }
+@property --lip { syntax: "<color>"; inherits: true; initial-value: #2b7a68; }
+@property --sky-1 { syntax: "<color>"; inherits: true; initial-value: #0b1a24; }
+@property --sky-2 { syntax: "<color>"; inherits: true; initial-value: #12303a; }
+@property --sky-3 { syntax: "<color>"; inherits: true; initial-value: #1d4a52; }
+@property --sky-4 { syntax: "<color>"; inherits: true; initial-value: #2f6b66; }
+@property --sky-5 { syntax: "<color>"; inherits: true; initial-value: #d9a066; }
+@property --hill { syntax: "<color>"; inherits: true; initial-value: #1f4a48; }
+@property --hill-2 { syntax: "<color>"; inherits: true; initial-value: #163836; }
 @property --grass-hi { syntax: "<color>"; inherits: true; initial-value: #b8ffe6; }
 @property --grass { syntax: "<color>"; inherits: true; initial-value: #5fd6a8; }
 @property --grass-lo { syntax: "<color>"; inherits: true; initial-value: #2e8f73; }
-@property --soil { syntax: "<color>"; inherits: true; initial-value: #1f1c52; }
-@property --soil-2 { syntax: "<color>"; inherits: true; initial-value: #2d2a70; }
+@property --soil { syntax: "<color>"; inherits: true; initial-value: #1d2a22; }
+@property --soil-2 { syntax: "<color>"; inherits: true; initial-value: #26382c; }
 :root { --theme-fade: 90s; }
 :root.theme-fading {
-  transition-property: --bg, --surface, --surface-2, --border, --text, --text-dim, --text-faint, --accent, --accent-2, --good, --on-good, --lip, --sky-1, --sky-2, --sky-3, --sky-4, --sky-5, --hill, --hill-2, --grass-hi, --grass, --grass-lo, --soil, --soil-2;
+  transition-property: --on-accent, --on-accent-lip, --bg, --surface, --surface-2, --border, --text, --text-dim, --text-faint, --accent, --accent-2, --good, --on-good, --lip, --sky-1, --sky-2, --sky-3, --sky-4, --sky-5, --hill, --hill-2, --grass-hi, --grass, --grass-lo, --soil, --soil-2;
   transition-duration: var(--theme-fade);
   transition-timing-function: ease-in-out;
 }
@@ -730,9 +788,9 @@ body { padding-left: calc(var(--sidebar-w) + max(24px, env(safe-area-inset-left)
 }
 .btn:active { transform: translateY(2px); box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.28); }
 .btn-flip, .seg-btn.is-active {
-  background: var(--accent); color: #fff; border-color: var(--border);
+  background: var(--accent); color: var(--on-accent); border-color: var(--border);
   text-transform: uppercase; letter-spacing: 0.06em;
-  text-shadow: 2px 2px 0 var(--lip);
+  text-shadow: 2px 2px 0 var(--on-accent-lip);
 }
 .btn-flip:hover { background: var(--accent); filter: brightness(1.08); }
 .seg-btn.is-active { box-shadow: var(--bevel); }
@@ -742,14 +800,30 @@ body { padding-left: calc(var(--sidebar-w) + max(24px, env(safe-area-inset-left)
 .sidebar-name { font-weight: 700; }
 .nav-link[aria-current="page"] { box-shadow: inset 3px 0 0 var(--accent); }
 .progress-bar { height: 12px; border-radius: 0; border: 2px solid var(--border); }
+/* The fill moves in pixel steps, its stripes march to the right, and a
+ * light band sweeps across it. */
 .progress-fill {
+  position: relative; overflow: hidden;
   border-radius: 0;
   background: repeating-linear-gradient(90deg, var(--accent) 0 8px, color-mix(in srgb, var(--accent) 70%, #fff) 8px 10px);
+  animation: progress-march 0.8s steps(5) infinite;
+  transition: width 0.6s steps(8, end);
+}
+.progress-fill::after {
+  content: ""; position: absolute; top: 0; bottom: 0; left: -40%; width: 30%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+  animation: progress-shine 2.6s ease-in-out infinite;
+}
+@keyframes progress-march { to { background-position: 10px 0; } }
+@keyframes progress-shine { 0%, 30% { left: -40%; } 100% { left: 110%; } }
+@media (prefers-reduced-motion: reduce) {
+  .progress-fill, .progress-fill::after { animation: none; }
+  .progress-fill { transition: none; }
 }
 .switch-track, .switch-thumb { border-radius: 2px; }
 .sidebar { background: color-mix(in srgb, var(--surface) 94%, transparent); border-right-width: 3px; }
 .topbar .brand-text h1, .topbar .brand-text p, .progress-count { text-shadow: 2px 2px 0 color-mix(in srgb, var(--bg) 70%, transparent); }
-::selection { background: var(--accent); color: #fff; }
+::selection { background: var(--accent); color: var(--on-accent); }
 
 /* ---------- Pixel scene (built by shell.js) ---------- */
 .scene {
@@ -838,8 +912,8 @@ body { padding-left: calc(var(--sidebar-w) + max(24px, env(safe-area-inset-left)
   .controls { flex-direction: column; align-items: stretch; }
   .segmented { width: 100%; justify-content: space-between; }
   .seg-btn { flex: 1; }
-  .card { min-height: 340px; }
-  .card-scene.has-answerbar .card { min-height: 428px; }
+  .card { min-height: 300px; }
+  .card-scene.has-answerbar .card { min-height: 360px; }
   .nav-arrow { width: 38px; height: 38px; font-size: 22px; }
   .actionbar .btn span:not(.btn-icon) { display: none; }
   .btn-flip span { display: inline !important; }
@@ -847,3 +921,28 @@ body { padding-left: calc(var(--sidebar-w) + max(24px, env(safe-area-inset-left)
   .btn-again, .btn-good, .btn-easy { padding: 11px 9px; font-size: 12.5px; }
   .topbar-actions { flex-wrap: wrap; }
 }
+
+/* ---------- Short windows ----------
+ * Less outer spacing and a lower card floor, so the study card fits a
+ * laptop window without a page scroll. Last, so it wins over the width rules. */
+@media (max-height: 760px) {
+  body { --pad-top: max(12px, env(safe-area-inset-top)); --pad-bottom: calc(12px + env(safe-area-inset-bottom)); }
+  .app { gap: 12px; }
+  .card, .finished-screen { min-height: 260px; }
+  .card-scene.has-answerbar .card { min-height: 320px; }
+}
+/* Narrow screens keep room at the top for the fixed menu button. */
+@media (max-height: 760px) and (max-width: 900px) {
+  body { --pad-top: max(64px, env(safe-area-inset-top)); }
+}
+
+/* ---------- Card text on short cards ----------
+ * The card height now follows the window. Each face is a size container,
+ * so the big word, the sentence and the reading also shrink with the card
+ * height (cqh) when the card is short. On a tall card the clamp() wins. */
+.card-face { container-type: size; }
+.word-display { font-size: min(clamp(54px, 16vw, 94px), 17cqh); }
+.word-display.is-long { font-size: min(clamp(36px, 11vw, 60px), 12cqh); }
+.word-display.is-xlong { font-size: min(clamp(28px, 8.5vw, 44px), 9cqh); }
+.front-sentence { font-size: min(clamp(19px, 5.2vw, 26px), 6.4cqh); }
+.reading-shown { font-size: min(clamp(32px, 9vw, 50px), 11cqh); }

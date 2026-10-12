@@ -42,6 +42,7 @@
   const loginOverlay = el("loginOverlay");
   const loginForm = el("loginForm");
   const loginInput = el("loginInput");
+  const loginCloseBtn = el("loginCloseBtn");
   const userChip = el("userChip");
   const userName = el("userName");
   const userAvatar = el("userAvatar");
@@ -672,8 +673,15 @@
 
   function showLogin() {
     loginOverlay.hidden = false;
-    loginInput.value = "";
-    setTimeout(() => loginInput.focus(), 30);
+    loginInput.value = isGuest() ? "" : currentUser;
+    setTimeout(() => { loginInput.focus(); loginInput.select(); }, 30);
+  }
+
+  // Closing keeps the current name (guest on a first visit).
+  function closeLogin() {
+    if (loginOverlay.hidden) return;
+    loginOverlay.hidden = true;
+    maybeShowHelpOnce();
   }
 
   // ---- Progress & mastery overlay ----
@@ -771,6 +779,9 @@
   easyBtn.addEventListener("click", () => grade("easy"));
 
   userChip.addEventListener("click", showLogin);
+  loginCloseBtn.addEventListener("click", closeLogin);
+  loginOverlay.addEventListener("click", (e) => { if (e.target === loginOverlay) closeLogin(); });
+  loginOverlay.addEventListener("keydown", (e) => { if (e.key === "Escape") closeLogin(); });
   loginForm.addEventListener("submit", (e) => { e.preventDefault(); login(loginInput.value); });
   document.querySelectorAll(".login-quick .chip").forEach((chip) => {
     chip.addEventListener("click", () => login(chip.dataset.user));
@@ -829,6 +840,14 @@
   // exists for the user, so a refresh or a trip to another page and back
   // resumes exactly where it left off. Only the Shuffle / In order /
   // Study Again buttons and the filter tabs start a fresh session.
+  // The Options row starts open when the window is tall enough for the card
+  // to fit with it. After a toggle, the user's choice is remembered.
+  const OPTIONS_OPEN_KEY = "kanji.optionsOpen";
+  const controlsMore = el("controlsMore");
+  const savedOpen = ls(true, OPTIONS_OPEN_KEY);
+  controlsMore.open = savedOpen ? savedOpen === "1" : window.innerHeight >= 960;
+  controlsMore.addEventListener("toggle", () => ls(false, OPTIONS_OPEN_KEY, controlsMore.open ? "1" : "0"));
+
   applyPrefs();
   const saved = ls(true, USER_KEY);
   if (saved) {

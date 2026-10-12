@@ -337,7 +337,7 @@
   // 06:00 or 18:00 in a visible tab, the colours and scene fade over
   // --theme-fade (90s in styles.css). In a hidden tab the switch is instant.
   var themeRoot = document.documentElement;
-  var THEME_COLOR = { day: "#6aa4e6", night: "#0b1035" };
+  var THEME_COLOR = { day: "#7fbcd6", night: "#0b1a24" };
   var FADE_MS = 90000;
   var fadeTimer = 0;
   function themeForNow() {

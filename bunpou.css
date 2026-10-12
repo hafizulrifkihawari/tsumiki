@@ -172,9 +172,9 @@
 }
 .mcq-opt .opt-text { font-family: var(--font-jp); }
 .mcq-opt.is-correct { background: color-mix(in srgb, var(--good) 18%, transparent); border-color: var(--good); color: var(--good); }
-.mcq-opt.is-correct .opt-letter { background: var(--good); border-color: var(--good); color: #06281c; }
+.mcq-opt.is-correct .opt-letter { background: var(--good); border-color: var(--good); color: var(--on-good); }
 .mcq-opt.is-wrong { background: color-mix(in srgb, var(--accent-2) 18%, transparent); border-color: var(--accent-2); color: var(--accent-2); }
-.mcq-opt.is-wrong .opt-letter { background: var(--accent-2); border-color: var(--accent-2); color: #2c0716; }
+.mcq-opt.is-wrong .opt-letter { background: var(--accent-2); border-color: var(--accent-2); color: var(--on-accent); }
 .mcq-opt[disabled] { cursor: default; }
 .mcq-feedback { font-size: 13.5px; line-height: 1.6; color: var(--text-dim); }
 .mcq-feedback[hidden] { display: none; }
@@ -326,7 +326,7 @@
 .exam-qcard .mcq-opt { align-items: flex-start; }
 .exam-qcard .mcq-opt .opt-text { line-height: 1.5; }
 .mcq-opt.is-selected { background: var(--accent-soft); border-color: var(--accent); color: var(--text); }
-.mcq-opt.is-selected .opt-letter { background: var(--accent); border-color: var(--accent); color: #0b1030; }
+.mcq-opt.is-selected .opt-letter { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
 
 .exam-controls { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
 .exam-controls .btn-flip { margin-left: auto; }

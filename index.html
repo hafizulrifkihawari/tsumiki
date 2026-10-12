@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>漢字 Kanji N4 · Tsumiki 積み木</title>
+  <title>Tsumiki</title>
   <link rel="manifest" href="manifest.json" />
-  <meta name="theme-color" content="#0b1035" />
+  <meta name="theme-color" content="#0b1a24" />
   <script>document.documentElement.dataset.theme = (function (h) { return h >= 6 && h < 18 ? "day" : "night"; })(new Date().getHours());</script>
   <link rel="icon" href="icon-192.png" />
   <link rel="apple-touch-icon" href="icon-apple-touch.png" />
@@ -18,23 +18,24 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body data-page="kanji">
-  <!-- Login / user picker -->
+  <!-- Name picker -->
   <div class="login-overlay" id="loginOverlay" hidden>
-    <div class="login-card">
+    <div class="login-card" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
+      <button class="sheet-close login-close" id="loginCloseBtn" type="button" aria-label="Close">×</button>
       <span class="login-kanji">積み木</span>
-      <h2>Tsumiki · Masuk</h2>
-      <p class="login-sub">Masukkan nama pengguna untuk menyimpan progres belajarmu.</p>
+      <h2 id="loginTitle">What's your name?</h2>
+      <p class="login-sub">Set your name so Tsumiki can remember your progress.</p>
       <form id="loginForm">
         <input id="loginInput" type="text" inputmode="text" autocomplete="off"
-               autocapitalize="none" spellcheck="false" placeholder="nama pengguna…" />
-        <button class="btn btn-flip" type="submit">Masuk</button>
+               autocapitalize="none" spellcheck="false" placeholder="your name…" />
+        <button class="btn btn-flip" type="submit">Save</button>
       </form>
       <div class="login-quick">
-        <button type="button" class="chip" data-user="guest">guest</button>
+        <button type="button" class="chip" data-user="guest">Continue without a name</button>
       </div>
       <p class="login-note">
-        <strong>guest</strong> — sesi acak baru setiap kali.<br />
-        nama lain — mengingat kanji yang sudah kamu kuasai.
+        <strong>Without a name</strong>, your progress is not saved and the cards shuffle each time.<br />
+        You can change your name at any time with the name button at the top.
       </p>
     </div>
   </div>
@@ -65,33 +66,36 @@
     </header>
 
     <section class="controls">
-      <div class="control-group">
-        <label class="switch">
-          <input type="checkbox" id="hintForm" />
-          <span class="switch-track"><span class="switch-thumb"></span></span>
-          <span class="switch-label">Show form hint on front</span>
-        </label>
-        <label class="switch">
-          <input type="checkbox" id="clozeMode" />
-          <span class="switch-track"><span class="switch-thumb"></span></span>
-          <span class="switch-label">Blank word in sentence (cloze)</span>
-        </label>
-        <label class="switch">
-          <input type="checkbox" id="romajiMode" />
-          <span class="switch-track"><span class="switch-thumb"></span></span>
-          <span class="switch-label">Show romaji</span>
-        </label>
-        <label class="switch">
-          <input type="checkbox" id="autoSpeak" />
-          <span class="switch-track"><span class="switch-thumb"></span></span>
-          <span class="switch-label" id="autoSpeakLabel">Auto-play audio</span>
-        </label>
-        <label class="switch">
-          <input type="checkbox" id="reverseMode" />
-          <span class="switch-track"><span class="switch-thumb"></span></span>
-          <span class="switch-label">Reverse (meaning → Japanese)</span>
-        </label>
-      </div>
+      <details class="controls-more" id="controlsMore">
+        <summary class="controls-summary">⚙ Options</summary>
+        <div class="control-group">
+          <label class="switch">
+            <input type="checkbox" id="hintForm" />
+            <span class="switch-track"><span class="switch-thumb"></span></span>
+            <span class="switch-label">Show form hint on front</span>
+          </label>
+          <label class="switch">
+            <input type="checkbox" id="clozeMode" />
+            <span class="switch-track"><span class="switch-thumb"></span></span>
+            <span class="switch-label">Blank word in sentence (cloze)</span>
+          </label>
+          <label class="switch">
+            <input type="checkbox" id="romajiMode" />
+            <span class="switch-track"><span class="switch-thumb"></span></span>
+            <span class="switch-label">Show romaji</span>
+          </label>
+          <label class="switch">
+            <input type="checkbox" id="autoSpeak" />
+            <span class="switch-track"><span class="switch-thumb"></span></span>
+            <span class="switch-label" id="autoSpeakLabel">Auto-play audio</span>
+          </label>
+          <label class="switch">
+            <input type="checkbox" id="reverseMode" />
+            <span class="switch-track"><span class="switch-thumb"></span></span>
+            <span class="switch-label">Reverse (meaning → Japanese)</span>
+          </label>
+        </div>
+      </details>
 
       <div class="control-group">
         <div class="segmented" id="filterSeg" role="tablist" aria-label="Filter by type">

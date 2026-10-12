@@ -52,11 +52,16 @@
     // Row toggle
     const th = document.createElement("td");
     th.className = "row-head";
+    const rowLabel = document.createElement("label");
+    rowLabel.className = "row-label";
     const rowCheck = document.createElement("input");
     rowCheck.type = "checkbox";
     rowCheck.className = "row-check";
     rowCheck.title = "Toggle all 10 in this row";
-    th.appendChild(rowCheck);
+    const rowText = document.createElement("span");
+    rowText.textContent = "#" + entries[0].id + "–" + entries[entries.length - 1].id;
+    rowLabel.append(rowCheck, rowText);
+    th.appendChild(rowLabel);
     tr.appendChild(th);
 
     rowCheck.addEventListener("change", () => {
@@ -88,10 +93,13 @@
       const kanji = document.createElement("span");
       kanji.className = "cell-kanji";
       kanji.textContent = e.word;
+      const reading = document.createElement("span");
+      reading.className = "cell-reading";
+      reading.textContent = e.reading;
       const meta = document.createElement("span");
       meta.className = "cell-meta";
-      meta.textContent = "#" + e.id + " · " + e.reading;
-      info.append(kanji, meta);
+      meta.textContent = "#" + e.id;
+      info.append(kanji, reading, meta);
 
       cb.addEventListener("change", () => {
         setKanji(e.id, cb.checked);
