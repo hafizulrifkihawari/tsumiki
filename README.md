@@ -4,7 +4,7 @@
 
 A flashcard web app for studying N4 kanji and vocabulary, built so each word is drilled in context rather than in isolation.
 
-**Live app:** https://hafizulrifkihawari.github.io/jp-flashcard/
+**Live app:** https://hafizulrifkihawari.github.io/tsumiki/
 
 ## What it does
 
