@@ -663,9 +663,14 @@ body { padding-left: calc(var(--sidebar-w) + max(24px, env(safe-area-inset-left)
 .dot-learning { background: var(--learning); }
 .dot-mature { background: var(--good); }
 
-#masteryGrid .cell { display: flex; cursor: default; justify-content: center; padding: 7px 4px; }
-#masteryGrid tr { grid-template-columns: repeat(auto-fill, minmax(58px, 1fr)); gap: 6px; padding: 8px 0; }
+#masteryGrid .cell { display: flex; cursor: default; justify-content: center; padding: 7px 2px; }
+#masteryGrid tr { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; padding: 8px 0; }
 #masteryGrid .cell.bucket-new { opacity: 0.55; }
+/* The progress sheet is wider than the other sheets, so a row of 10 words fits on one line. */
+#progressOverlay .sheet-card { max-width: 980px; max-height: min(860px, 90vh); }
+@media (min-width: 1000px) { #masteryGrid tr { grid-template-columns: repeat(10, minmax(0, 1fr)); } }
+#masteryGrid .cell-kanji { font-size: 17px; overflow-wrap: normal; word-break: keep-all; }
+@media (max-width: 480px) { #masteryGrid .cell-kanji { font-size: 14px; word-break: normal; overflow-wrap: anywhere; } }
 #masteryGrid .cell.bucket-learning { border-color: var(--learning); }
 #masteryGrid .cell.bucket-mature { border-color: var(--good); background: color-mix(in srgb, var(--good) 10%, transparent); }
 
