@@ -119,8 +119,8 @@
 
   // ---------- 5. Pixel scene ----------
   // A decorative background layer: sky, clouds or stars, trees, ground, and
-  // walking animals. CSS shows the day set in light mode and the night set in
-  // dark mode. Sprites are rows of palette letters ("." is transparent).
+  // walking animals. CSS shows the day set when data-theme is "day" and the
+  // night set at other times. Sprites are rows of palette letters ("." is transparent).
   var PAL = {
     o: "#2a1a12", b: "#e8913a", w: "#fff1d6", k: "#1a1010", p: "#ff8fa3",   // shiba
     c: "#f0a050", s: "#c8702a",                                              // ginger cat
@@ -330,6 +330,35 @@
       critter(CAT, 3, BLACK_CAT, "", "--dur:34s;--delay:-3.4s") +
       critter(CAT, 3, null, "is-left", "--dur:44s;--delay:-24s") +
     "</div>");
+
+  // ---------- 6. Time-of-day theme ----------
+  // The head script of each page sets data-theme from the hour at load. This
+  // part keeps it current while the page stays open. When the hour crosses
+  // 06:00 or 18:00 in a visible tab, the colours and scene fade over
+  // --theme-fade (90s in styles.css). In a hidden tab the switch is instant.
+  var themeRoot = document.documentElement;
+  var THEME_COLOR = { day: "#6aa4e6", night: "#0b1035" };
+  var FADE_MS = 90000;
+  var fadeTimer = 0;
+  function themeForNow() {
+    var h = new Date().getHours();
+    return h >= 6 && h < 18 ? "day" : "night";
+  }
+  function applyTheme(fade) {
+    var theme = themeForNow();
+    if (themeRoot.dataset.theme !== theme) {
+      if (fade) {
+        themeRoot.classList.add("theme-fading");
+        clearTimeout(fadeTimer);
+        fadeTimer = setTimeout(function () { themeRoot.classList.remove("theme-fading"); }, FADE_MS + 1000);
+      }
+      themeRoot.dataset.theme = theme;
+    }
+    document.querySelectorAll('meta[name="theme-color"]').forEach(function (m) { m.content = THEME_COLOR[theme]; });
+  }
+  applyTheme(false);
+  setInterval(function () { applyTheme(!document.hidden); }, 30000);
+  document.addEventListener("visibilitychange", function () { if (!document.hidden) applyTheme(true); });
 
   // ---------- 4. Force Update ----------
   function withTimeout(promise, ms) {

@@ -1,5 +1,7 @@
-/* Pixel-game theme. Dark mode is the night forest scene, light mode is the
- * day meadow scene (see "Pixel scene" below and section 5 of shell.js). */
+/* Pixel-game theme. The local hour sets the theme: 06:00-17:59 is the day
+ * meadow scene and 18:00-05:59 is the night forest scene. The head script of
+ * each page sets <html data-theme> at load, and section 6 of shell.js fades
+ * to the other theme when the hour changes (see "Pixel scene" below). */
 :root {
   /* Night (default) */
   --bg: #0e1238;
@@ -666,22 +668,55 @@ body { padding-left: calc(var(--sidebar-w) + max(24px, env(safe-area-inset-left)
   .manage-table { border-spacing: 4px; }
 }
 
-/* ---------- Day theme (light mode) ---------- */
-@media (prefers-color-scheme: light) {
-  :root {
-    --bg: #7fb2ea;
-    --surface: #fbf8ff; --surface-2: #ece4fd; --border: #2b1d47;
-    --text: #24173d; --text-dim: #574775; --text-faint: #8a7bab;
-    --accent: #8a5ad9; --accent-2: #d93f6a; --good: #3d9e2e; --on-good: #fff;
-    --lip: #5d3a9e;
-    --accent-soft: color-mix(in srgb, var(--accent) 16%, transparent);
-    --shadow: 6px 6px 0 rgba(43, 29, 71, 0.28);
-    --sky-1: #6aa4e6; --sky-2: #7fb2ea; --sky-3: #96c4f0; --sky-4: #b4d8f6; --sky-5: #d6ecfb;
-    --hill: #ffffff; --hill-2: #e2f0fc;
-    --grass-hi: #9be34f; --grass: #5cbf2a; --grass-lo: #3c8a1f;
-    --soil: #6e2a32; --soil-2: #8b3a3a;
-    color-scheme: light;
-  }
+/* ---------- Day theme ---------- */
+:root[data-theme="day"] {
+  --bg: #7fb2ea;
+  --surface: #fbf8ff; --surface-2: #ece4fd; --border: #2b1d47;
+  --text: #24173d; --text-dim: #574775; --text-faint: #8a7bab;
+  --accent: #8a5ad9; --accent-2: #d93f6a; --good: #3d9e2e; --on-good: #fff;
+  --lip: #5d3a9e;
+  --accent-soft: color-mix(in srgb, var(--accent) 16%, transparent);
+  --shadow: 6px 6px 0 rgba(43, 29, 71, 0.28);
+  --sky-1: #6aa4e6; --sky-2: #7fb2ea; --sky-3: #96c4f0; --sky-4: #b4d8f6; --sky-5: #d6ecfb;
+  --hill: #ffffff; --hill-2: #e2f0fc;
+  --grass-hi: #9be34f; --grass: #5cbf2a; --grass-lo: #3c8a1f;
+  --soil: #6e2a32; --soil-2: #8b3a3a;
+  color-scheme: light;
+}
+
+/* ---------- Day/night fade ----------
+ * Registered colour tokens can animate. shell.js adds .theme-fading for one
+ * fade when the hour crosses 06:00 or 18:00 while the page is open. A page
+ * load picks its theme at once, with no fade. */
+@property --bg { syntax: "<color>"; inherits: true; initial-value: #0e1238; }
+@property --surface { syntax: "<color>"; inherits: true; initial-value: #241f5c; }
+@property --surface-2 { syntax: "<color>"; inherits: true; initial-value: #2f2873; }
+@property --border { syntax: "<color>"; inherits: true; initial-value: #0a0820; }
+@property --text { syntax: "<color>"; inherits: true; initial-value: #f1eeff; }
+@property --text-dim { syntax: "<color>"; inherits: true; initial-value: #b9b0ea; }
+@property --text-faint { syntax: "<color>"; inherits: true; initial-value: #8479c4; }
+@property --accent { syntax: "<color>"; inherits: true; initial-value: #9a6bf0; }
+@property --accent-2 { syntax: "<color>"; inherits: true; initial-value: #ff5f93; }
+@property --good { syntax: "<color>"; inherits: true; initial-value: #5fe0b0; }
+@property --on-good { syntax: "<color>"; inherits: true; initial-value: #06251b; }
+@property --lip { syntax: "<color>"; inherits: true; initial-value: #5a36a8; }
+@property --sky-1 { syntax: "<color>"; inherits: true; initial-value: #0b1035; }
+@property --sky-2 { syntax: "<color>"; inherits: true; initial-value: #1a1e6b; }
+@property --sky-3 { syntax: "<color>"; inherits: true; initial-value: #3a2a9a; }
+@property --sky-4 { syntax: "<color>"; inherits: true; initial-value: #7a35b0; }
+@property --sky-5 { syntax: "<color>"; inherits: true; initial-value: #e0507a; }
+@property --hill { syntax: "<color>"; inherits: true; initial-value: #3b2a8f; }
+@property --hill-2 { syntax: "<color>"; inherits: true; initial-value: #2a2070; }
+@property --grass-hi { syntax: "<color>"; inherits: true; initial-value: #b8ffe6; }
+@property --grass { syntax: "<color>"; inherits: true; initial-value: #5fd6a8; }
+@property --grass-lo { syntax: "<color>"; inherits: true; initial-value: #2e8f73; }
+@property --soil { syntax: "<color>"; inherits: true; initial-value: #1f1c52; }
+@property --soil-2 { syntax: "<color>"; inherits: true; initial-value: #2d2a70; }
+:root { --theme-fade: 90s; }
+:root.theme-fading {
+  transition-property: --bg, --surface, --surface-2, --border, --text, --text-dim, --text-faint, --accent, --accent-2, --good, --on-good, --lip, --sky-1, --sky-2, --sky-3, --sky-4, --sky-5, --hill, --hill-2, --grass-hi, --grass, --grass-lo, --soil, --soil-2;
+  transition-duration: var(--theme-fade);
+  transition-timing-function: ease-in-out;
 }
 
 /* ---------- Pixel chrome ---------- */
@@ -729,10 +764,11 @@ body { padding-left: calc(var(--sidebar-w) + max(24px, env(safe-area-inset-left)
 .sidebar-collapsed .scene { --scene-left: 0px; }
 @media (max-width: 900px) { .scene { --scene-left: 0px; } }
 .scene-day, .scene-night { position: absolute; inset: 0; }
-.scene-day { display: none; }
-@media (prefers-color-scheme: light) {
-  .scene-day { display: block; }
-  .scene-night { display: none; }
+.scene-day,
+[data-theme="day"] .scene-night { opacity: 0; visibility: hidden; }
+[data-theme="day"] .scene-day { opacity: 1; visibility: visible; }
+.theme-fading .scene-day, .theme-fading .scene-night {
+  transition: opacity var(--theme-fade) ease-in-out, visibility var(--theme-fade);
 }
 
 .scene-hills { position: absolute; left: 0; right: 0; bottom: calc(var(--ground-h) - 2px); height: 150px; }
