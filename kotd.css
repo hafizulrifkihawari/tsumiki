@@ -10,8 +10,8 @@
 }
 
 .kotd-card {
-  background: linear-gradient(165deg, var(--surface), var(--surface-2));
-  border: 1px solid var(--border);
+  background: var(--surface);
+  border: var(--bw) solid var(--border);
   border-radius: var(--radius);
   padding: 16px 18px;
   display: flex;
@@ -48,22 +48,22 @@
 }
 
 .kotd-icon-btn {
-  width: 32px; height: 32px; border-radius: 50%;
-  border: 1px solid var(--border); background: var(--surface-2);
+  width: 32px; height: 32px; border-radius: var(--r-sm);
+  border: var(--bw) solid var(--border); background: var(--surface-2);
   font-size: 14px; line-height: 1; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
   transition: background 0.18s, transform 0.1s, opacity 0.18s;
 }
 .kotd-icon-btn:hover { background: var(--accent-soft); }
 .kotd-icon-btn:active { transform: scale(0.9); }
-.kotd-known-btn.is-known { background: var(--good); color: #06251b; border-color: var(--good); }
+.kotd-known-btn.is-known { background: var(--good); color: var(--on-good); border-color: var(--good); }
 
 .kotd-all-known-note {
   font-size: 13px;
   color: var(--text-dim);
   background: var(--surface-2);
-  border: 1px solid var(--border);
-  border-radius: 12px;
+  border: var(--bw) solid var(--border);
+  border-radius: var(--r-sm);
   padding: 10px 14px;
   margin: 0 0 12px;
 }
@@ -100,8 +100,8 @@
 
 .kotd-example {
   background: var(--surface-2);
-  border: 1px solid var(--border);
-  border-radius: 14px;
+  border: var(--bw) solid var(--border);
+  border-radius: var(--r-sm);
   padding: 10px 12px;
   display: flex;
   flex-direction: column;

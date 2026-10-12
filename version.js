@@ -7,7 +7,7 @@
  * it against a no-store fetch of this same file to tell users when a newer
  * version is live.
  */
-self.APP_VERSION = "30";
+self.APP_VERSION = "31";
 self.APP_ASSETS = [
   "./",
   "./index.html",
