@@ -32,6 +32,9 @@
   --hill: #1f4a48; --hill-2: #163836;
   --grass-hi: #b8ffe6; --grass: #5fd6a8; --grass-lo: #2e8f73;
   --soil: #1d2a22; --soil-2: #26382c;
+  /* Scene tree leaves (day trees) and night pines. */
+  --leaf-hi: #9be34f; --leaf: #6cc644; --leaf-lo: #4a9c2c; --leaf-dark: #1f4a1a;
+  --pine-hi: #b8fff0; --pine: #3fbfa8; --pine-lo: #1d6f6a; --pine-dark: #0f3a48;
   /* Japanese study text stays in a clean sans so kanji strokes stay readable. */
   --font-jp: "Noto Sans JP", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", system-ui, sans-serif;
   /* UI chrome uses a pixel face; DotGothic16 covers any Japanese in the chrome. */
@@ -740,6 +743,42 @@ body[data-page="kanji-manage"] .app { max-width: 1180px; }
   color-scheme: light;
 }
 
+/* ---------- Autumn season ----------
+ * Chosen in the sidebar (data-season="autumn"). Night is the base rule and
+ * day is the more specific one, so day wins when both match. */
+:root[data-season="autumn"] {
+  --bg: #1e1512;
+  --surface: #2a1f1a; --surface-2: #352720; --border: #0d0806;
+  --text: #f3e9dc; --text-dim: #cdb9a3; --text-faint: #a8927e;
+  --accent: #f0a04b; --accent-2: #f07a6a; --good: #b9d36e; --on-good: #1c2408;
+  --lip: #8a4a1a; --on-accent: #2a1406; --on-accent-lip: transparent;
+  --shadow: 6px 6px 0 rgba(10, 5, 2, 0.55);
+  --sky-1: #1a1220; --sky-2: #2a1a2a; --sky-3: #4a2630; --sky-4: #7a3a30; --sky-5: #c8743a;
+  --hill: #4a2a22; --hill-2: #36201a;
+  --grass-hi: #e9c27a; --grass: #b8862e; --grass-lo: #6e5420;
+  --soil: #2a1a12; --soil-2: #36241a;
+  --leaf-hi: #f5c04a; --leaf: #e8873a; --leaf-lo: #c0532f; --leaf-dark: #6e2a1a;
+  --pine-hi: #f2b86a; --pine: #c8682e; --pine-lo: #7a3418; --pine-dark: #3a1a10;
+}
+:root[data-season="autumn"][data-theme="day"] {
+  --bg: #f0d9b5;
+  --surface: #fdf6ea; --surface-2: #f3e6d0; --border: #3a2414;
+  --text: #3a2414; --text-dim: #64452f; --text-faint: #7a5a42;
+  --accent: #a8501a; --accent-2: #a33328; --good: #55701f; --on-good: #fff;
+  --lip: #7a3a12; --on-accent: #fff; --on-accent-lip: var(--lip);
+  --shadow: 6px 6px 0 rgba(58, 36, 20, 0.28);
+  --sky-1: #9fc3dc; --sky-2: #b9d0dc; --sky-3: #d6dcd0; --sky-4: #ecdcbc; --sky-5: #f3d2a0;
+  --hill: #f7e7cf; --hill-2: #efd6b0;
+  --grass-hi: #f0cf5e; --grass: #d19a2e; --grass-lo: #8a6a1e;
+  --soil: #5a3a22; --soil-2: #6b4a2e;
+  color-scheme: light;
+}
+/* Ginkgo trees turn gold in autumn, so the scene mixes red and gold. */
+[data-season="autumn"] .scene-tree.is-ginkgo {
+  --leaf-hi: #ffe27a; --leaf: #f0c03a; --leaf-lo: #c8901e; --leaf-dark: #7a5410;
+  --pine-hi: #ffe27a; --pine: #f0c03a; --pine-lo: #c8901e; --pine-dark: #5a3a10;
+}
+
 /* ---------- Day/night fade ----------
  * Registered colour tokens can animate. shell.js adds .theme-fading for one
  * fade when the hour crosses 06:00 or 18:00 while the page is open. A page
@@ -770,9 +809,17 @@ body[data-page="kanji-manage"] .app { max-width: 1180px; }
 @property --grass-lo { syntax: "<color>"; inherits: true; initial-value: #2e8f73; }
 @property --soil { syntax: "<color>"; inherits: true; initial-value: #1d2a22; }
 @property --soil-2 { syntax: "<color>"; inherits: true; initial-value: #26382c; }
+@property --leaf-hi { syntax: "<color>"; inherits: true; initial-value: #9be34f; }
+@property --leaf { syntax: "<color>"; inherits: true; initial-value: #6cc644; }
+@property --leaf-lo { syntax: "<color>"; inherits: true; initial-value: #4a9c2c; }
+@property --leaf-dark { syntax: "<color>"; inherits: true; initial-value: #1f4a1a; }
+@property --pine-hi { syntax: "<color>"; inherits: true; initial-value: #b8fff0; }
+@property --pine { syntax: "<color>"; inherits: true; initial-value: #3fbfa8; }
+@property --pine-lo { syntax: "<color>"; inherits: true; initial-value: #1d6f6a; }
+@property --pine-dark { syntax: "<color>"; inherits: true; initial-value: #0f3a48; }
 :root { --theme-fade: 90s; }
 :root.theme-fading {
-  transition-property: --on-accent, --on-accent-lip, --bg, --surface, --surface-2, --border, --text, --text-dim, --text-faint, --accent, --accent-2, --good, --on-good, --lip, --sky-1, --sky-2, --sky-3, --sky-4, --sky-5, --hill, --hill-2, --grass-hi, --grass, --grass-lo, --soil, --soil-2;
+  transition-property: --on-accent, --on-accent-lip, --bg, --surface, --surface-2, --border, --text, --text-dim, --text-faint, --accent, --accent-2, --good, --on-good, --lip, --sky-1, --sky-2, --sky-3, --sky-4, --sky-5, --hill, --hill-2, --grass-hi, --grass, --grass-lo, --soil, --soil-2, --leaf-hi, --leaf, --leaf-lo, --leaf-dark, --pine-hi, --pine, --pine-lo, --pine-dark;
   transition-duration: var(--theme-fade);
   transition-timing-function: ease-in-out;
 }
@@ -940,9 +987,40 @@ body[data-page="kanji-manage"] .app { max-width: 1180px; }
  * The card height now follows the window. Each face is a size container,
  * so the big word, the sentence and the reading also shrink with the card
  * height (cqh) when the card is short. On a tall card the clamp() wins. */
-.card-face { container-type: size; }
+.card > .card-face { container-type: size; }
 .word-display { font-size: min(clamp(54px, 16vw, 94px), 17cqh); }
 .word-display.is-long { font-size: min(clamp(36px, 11vw, 60px), 12cqh); }
 .word-display.is-xlong { font-size: min(clamp(28px, 8.5vw, 44px), 9cqh); }
 .front-sentence { font-size: min(clamp(19px, 5.2vw, 26px), 6.4cqh); }
 .reading-shown { font-size: min(clamp(32px, 9vw, 50px), 11cqh); }
+
+/* ---------- Falling leaves (autumn) ---------- */
+.scene-leaf {
+  display: none; position: absolute; top: -24px;
+  animation: leaf-fall var(--dur, 16s) linear var(--delay, 0s) infinite;
+}
+.scene-leaf svg { animation: leaf-spin 2.4s steps(4) infinite; }
+[data-season="autumn"] .scene-leaf { display: block; }
+@keyframes leaf-fall {
+  0% { transform: translate(0, 0); }
+  25% { transform: translate(28px, 26vh); }
+  50% { transform: translate(-10px, 52vh); }
+  75% { transform: translate(24px, 78vh); }
+  100% { transform: translate(0, calc(100vh - var(--ground-h))); }
+}
+@keyframes leaf-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  [data-season="autumn"] .scene-leaf { display: none; }
+}
+
+/* ---------- Season picker (sidebar) ---------- */
+.season-seg { display: flex; width: 100%; margin-bottom: 10px; }
+.season-seg .seg-btn { flex: 1; padding: 7px 6px; font-size: 12px; white-space: nowrap; }
+
+/* ---------- Study text font ----------
+ * Words, readings, romaji, meanings and examples on every flashcard use the
+ * clean sans (--font-jp), not the pixel face, so they stay easy to read.
+ * Buttons, badges and chips on the cards keep the pixel UI font. */
+.card-center, .quiz-face,
+.kotd-kanji, .kotd-readings, .kotd-parts, .kotd-meaning, .kotd-example { font-family: var(--font-jp); }
+.card-center .btn, .quiz-face .btn, .quiz-face .badge, .quiz-face .chip { font-family: var(--font-ui); }

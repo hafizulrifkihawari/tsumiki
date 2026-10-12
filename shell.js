@@ -69,6 +69,10 @@
       "</div>" +
       '<nav><ul class="nav-list">' + navHtml + "</ul></nav>" +
       '<div class="sidebar-foot">' +
+        '<div class="segmented season-seg" role="group" aria-label="Season">' +
+          '<button class="seg-btn" type="button" data-season="meadow" aria-pressed="false">🌿 Meadow</button>' +
+          '<button class="seg-btn" type="button" data-season="autumn" aria-pressed="false">🍁 Autumn</button>' +
+        "</div>" +
         '<button class="btn btn-ghost sidebar-update" id="updateBtn" type="button" ' +
           'title="Force refresh to the newest version (clears the app cache)">' +
           '<span class="btn-icon">↻</span><span class="update-label">Force Update</span>' +
@@ -124,9 +128,10 @@
   var PAL = {
     o: "#2a1a12", b: "#e8913a", w: "#fff1d6", k: "#1a1010", p: "#ff8fa3",   // shiba
     c: "#f0a050", s: "#c8702a",                                              // ginger cat
-    g: "#6cc644", G: "#4a9c2c", h: "#9be34f", O: "#1f4a1a", t: "#7a2e2e", T: "#5a1f22", // day trees
+    // Tree leaves read CSS tokens, so a season can recolour them (see styles.css).
+    g: "var(--leaf)", G: "var(--leaf-lo)", h: "var(--leaf-hi)", O: "var(--leaf-dark)", t: "#7a2e2e", T: "#5a1f22", // day trees
     W: "#ffffff", l: "#dcebfa",                                             // clouds
-    H: "#b8fff0", m: "#3fbfa8", d: "#1d6f6a", n: "#0f3a48"                   // night pines
+    H: "var(--pine-hi)", m: "var(--pine)", d: "var(--pine-lo)", n: "var(--pine-dark)" // night pines
   };
   var GREY_CAT = { c: "#9aa0b8", s: "#6c7290", o: "#1c1d2c", w: "#f4f4fa" };
   var BLACK_CAT = { c: "#2c2a3a", s: "#1a1926", o: "#0a0a12", w: "#f4f4fa", k: "#f2d24a" };
@@ -299,6 +304,16 @@
       "s;animation-delay:" + c[3] + 's">' + sprite(CLOUD, c[1]) + "</div>";
   });
 
+  // Falling leaves. CSS shows them only in the autumn season.
+  var LEAF = [".aa..", "abbaa", "abbba", ".aab.", "...a."];
+  var LEAF_PALS = [{ a: "#a8321e", b: "#e0582e" }, { a: "#c8901e", b: "#f5c84a" }, { a: "#b8521a", b: "#f08a3a" }];
+  var leaves = "";
+  for (var j = 0; j < 10; j++) {
+    leaves += '<div class="scene-leaf" style="left:' + (4 + rand() * 92).toFixed(1) + "%;--dur:" +
+      (12 + rand() * 10).toFixed(1) + "s;--delay:" + (rand() * -22).toFixed(1) + 's">' +
+      sprite(LEAF, 3, LEAF_PALS[j % 3]) + "</div>";
+  }
+
   var L = "calc(var(--scene-left) + ";
   document.body.insertAdjacentHTML("afterbegin",
     '<div class="scene" aria-hidden="true">' +
@@ -307,9 +322,9 @@
           '<g fill="var(--hill)">' + hills(1, 26, 10) + "</g>" +
           '<g fill="var(--hill-2)">' + hills(4, 14, 6) + "</g></svg></div>" +
         place("scene-tree", L + "1%)", sprite(PINE, 5)) +
-        place("scene-tree", L + "7%)", sprite(PINE, 7)) +
+        place("scene-tree is-ginkgo", L + "7%)", sprite(PINE, 7)) +
         place("scene-tree is-optional", L + "14%)", sprite(PINE, 4)) +
-        place("scene-tree is-optional", "78%", sprite(PINE, 5)) +
+        place("scene-tree is-optional is-ginkgo", "78%", sprite(PINE, 5)) +
         place("scene-tree", "86%", sprite(PINE, 8)) +
         place("scene-tree is-optional", "94%", sprite(PINE, 4)) +
       "</div>" +
@@ -319,11 +334,12 @@
           '<g fill="var(--hill-2)">' + hills(5, 9, 4) + "</g></svg></div>" +
         place("scene-tree", L + "0%)", sprite(BUSH, 4)) +
         place("scene-tree", L + "4%)", sprite(DAY_TREE, 5)) +
-        place("scene-tree is-optional", L + "10%)", sprite(DAY_TREE, 6)) +
+        place("scene-tree is-optional is-ginkgo", L + "10%)", sprite(DAY_TREE, 6)) +
         place("scene-tree is-optional", L + "15%)", sprite(BUSH, 3)) +
         place("scene-tree is-optional", "74%", sprite(BUSH, 4)) +
-        place("scene-tree", "88%", sprite(DAY_TREE, 6)) +
+        place("scene-tree is-ginkgo", "88%", sprite(DAY_TREE, 6)) +
       "</div>" +
+      leaves +
       '<div class="scene-ground"></div>' +
       critter(SIT_CAT, 3, GREY_CAT, "is-sitting", "--x:82%") +
       critter(SHIBA, 3, null, "", "--dur:34s;--delay:-6s") +
@@ -337,7 +353,15 @@
   // 06:00 or 18:00 in a visible tab, the colours and scene fade over
   // --theme-fade (90s in styles.css). In a hidden tab the switch is instant.
   var themeRoot = document.documentElement;
-  var THEME_COLOR = { day: "#7fbcd6", night: "#0b1a24" };
+  var THEME_COLOR = {
+    meadow: { day: "#7fbcd6", night: "#0b1a24" },
+    autumn: { day: "#9fc3dc", night: "#1a1220" }
+  };
+  function seasonNow() { return themeRoot.dataset.season === "autumn" ? "autumn" : "meadow"; }
+  function setThemeColor() {
+    var c = THEME_COLOR[seasonNow()][themeRoot.dataset.theme === "day" ? "day" : "night"];
+    document.querySelectorAll('meta[name="theme-color"]').forEach(function (m) { m.content = c; });
+  }
   var FADE_MS = 90000;
   var fadeTimer = 0;
   function themeForNow() {
@@ -354,11 +378,43 @@
       }
       themeRoot.dataset.theme = theme;
     }
-    document.querySelectorAll('meta[name="theme-color"]').forEach(function (m) { m.content = THEME_COLOR[theme]; });
+    setThemeColor();
   }
   applyTheme(false);
   setInterval(function () { applyTheme(!document.hidden); }, 30000);
   document.addEventListener("visibilitychange", function () { if (!document.hidden) applyTheme(true); });
+
+  // ---------- 7. Season picker ----------
+  // The head script of each page sets data-season from localStorage before
+  // the first paint. The sidebar buttons change it with a short colour fade
+  // and remember the choice in this browser.
+  var SEASON_KEY = "tsumiki.season";
+  var seasonBtns = document.querySelectorAll(".season-seg .seg-btn");
+  function markSeason() {
+    var season = seasonNow();
+    seasonBtns.forEach(function (b) {
+      var on = b.dataset.season === season;
+      b.classList.toggle("is-active", on);
+      b.setAttribute("aria-pressed", on ? "true" : "false");
+    });
+  }
+  seasonBtns.forEach(function (b) {
+    b.addEventListener("click", function () {
+      if (b.dataset.season === seasonNow()) return;
+      themeRoot.style.setProperty("--theme-fade", "0.6s");
+      themeRoot.classList.add("theme-fading");
+      themeRoot.dataset.season = b.dataset.season;
+      try { localStorage.setItem(SEASON_KEY, b.dataset.season); } catch (e) {}
+      markSeason();
+      setThemeColor();
+      clearTimeout(fadeTimer);
+      fadeTimer = setTimeout(function () {
+        themeRoot.classList.remove("theme-fading");
+        themeRoot.style.removeProperty("--theme-fade");
+      }, 700);
+    });
+  });
+  markSeason();
 
   // ---------- 4. Force Update ----------
   function withTimeout(promise, ms) {

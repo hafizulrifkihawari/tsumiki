@@ -5,7 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Tsumiki</title>
   <meta name="theme-color" content="#0b1a24" />
-  <script>document.documentElement.dataset.theme = (function (h) { return h >= 6 && h < 18 ? "day" : "night"; })(new Date().getHours());</script>
+  <script>(function (r) {
+    var h = new Date().getHours();
+    r.dataset.theme = h >= 6 && h < 18 ? "day" : "night";
+    try { r.dataset.season = localStorage.getItem("tsumiki.season") === "autumn" ? "autumn" : "meadow"; } catch (e) {}
+  })(document.documentElement);</script>
   <link rel="icon" href="icon-192.png" />
   <link rel="apple-touch-icon" href="icon-apple-touch.png" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
