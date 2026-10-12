@@ -24,6 +24,11 @@
   const wordCount = el("wordCount");
   const dueCountEl = el("dueCount");
   const speakFrontBtn = el("speakFrontBtn");
+  const speakBackBtn = el("speakBackBtn");
+  const frontType = el("frontType");
+  const frontMeaning = el("frontMeaning");
+  const frontHint = el("frontHint");
+  const reverseInput = el("reverseMode");
 
   // Pelajaran word list (right-edge drawer)
   const listTab = el("listTab");
@@ -56,6 +61,16 @@
   // streak are shared across both decks rather than siloed per page.
   const currentUser = ls(true, "kanji.currentUser") || "guest";
   const KOTOBA_DECK = "kotoba";
+  // Reverse mode (meaning → word) is a different skill from recognition, so
+  // it gets its own SRS schedule and its own saved session. The "sudah paham"
+  // set stays shared: a retired word is retired in both directions.
+  const KOTOBA_REV_DECK = "kotoba-rev";
+  const PREFS_KEY = "kotoba.prefs";
+  function loadPrefs() {
+    try { return JSON.parse(ls(true, PREFS_KEY)) || {}; } catch (e) { return {}; }
+  }
+  let reverse = !!loadPrefs().reverse;
+  const srsDeck = () => (reverse ? KOTOBA_REV_DECK : KOTOBA_DECK);
 
   // Stable per-card id (position in the fixed KOTOBA array never changes),
   // used as the SRS key and for restoring a saved session after reload.
@@ -78,7 +93,7 @@
   let kotobaKnown = loadKnown(KOTOBA_DECK, currentUser);
   const activeCards = () => KOTOBA.filter((c) => !disabledLessons.has(c.lesson) && !kotobaKnown.has(c.key));
 
-  let srsMap = loadSrs(KOTOBA_DECK, currentUser);
+  let srsMap = loadSrs(srsDeck(), currentUser);
   let sessionCorrect = 0;
   let sessionMissed = 0;
   let againQueue = new Set();
@@ -107,7 +122,7 @@
   }
 
   // ---- Session progress persistence ----
-  const progressKeyFor = (u) => "kotoba.progress." + u;
+  const progressKeyFor = (u) => "kotoba.progress." + (reverse ? "rev." : "") + u;
 
   function saveProgress() {
     const data = {
@@ -216,6 +231,11 @@
     }
   }
 
+  function fitFaces() {
+    fitWordText(cardFront, reverse ? frontMeaning : frontKana);
+    fitWordText(cardBack, backKana);
+  }
+
   function render() {
     const c = deck[index];
     posTotal.textContent = deck.length;
@@ -223,11 +243,20 @@
     unflip();
 
     frontLesson.textContent = "Pelajaran " + c.lesson;
+    frontType.textContent = c.type;
+    frontMeaning.textContent = c.meaning;
     frontKana.textContent = c.kana;
-    if (c.kanji) { frontKanji.textContent = c.kanji; frontKanji.hidden = false; }
-    else { frontKanji.textContent = ""; frontKanji.hidden = true; }
-    if (c.context) { frontContext.textContent = c.context; frontContext.hidden = false; }
-    else { frontContext.hidden = true; }
+    frontKanji.textContent = c.kanji || "";
+    frontContext.textContent = c.context || "";
+    // Reverse: the front shows only the meaning (plus badges) — the kana,
+    // kanji, context and audio would all give the answer away.
+    frontType.hidden = !reverse;
+    frontMeaning.hidden = !reverse;
+    frontKana.hidden = reverse;
+    frontKanji.hidden = reverse || !c.kanji;
+    frontContext.hidden = reverse || !c.context;
+    speakFrontBtn.hidden = reverse;
+    speakBackBtn.hidden = !reverse;
 
     backType.textContent = c.type;
     backKana.textContent = c.kana;
@@ -237,8 +266,7 @@
     else { backContext.hidden = true; }
     backMeaning.textContent = c.meaning;
 
-    fitWordText(cardFront, frontKana);
-    fitWordText(cardBack, backKana);
+    fitFaces();
 
     posNow.textContent = index + 1;
     const pct = deck.length ? ((index + 1) / deck.length) * 100 : 0;
@@ -293,7 +321,14 @@
 
   function speakCurrent() {
     const c = deck[index];
-    if (c) speak(c.kana, speakFrontBtn);
+    if (!c) return;
+    // In reverse mode the audio is part of the answer — only play it once
+    // the card is flipped.
+    if (reverse) {
+      if (card.classList.contains("is-flipped")) speak(c.kana, speakBackBtn);
+    } else {
+      speak(c.kana, speakFrontBtn);
+    }
   }
 
   // ---- Navigation ----
@@ -308,7 +343,7 @@
     if (!deck.length) return;
     const c = deck[index];
     srsMap[c.key] = schedule(srsMap[c.key], level);
-    saveSrs(KOTOBA_DECK, currentUser, srsMap);
+    saveSrs(srsDeck(), currentUser, srsMap);
     updateDueCount();
 
     if (level === "again") {
@@ -505,6 +540,12 @@
   el("resetBtn").addEventListener("click", () => buildDeck(false));
   el("studyAllBtn").addEventListener("click", () => buildDeck(true, true));
   speakFrontBtn.addEventListener("click", (e) => { e.stopPropagation(); speakCurrent(); });
+  speakBackBtn.addEventListener("click", (e) => { e.stopPropagation(); speakCurrent(); });
+  reverseInput.addEventListener("change", () => {
+    setReverse(reverseInput.checked);
+    // Drop focus so Space / 1-3 go back to the card, not the checkbox.
+    reverseInput.blur();
+  });
 
   listTab.addEventListener("click", () => { if (drawerOpen) closeDrawer(); else openDrawer(); });
   listBackdrop.addEventListener("click", closeDrawer);
@@ -522,10 +563,7 @@
   let resizeTimer = null;
   window.addEventListener("resize", () => {
     clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(() => {
-      fitWordText(cardFront, frontKana);
-      fitWordText(cardBack, backKana);
-    }, 150);
+    resizeTimer = setTimeout(fitFaces, 150);
   });
 
   document.addEventListener("keydown", (e) => {
@@ -546,11 +584,34 @@
       case "2": case "y": case "Y": case "ArrowUp": e.preventDefault(); grade("good"); break;
       case "3": e.preventDefault(); grade("easy"); break;
       case "p": case "P": e.preventDefault(); speakCurrent(); break;
+      case "r": case "R": e.preventDefault(); setReverse(!reverse); break;
     }
   });
 
+  // ---- Reverse mode (meaning → word) ----
+  function applyReverseUi() {
+    reverseInput.checked = reverse;
+    frontHint.textContent = reverse ? "Recall the Japanese · Space to flip" : "Tap or swipe · Space to flip";
+  }
+
+  // Switches direction mid-session: park the current session under its own
+  // key, load the other direction's schedule, then resume that direction's
+  // saved session (or start a fresh due-first one).
+  function setReverse(on) {
+    if (on === reverse) return;
+    saveProgress();
+    reverse = on;
+    ls(false, PREFS_KEY, JSON.stringify(Object.assign(loadPrefs(), { reverse })));
+    srsMap = loadSrs(srsDeck(), currentUser);
+    applyReverseUi();
+    unflip();
+    if (!restoreProgress(loadProgress())) buildDeck(true);
+    if (drawerOpen) renderWordList();
+  }
+
   // ---- Init: resume a saved session (position/score/queue) if one exists
   // for this user, otherwise build a fresh due-first session. ----
+  applyReverseUi();
   bumpStreak(currentUser);
   if (!restoreProgress(loadProgress())) buildDeck(true);
 })();

@@ -3,25 +3,25 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>漢字 N4 — Flashcards</title>
+  <title>漢字 Kanji N4 · Tsumiki 積み木</title>
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#171a2e" />
   <link rel="icon" href="icon-192.png" />
   <link rel="apple-touch-icon" href="icon-apple-touch.png" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="漢字 N4" />
+  <meta name="apple-mobile-web-app-title" content="Tsumiki" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
 </head>
-<body>
+<body data-page="kanji">
   <!-- Login / user picker -->
   <div class="login-overlay" id="loginOverlay" hidden>
     <div class="login-card">
-      <span class="login-kanji">漢字</span>
-      <h2>Masuk · Sign in</h2>
+      <span class="login-kanji">積み木</span>
+      <h2>Tsumiki · Masuk</h2>
       <p class="login-sub">Masukkan nama pengguna untuk menyimpan progres belajarmu.</p>
       <form id="loginForm">
         <input id="loginInput" type="text" inputmode="text" autocomplete="off"
@@ -41,9 +41,8 @@
   <div class="app">
     <header class="topbar">
       <div class="brand">
-        <span class="brand-kanji">漢字</span>
         <div class="brand-text">
-          <h1>N4 Flashcards</h1>
+          <h1>Kanji N4</h1>
           <p id="brandSub">300 words · shuffled every session</p>
         </div>
       </div>
@@ -59,15 +58,8 @@
           <span class="user-avatar" id="userAvatar">👤</span>
           <span id="userName">guest</span>
         </button>
-        <a class="btn btn-ghost" href="manage.html" title="Choose which kanji appear">管理 Manage</a>
-        <a class="btn btn-ghost" href="kotoba.html" title="Kotoba vocabulary flashcards">言葉 Kotoba</a>
-        <a class="btn btn-ghost" href="bunpou.html" title="Japanese grammar practice">文法 Bunpou</a>
-        <a class="btn btn-ghost" href="kotd.html" title="Kanji of the day">今日 KOTD</a>
         <button class="btn btn-ghost btn-icon-only" id="progressBtn" type="button" title="Your progress & mastery">📊</button>
         <button class="btn btn-ghost btn-icon-only" id="helpBtn" type="button" title="How to study">❓</button>
-        <button class="btn btn-ghost" id="updateBtn" type="button" title="Force refresh to the newest version (clears the app cache)">
-          <span class="btn-icon">↻</span> <span class="update-label">Force Update</span>
-        </button>
       </div>
     </header>
 
@@ -282,71 +274,12 @@
     <button class="update-toast-dismiss" type="button" id="updateToastDismiss" aria-label="Dismiss">×</button>
   </div>
 
+  <script src="version.js"></script>
+  <script src="shell.js"></script>
   <script src="conjugate.js"></script>
   <script src="romaji.js"></script>
   <script src="data.js"></script>
   <script src="srs.js"></script>
   <script src="app.js"></script>
-  <script>
-    // Wired inline (not in app.js) so all of this — including the update
-    // notification below — still works even when a broken/stale-cached
-    // app.js fails to load.
-    if ("serviceWorker" in navigator) {
-      var swHadController = !!navigator.serviceWorker.controller;
-      window.addEventListener("load", () => {
-        navigator.serviceWorker.register("sw.js").then(function (reg) {
-          // Standalone/installed PWAs (iOS especially) don't reliably
-          // re-check sw.js on their own — nudge it whenever the tab
-          // regains focus.
-          document.addEventListener("visibilitychange", function () {
-            if (document.visibilityState === "visible") reg.update().catch(function () {});
-          });
-        }).catch(() => {});
-      });
-
-      // Fires once on this page's very first-ever activation (not a real
-      // update — skip it) and again every time a newer worker takes over
-      // afterward (a real update — let the user know).
-      navigator.serviceWorker.addEventListener("controllerchange", function () {
-        if (!swHadController) { swHadController = true; return; }
-        var toast = document.getElementById("updateToast");
-        if (toast) toast.hidden = false;
-      });
-    }
-
-    (function () {
-      var toast = document.getElementById("updateToast");
-      var refreshBtn = document.getElementById("updateToastRefresh");
-      var dismissBtn = document.getElementById("updateToastDismiss");
-      if (refreshBtn) refreshBtn.addEventListener("click", function () { location.reload(); });
-      if (dismissBtn) dismissBtn.addEventListener("click", function () { if (toast) toast.hidden = true; });
-    })();
-
-    // Force-update escape hatch: unregister the service worker, drop every
-    // cache, then reload with a cache-busting query so a stuck/stale bundle
-    // can never survive.
-    (function () {
-      var btn = document.getElementById("updateBtn");
-      if (!btn) return;
-      btn.addEventListener("click", async function () {
-        btn.disabled = true;
-        var label = btn.querySelector(".update-label");
-        if (label) label.textContent = "Updating…";
-        try {
-          if ("serviceWorker" in navigator) {
-            var regs = await navigator.serviceWorker.getRegistrations();
-            await Promise.all(regs.map(function (r) { return r.unregister(); }));
-          }
-          if (window.caches) {
-            var keys = await caches.keys();
-            await Promise.all(keys.map(function (k) { return caches.delete(k); }));
-          }
-        } catch (e) { /* ignore — reload anyway */ }
-        var u = new URL(location.href);
-        u.searchParams.set("_v", Date.now());
-        location.replace(u.href);
-      });
-    })();
-  </script>
 </body>
 </html>

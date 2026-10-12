@@ -1,63 +1,34 @@
-/* Service worker — offline cache for the N4 flashcard PWA. */
+/* Service worker — offline cache for the Tsumiki 積み木 PWA. */
 
-const CACHE_NAME = "kanji-n4-v29";
+importScripts("version.js");
+
+const CACHE_NAME = "tsumiki-v" + self.APP_VERSION;
 const FONT_ORIGINS = ["https://fonts.googleapis.com", "https://fonts.gstatic.com"];
-const ASSETS = [
-  "./",
-  "./index.html",
-  "./styles.css",
-  "./app.js",
-  "./conjugate.js",
-  "./romaji.js",
-  "./data.js",
-  "./srs.js",
-  "./manifest.json",
-  "./icon-192.png",
-  "./icon-512.png",
-  "./audio/manifest.json",
-  "./kotoba.html",
-  "./kotoba.css",
-  "./kotoba-data.js",
-  "./kotoba-app.js",
-  "./kotoba-manage.html",
-  "./kotoba-manage.css",
-  "./kotoba-manage.js",
-  "./manage.html",
-  "./manage.js",
-  "./bunpou.html",
-  "./bunpou.css",
-  "./bunpou-data.js",
-  "./bunpou-quiz-data.js",
-  "./bunpou-particle-data.js",
-  "./bunpou-app.js",
-  "./n4sim-data.js",
-  "./n4sim.js",
-  "./choukai-data.js",
-  "./choukai.js",
-  "./kotd.html",
-  "./kotd.css",
-  "./kotd-data.js",
-  "./kotd.js"
-];
+// Asset list lives in version.js so pages (Force Update) and this worker share it.
+const ASSETS = self.APP_ASSETS;
+
+// cache: "reload" skips the browser HTTP cache, so a new worker never stores
+// a stale copy of a file that the HTTP cache still holds from the old release.
+const fresh = (url) => new Request(url, { cache: "reload" });
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) =>
-        cache.addAll(ASSETS).then(() =>
+        cache.addAll(ASSETS.map(fresh)).then(() =>
           // Pre-cache every pre-rendered audio clip so cards work offline
           // even before they've ever been played. The 聴解 clips live under
           // audio/choukai/<hash>.m4a with their own hash-list manifest. Both
           // are tolerant: a missing manifest (e.g. clips not generated yet) or
           // an offline first install just lets the fetch handler cache lazily.
           Promise.all([
-            fetch("./audio/manifest.json")
+            fetch(fresh("./audio/manifest.json"))
               .then((r) => r.json())
-              .then((files) => cache.addAll(files.map((f) => `./audio/${f}`)))
+              .then((files) => cache.addAll(files.map((f) => fresh(`./audio/${f}`))))
               .catch(() => {}),
-            fetch("./audio/choukai/manifest.json")
+            fetch(fresh("./audio/choukai/manifest.json"))
               .then((r) => (r.ok ? r.json() : []))
-              .then((hashes) => cache.addAll(hashes.map((h) => `./audio/choukai/${h}.m4a`)))
+              .then((hashes) => cache.addAll(hashes.map((h) => fresh(`./audio/choukai/${h}.m4a`))))
               .catch(() => {}),
           ])
         )
@@ -83,6 +54,9 @@ self.addEventListener("fetch", (event) => {
   const sameOrigin = url.origin === self.location.origin;
   const isFont = FONT_ORIGINS.includes(url.origin);
   if (!sameOrigin && !isFont) return;
+  // The version check (shell.js) must always reach the network and must
+  // never land in the cache — let the browser handle it directly.
+  if (sameOrigin && url.pathname.endsWith("/version.js") && url.searchParams.has("check")) return;
 
   event.respondWith(
     caches.match(event.request).then((cached) => {

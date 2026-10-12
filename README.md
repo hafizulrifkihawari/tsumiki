@@ -1,4 +1,6 @@
-# 漢字 N4 Flashcards
+# Tsumiki 積み木
+
+*Tsumiki* means "building blocks": you build your Japanese one card at a time.
 
 A flashcard web app for studying N4 kanji and vocabulary, built so each word is drilled in context rather than in isolation.
 
@@ -34,7 +36,12 @@ A flashcard web app for studying N4 kanji and vocabulary, built so each word is 
 
 ### Shared
 - **Installable PWA** — works offline once installed (`manifest.json` / `sw.js`); add it to your phone's home screen via the browser's "Install app" / "Add to Home Screen" option.
-- **Force Update** button — unregisters the service worker and clears every cache before reloading, for recovering from a stuck/stale cached build.
+- **Sidebar navigation** (`shell.js`) — one left sidebar on every page links Kanji, Kotoba, Bunpou, Kanji of the Day and the two Manage pages. On narrow screens it is a ☰ drawer.
+- **Version check** — the page compares its own `APP_VERSION` (`version.js`) with the live `version.js`. When the live version is newer, a pulsing dot shows on Force Update (and on ☰), the tooltip names both versions, and a toast offers Force Update.
+- **Force Update** button — unregisters the service worker, refreshes every asset past the HTTP cache, clears every cache, then reloads. Each step has a timeout, and a fallback timer reloads the page if a browser API hangs.
+
+### Releasing a new version
+Bump `APP_VERSION` in `version.js`. The service worker cache name (`tsumiki-v<version>`) comes from it, and open pages see the new number and ask the user to update. Add any new file to `APP_ASSETS` in the same file.
 
 ## Running locally
 
@@ -61,8 +68,8 @@ The Bunpou page's 聴解 (listening) practice sets (`choukai-data.js`) play pre-
    node scripts/generate-choukai-audio.js 0.9    # slower, for learners
    ```
    The script renders every line, skips clips that already exist, and writes `audio/choukai/manifest.json`. CPU synthesis is slow — a full run of ~380 lines takes about 15 minutes.
-3. **Bump the cache.** Increase `CACHE_NAME` in `sw.js` (for example `kanji-n4-v23` → `v24`) so visitors get the new clips.
-4. **Commit** `audio/choukai/` and `sw.js`, then stop the engine (`docker stop voicevox-engine` or `Ctrl+C`).
+3. **Bump the version.** Increase `APP_VERSION` in `version.js` (for example `30` → `31`) so visitors get the new clips.
+4. **Commit** `audio/choukai/` and `version.js`, then stop the engine (`docker stop voicevox-engine` or `Ctrl+C`).
 
 **Docker credential note:** if a pull fails with `docker-credential-desktop ... not found`, your `~/.docker/config.json` has a stale `"credsStore": "desktop"` from Docker Desktop. Remove that line — public image pulls need no credentials.
 
@@ -86,3 +93,5 @@ The Bunpou page's 聴解 (listening) practice sets (`choukai-data.js`) play pre-
 | `bunpou.html` / `bunpou-app.js` / `bunpou-data.js` / `bunpou-quiz-data.js` / `bunpou-particle-data.js` / `bunpou.css` | Bunpou grammar section (drill modes incl. 構造・Partikel), plus the 模試 N4 and 聴解 modes (`n4sim.js`, `choukai.js`) |
 | `kotd.html` / `kotd.js` / `kotd-data.js` / `kotd.css` | Kanji of the Day — rotating daily picks from the N4/N5 + everyday kanji sets |
 | `manifest.json` / `sw.js` | PWA install & offline support |
+| `version.js` | `APP_VERSION` and the offline asset list, shared by the pages and `sw.js` |
+| `shell.js` | Shared sidebar, service worker registration, version check and Force Update |

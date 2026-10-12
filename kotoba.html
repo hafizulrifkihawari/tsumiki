@@ -3,26 +3,24 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>言葉 Kotoba — Flashcards</title>
+  <title>言葉 Kotoba · Tsumiki</title>
   <meta name="theme-color" content="#171a2e" />
   <link rel="icon" href="icon-192.png" />
   <link rel="apple-touch-icon" href="icon-apple-touch.png" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="言葉 Kotoba" />
+  <meta name="apple-mobile-web-app-title" content="Tsumiki" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="kotoba.css" />
 </head>
-<body>
+<body data-page="kotoba">
   <div class="app">
-    <a class="back-link" href="index.html">← 漢字 N4</a>
 
     <header class="topbar">
       <div class="brand">
-        <span class="brand-kanji">言葉</span>
         <div class="brand-text">
           <h1>Kotoba Flashcards</h1>
           <p><span id="wordCount">0</span> words · <span id="dueCount">0</span> due</p>
@@ -35,14 +33,17 @@
         </div>
         <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
       </div>
-      <div class="topbar-actions">
-        <a class="btn btn-ghost" href="kotoba-manage.html" title="Choose which Pelajaran appear">管理 Manage</a>
-        <a class="btn btn-ghost" href="kotd.html" title="Kanji of the day">今日 KOTD</a>
-        <button class="btn btn-ghost" id="updateBtn" type="button" title="Force refresh to the newest version (clears the app cache)">
-          <span class="btn-icon">↻</span> <span class="update-label">Force Update</span>
-        </button>
-      </div>
     </header>
+
+    <section class="controls">
+      <div class="control-group">
+        <label class="switch" title="Show the meaning first, recall the Japanese word (R)">
+          <input type="checkbox" id="reverseMode" />
+          <span class="switch-track"><span class="switch-thumb"></span></span>
+          <span class="switch-label">Reverse (meaning → Japanese)</span>
+        </label>
+      </div>
+    </section>
 
     <main class="stage">
       <button class="nav-arrow" id="prevBtn" aria-label="Previous card">‹</button>
@@ -53,15 +54,18 @@
           <div class="card-face card-front">
             <div class="card-top">
               <span class="lesson-badge" id="frontLesson">Pelajaran 26</span>
+              <span class="badge badge-type" id="frontType" hidden></span>
             </div>
             <div class="card-center">
               <div class="word-display" id="frontKana">みます</div>
               <div class="kotoba-kanji" id="frontKanji"></div>
               <div class="kotoba-context" id="frontContext" hidden></div>
+              <!-- Reverse mode: the meaning is the prompt, the word is the answer -->
+              <div class="kotoba-front-meaning" id="frontMeaning" hidden></div>
               <button class="speak-btn" id="speakFrontBtn" type="button" aria-label="Play pronunciation" title="Play pronunciation (P)">🔊</button>
             </div>
             <div class="card-bottom">
-              <span class="hint-text">Tap or swipe · Space to flip</span>
+              <span class="hint-text" id="frontHint">Tap or swipe · Space to flip</span>
             </div>
           </div>
 
@@ -81,6 +85,7 @@
               <div class="meaning-row">
                 <span class="meaning-id" id="backMeaning">melihat, memeriksa</span>
               </div>
+              <button class="speak-btn" id="speakBackBtn" type="button" aria-label="Play pronunciation" title="Play pronunciation (P)" hidden>🔊</button>
             </div>
             <div class="card-bottom">
               <span class="hint-text">Swipe or ← → to move · Grade: Again / Good / Easy</span>
@@ -156,61 +161,10 @@
     <button class="update-toast-dismiss" type="button" id="updateToastDismiss" aria-label="Dismiss">×</button>
   </div>
 
+  <script src="version.js"></script>
+  <script src="shell.js"></script>
   <script src="kotoba-data.js"></script>
   <script src="srs.js"></script>
   <script src="kotoba-app.js"></script>
-  <script>
-    // Inline (see index.html) so all of this — including the update
-    // notification below — still works even if kotoba-app.js fails to load.
-    if ("serviceWorker" in navigator) {
-      var swHadController = !!navigator.serviceWorker.controller;
-      window.addEventListener("load", () => {
-        navigator.serviceWorker.register("sw.js").then(function (reg) {
-          document.addEventListener("visibilitychange", function () {
-            if (document.visibilityState === "visible") reg.update().catch(function () {});
-          });
-        }).catch(() => {});
-      });
-
-      navigator.serviceWorker.addEventListener("controllerchange", function () {
-        if (!swHadController) { swHadController = true; return; }
-        var toast = document.getElementById("updateToast");
-        if (toast) toast.hidden = false;
-      });
-    }
-
-    (function () {
-      var toast = document.getElementById("updateToast");
-      var refreshBtn = document.getElementById("updateToastRefresh");
-      var dismissBtn = document.getElementById("updateToastDismiss");
-      if (refreshBtn) refreshBtn.addEventListener("click", function () { location.reload(); });
-      if (dismissBtn) dismissBtn.addEventListener("click", function () { if (toast) toast.hidden = true; });
-    })();
-
-    // Force-update escape hatch (see index.html): drop the service worker and
-    // every cache, then hard-reload. Inline so it works even if kotoba-app.js fails.
-    (function () {
-      var btn = document.getElementById("updateBtn");
-      if (!btn) return;
-      btn.addEventListener("click", async function () {
-        btn.disabled = true;
-        var label = btn.querySelector(".update-label");
-        if (label) label.textContent = "Updating…";
-        try {
-          if ("serviceWorker" in navigator) {
-            var regs = await navigator.serviceWorker.getRegistrations();
-            await Promise.all(regs.map(function (r) { return r.unregister(); }));
-          }
-          if (window.caches) {
-            var keys = await caches.keys();
-            await Promise.all(keys.map(function (k) { return caches.delete(k); }));
-          }
-        } catch (e) { /* ignore — reload anyway */ }
-        var u = new URL(location.href);
-        u.searchParams.set("_v", Date.now());
-        location.replace(u.href);
-      });
-    })();
-  </script>
 </body>
 </html>

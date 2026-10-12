@@ -7,14 +7,6 @@
   --mode-build: #e0a72e;
 }
 
-.back-link {
-  display: inline-flex; align-items: center; gap: 6px;
-  font-size: 13px; font-weight: 600; color: var(--text-dim);
-  text-decoration: none; padding: 8px 4px; border-radius: 10px;
-  transition: color 0.18s;
-}
-.back-link:hover { color: var(--accent); }
-
 /* ---------- Browse view ---------- */
 .mastery-legend { font-size: 11.5px; }
 
