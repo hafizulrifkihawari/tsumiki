@@ -50,8 +50,9 @@
     const tr = document.createElement("tr");
 
     // Row toggle
-    const th = document.createElement("td");
+    const th = document.createElement("th");
     th.className = "row-head";
+    th.scope = "row";
     const rowLabel = document.createElement("label");
     rowLabel.className = "row-label";
     const rowCheck = document.createElement("input");

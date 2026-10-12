@@ -7,8 +7,10 @@
   <meta name="theme-color" content="#0b1a24" />
   <script>(function (r) {
     var h = new Date().getHours();
-    r.dataset.theme = h >= 6 && h < 18 ? "day" : "night";
-    try { r.dataset.season = localStorage.getItem("tsumiki.season") === "autumn" ? "autumn" : "meadow"; } catch (e) {}
+    var s = "meadow";
+    try { s = localStorage.getItem("tsumiki.season") || s; } catch (e) {}
+    r.dataset.season = /^(autumn|light|dark)$/.test(s) ? s : "meadow";
+    r.dataset.theme = s === "light" || (s !== "dark" && h >= 6 && h < 18) ? "day" : "night";
   })(document.documentElement);</script>
   <link rel="icon" href="icon-192.png" />
   <link rel="apple-touch-icon" href="icon-apple-touch.png" />
@@ -42,10 +44,10 @@
     <section id="browseView">
       <section class="controls">
         <div class="control-group">
-          <div class="segmented" id="levelSeg" role="tablist" aria-label="Filter by level">
-            <button class="seg-btn is-active" data-level="all">Semua</button>
-            <button class="seg-btn" data-level="N5">N5</button>
-            <button class="seg-btn" data-level="N4">N4</button>
+          <div class="segmented" id="levelSeg" role="group" aria-label="Filter by level">
+            <button class="seg-btn is-active" type="button" aria-pressed="true" data-level="all">Semua</button>
+            <button class="seg-btn" type="button" aria-pressed="false" data-level="N5">N5</button>
+            <button class="seg-btn" type="button" aria-pressed="false" data-level="N4">N4</button>
           </div>
         </div>
         <div class="control-group mastery-legend">

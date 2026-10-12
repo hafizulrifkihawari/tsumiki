@@ -343,6 +343,7 @@
     if (!deck.length) return;
     const c = deck[index];
     srsMap[c.key] = schedule(srsMap[c.key], level);
+    if (self.tsumikiAnnounce) self.tsumikiAnnounce({ again: "Again", good: "Good", easy: "Easy" }[level] + ".");
     saveSrs(srsDeck(), currentUser, srsMap);
     updateDueCount();
 
@@ -567,7 +568,7 @@
   });
 
   document.addEventListener("keydown", (e) => {
-    if (e.target.tagName === "INPUT") return;
+    if (/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
     // While the word list is open it owns the keyboard. Without this, 1/2/3
     // would grade the card hidden behind the drawer and ←/→ would move it.
     if (drawerOpen) {
@@ -576,7 +577,10 @@
     }
     switch (e.key) {
       case " ":
-      case "Enter": e.preventDefault(); flip(); break;
+      case "Enter":
+        // A focused button or link keeps its own Space / Enter action.
+        if (e.target !== card && e.target.closest("button, a, summary")) return;
+        e.preventDefault(); flip(); break;
       case "ArrowRight": e.preventDefault(); next(); break;
       case "ArrowLeft": e.preventDefault(); prev(); break;
       case "s": case "S": buildDeck(true); break;

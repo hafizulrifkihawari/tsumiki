@@ -227,8 +227,9 @@
     if (!restored.length) return false;
 
     filter = FILTERS[saved.filter] ? saved.filter : "all";
-    document.querySelectorAll(".seg-btn").forEach((b) => {
+    el("filterSeg").querySelectorAll(".seg-btn").forEach((b) => {
       b.classList.toggle("is-active", b.dataset.filter === filter);
+      b.setAttribute("aria-pressed", String(b.dataset.filter === filter));
     });
 
     deck = restored;
@@ -618,6 +619,7 @@
     if (!deck.length || finished) return;
     const c = deck[index];
     srsMap[c.audioFile] = schedule(srsMap[c.audioFile], level);
+    if (self.tsumikiAnnounce) self.tsumikiAnnounce({ again: "Again", good: "Good", easy: "Easy" }[level] + ".");
     saveSrs("kanji", currentUser, srsMap);
 
     if (level === "again") {
@@ -810,18 +812,23 @@
   el("filterSeg").addEventListener("click", (e) => {
     const btn = e.target.closest(".seg-btn");
     if (!btn) return;
-    document.querySelectorAll(".seg-btn").forEach((b) => b.classList.remove("is-active"));
-    btn.classList.add("is-active");
+    el("filterSeg").querySelectorAll(".seg-btn").forEach((b) => {
+      b.classList.toggle("is-active", b === btn);
+      b.setAttribute("aria-pressed", String(b === btn));
+    });
     filter = btn.dataset.filter;
     buildDeck(true);   // keep it shuffled when switching filters
   });
 
   document.addEventListener("keydown", (e) => {
-    if (e.target.tagName === "INPUT") return;
+    if (/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
     if (e.key === "Escape") { hideHelp(); hideProgress(); return; }
     switch (e.key) {
       case " ":
-      case "Enter": e.preventDefault(); flip(); break;
+      case "Enter":
+        // A focused button or link keeps its own Space / Enter action.
+        if (e.target !== card && e.target.closest("button, a, summary")) return;
+        e.preventDefault(); flip(); break;
       case "ArrowRight": e.preventDefault(); next(); break;
       case "ArrowLeft": e.preventDefault(); prev(); break;
       case "s": case "S": buildDeck(true); break;

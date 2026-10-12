@@ -682,7 +682,7 @@ body[data-page="kanji-manage"] .app { max-width: 1180px; }
   border-radius: var(--radius); padding: 4px 14px;
   container-type: inline-size;
 }
-.manage-table, .manage-table tbody, .manage-table td { display: block; }
+.manage-table, .manage-table tbody, .manage-table td, .manage-table th { display: block; }
 .manage-table tr {
   display: grid; gap: 8px;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -693,7 +693,7 @@ body[data-page="kanji-manage"] .app { max-width: 1180px; }
 @container (min-width: 1000px) { .manage-table tr { grid-template-columns: repeat(10, minmax(0, 1fr)); } }
 .manage-table tr + tr { border-top: var(--bw) dashed color-mix(in srgb, var(--text-faint) 45%, transparent); }
 .manage-table td:empty { display: none; }
-.row-head { grid-column: 1 / -1; }
+.row-head { grid-column: 1 / -1; font-weight: inherit; text-align: inherit; }
 .row-label {
   display: inline-flex; align-items: center; gap: 8px; cursor: pointer;
   font-size: 13px; font-weight: 600; color: var(--text-dim);
@@ -778,6 +778,31 @@ body[data-page="kanji-manage"] .app { max-width: 1180px; }
   --leaf-hi: #ffe27a; --leaf: #f0c03a; --leaf-lo: #c8901e; --leaf-dark: #7a5410;
   --pine-hi: #ffe27a; --pine: #f0c03a; --pine-lo: #c8901e; --pine-dark: #5a3a10;
 }
+
+/* ---------- Plain Light and Dark themes ----------
+ * Chosen in the sidebar. They ignore the hour and show no pixel scene. */
+:root[data-season="light"] {
+  --bg: #eef0f2;
+  --surface: #ffffff; --surface-2: #f1f3f5; --border: #1f2933;
+  --text: #1f2933; --text-dim: #4a5562; --text-faint: #5f6b78;
+  --accent: #1f6b5c; --accent-2: #b23a1f; --good: #2a6e33; --on-good: #fff;
+  --lip: #174f44; --on-accent: #fff; --on-accent-lip: var(--lip);
+  --accent-soft: color-mix(in srgb, var(--accent) 14%, transparent);
+  --shadow: 5px 5px 0 rgba(31, 41, 51, 0.18);
+  --ground-h: 0px;
+  color-scheme: light;
+}
+:root[data-season="dark"] {
+  --bg: #121417;
+  --surface: #1c1f24; --surface-2: #252a30; --border: #050607;
+  --text: #e8eaed; --text-dim: #b4bac2; --text-faint: #9aa1aa;
+  --accent: #6fd0b4; --accent-2: #f29a6b; --good: #a6e07a; --on-good: #10240a;
+  --lip: #2b7a68; --on-accent: #0b2420; --on-accent-lip: transparent;
+  --shadow: 5px 5px 0 rgba(0, 0, 0, 0.55);
+  --ground-h: 0px;
+  color-scheme: dark;
+}
+[data-season="light"] .scene, [data-season="dark"] .scene { display: none; }
 
 /* ---------- Day/night fade ----------
  * Registered colour tokens can animate. shell.js adds .theme-fading for one
@@ -1014,7 +1039,7 @@ body[data-page="kanji-manage"] .app { max-width: 1180px; }
 }
 
 /* ---------- Season picker (sidebar) ---------- */
-.season-seg { display: flex; width: 100%; margin-bottom: 10px; }
+.season-seg { display: grid; grid-template-columns: 1fr 1fr; width: 100%; margin-bottom: 10px; }
 .season-seg .seg-btn { flex: 1; padding: 7px 6px; font-size: 12px; white-space: nowrap; }
 
 /* ---------- Study text font ----------
@@ -1024,3 +1049,27 @@ body[data-page="kanji-manage"] .app { max-width: 1180px; }
 .card-center, .quiz-face,
 .kotd-kanji, .kotd-readings, .kotd-parts, .kotd-meaning, .kotd-example { font-family: var(--font-jp); }
 .card-center .btn, .quiz-face .btn, .quiz-face .badge, .quiz-face .chip { font-family: var(--font-ui); }
+
+/* ---------- Accessibility ---------- */
+/* One focus ring for every control that has no ring of its own. */
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+main:focus { outline: none; }
+.card:focus-visible { outline-offset: 4px; }
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+.skip-link {
+  position: fixed; top: 8px; left: 8px; z-index: 100;
+  padding: 8px 14px; border-radius: var(--radius);
+  background: var(--accent); color: var(--on-accent); font-weight: 700; text-decoration: none;
+  transform: translateY(-200%);
+}
+.skip-link:focus { transform: none; }
+/* Reduce motion: stop all remaining animations and long transitions, the card flip too. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important; animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important; scroll-behavior: auto !important;
+  }
+}

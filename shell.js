@@ -72,6 +72,8 @@
         '<div class="segmented season-seg" role="group" aria-label="Season">' +
           '<button class="seg-btn" type="button" data-season="meadow" aria-pressed="false">🌿 Meadow</button>' +
           '<button class="seg-btn" type="button" data-season="autumn" aria-pressed="false">🍁 Autumn</button>' +
+          '<button class="seg-btn" type="button" data-season="light" aria-pressed="false">☀ Light</button>' +
+          '<button class="seg-btn" type="button" data-season="dark" aria-pressed="false">🌙 Dark</button>' +
         "</div>" +
         '<button class="btn btn-ghost sidebar-update" id="updateBtn" type="button" ' +
           'title="Force refresh to the newest version (clears the app cache)">' +
@@ -355,9 +357,14 @@
   var themeRoot = document.documentElement;
   var THEME_COLOR = {
     meadow: { day: "#7fbcd6", night: "#0b1a24" },
-    autumn: { day: "#9fc3dc", night: "#1a1220" }
+    autumn: { day: "#9fc3dc", night: "#1a1220" },
+    light: { day: "#eef0f2", night: "#eef0f2" },
+    dark: { day: "#121417", night: "#121417" }
   };
-  function seasonNow() { return themeRoot.dataset.season === "autumn" ? "autumn" : "meadow"; }
+  function seasonNow() {
+    var s = themeRoot.dataset.season;
+    return THEME_COLOR.hasOwnProperty(s) ? s : "meadow";
+  }
   function setThemeColor() {
     var c = THEME_COLOR[seasonNow()][themeRoot.dataset.theme === "day" ? "day" : "night"];
     document.querySelectorAll('meta[name="theme-color"]').forEach(function (m) { m.content = c; });
@@ -365,6 +372,9 @@
   var FADE_MS = 90000;
   var fadeTimer = 0;
   function themeForNow() {
+    // The plain Light and Dark themes ignore the hour.
+    if (seasonNow() === "light") return "day";
+    if (seasonNow() === "dark") return "night";
     var h = new Date().getHours();
     return h >= 6 && h < 18 ? "day" : "night";
   }
@@ -404,6 +414,7 @@
       themeRoot.style.setProperty("--theme-fade", "0.6s");
       themeRoot.classList.add("theme-fading");
       themeRoot.dataset.season = b.dataset.season;
+      themeRoot.dataset.theme = themeForNow();
       try { localStorage.setItem(SEASON_KEY, b.dataset.season); } catch (e) {}
       markSeason();
       setThemeColor();
@@ -415,6 +426,124 @@
     });
   });
   markSeason();
+
+  // ---------- 8. Accessibility ----------
+  // a. A skip link to the page's <main>, first in the tab order.
+  var mainEl = document.querySelector("main");
+  if (mainEl) {
+    if (!mainEl.id) mainEl.id = "main";
+    mainEl.setAttribute("tabindex", "-1");
+    document.body.insertAdjacentHTML("afterbegin",
+      '<a class="skip-link" href="#' + mainEl.id + '">Skip to content</a>');
+  }
+
+  // b. A polite live region. Pages call self.tsumikiAnnounce("…") to have a
+  // screen reader speak a result. Messages sent in one burst join into one.
+  var live = document.createElement("div");
+  live.className = "sr-only";
+  live.setAttribute("aria-live", "polite");
+  live.setAttribute("role", "status");
+  document.body.appendChild(live);
+  var livePending = [], liveTimer = 0;
+  function announce(msg) {
+    if (!msg) return;
+    var key = typeof msg === "string" ? msg : msg.textContent;
+    if (livePending.some(function (p) { return (typeof p === "string" ? p : p.textContent) === key; })) return;
+    livePending.push(msg);
+    clearTimeout(liveTimer);
+    liveTimer = setTimeout(function () {
+      live.textContent = "";
+      var parts = livePending.splice(0);
+      // A new text node after a clear makes screen readers speak repeats too.
+      setTimeout(function () {
+        parts.forEach(function (p) {
+          var span = document.createElement("span");
+          if (typeof p === "string") span.textContent = p + " ";
+          else span.appendChild(p);
+          live.appendChild(span);
+        });
+      }, 30);
+    }, 60);
+  }
+  self.tsumikiAnnounce = announce;
+
+  // c. Mark Japanese text with lang="ja", so a screen reader uses a Japanese
+  // voice. An element gets it when kana or kanji make up most of its own text.
+  var JA = /[぀-ヿ㐀-鿿ｦ-ﾟ]/g;
+  function ownText(node) {
+    var t = "";
+    for (var c = node.firstChild; c; c = c.nextSibling) if (c.nodeType === 3) t += c.data;
+    return t.replace(/[\s\d.,!?()\[\]「」『』。、・…〜~:;\/\-–—'"“”]+/g, "");
+  }
+  function tagLang(el) {
+    if (el.nodeType !== 1 || el.hasAttribute("lang") || /^(SCRIPT|STYLE|svg)$/.test(el.nodeName)) return;
+    var t = ownText(el);
+    if (t && (t.match(JA) || []).length * 2 >= t.length) el.setAttribute("lang", "ja");
+  }
+  function tagTree(root) {
+    if (root.nodeType !== 1 || root.closest(".scene")) return;
+    tagLang(root);
+    root.querySelectorAll("*").forEach(tagLang);
+  }
+  var langQueue = new Set(), langFrame = 0;
+  function queueLang(node) {
+    langQueue.add(node.nodeType === 3 ? node.parentNode : node);
+    if (!langFrame) langFrame = requestAnimationFrame(function () {
+      langFrame = 0;
+      langQueue.forEach(function (n) {
+        // Text that changed in place may no longer be Japanese.
+        if (n && n.nodeType === 1 && n.getAttribute("lang") === "ja" && !ownText(n).match(JA)) n.removeAttribute("lang");
+        if (n) tagTree(n);
+      });
+      langQueue.clear();
+    });
+  }
+  tagTree(document.body);
+  new MutationObserver(function (list) {
+    list.forEach(function (m) {
+      if (m.type === "characterData") queueLang(m.target);
+      else {
+        queueLang(m.target);
+        m.addedNodes.forEach(queueLang);
+      }
+    });
+  }).observe(document.body, { subtree: true, childList: true, characterData: true });
+
+  // d. Flashcards: hide the face that is turned away, let the card take
+  // focus, and speak the new face when it flips or a new card shows.
+  document.querySelectorAll(".card").forEach(function (card) {
+    var front = card.querySelector(".card-front");
+    var back = card.querySelector(".card-back");
+    if (!front || !back) return;
+    card.setAttribute("tabindex", "0");
+    card.setAttribute("aria-roledescription", "flashcard");
+    function faceText(face) {
+      var center = face.querySelector(".card-center") || face;
+      var copy = center.cloneNode(true);
+      copy.querySelectorAll("button, [hidden], [aria-hidden='true']").forEach(function (n) { n.remove(); });
+      return copy;
+    }
+    var flipped = card.classList.contains("is-flipped");
+    function sync(speak) {
+      var now = card.classList.contains("is-flipped");
+      front.setAttribute("aria-hidden", now ? "true" : "false");
+      back.setAttribute("aria-hidden", now ? "false" : "true");
+      if (speak) announce(faceText(now ? back : front));
+    }
+    sync(false);
+    new MutationObserver(function () {
+      var now = card.classList.contains("is-flipped");
+      if (now !== flipped) { flipped = now; sync(true); }
+    }).observe(card, { attributes: true, attributeFilter: ["class"] });
+    // A new card: the front word text changes while the front shows.
+    var word = front.querySelector(".word-display");
+    var lastWord = word ? word.textContent : "";
+    if (word) new MutationObserver(function () {
+      if (word.textContent === lastWord) return;
+      lastWord = word.textContent;
+      if (!card.classList.contains("is-flipped")) sync(true);
+    }).observe(word, { subtree: true, childList: true, characterData: true });
+  });
 
   // ---------- 4. Force Update ----------
   function withTimeout(promise, ms) {

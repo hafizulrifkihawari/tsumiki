@@ -242,8 +242,10 @@
   el("levelSeg").addEventListener("click", (e) => {
     const btn = e.target.closest(".seg-btn");
     if (!btn) return;
-    el("levelSeg").querySelectorAll(".seg-btn").forEach((b) => b.classList.remove("is-active"));
-    btn.classList.add("is-active");
+    el("levelSeg").querySelectorAll(".seg-btn").forEach((b) => {
+      b.classList.toggle("is-active", b === btn);
+      b.setAttribute("aria-pressed", String(b === btn));
+    });
     currentLevelFilter = btn.getAttribute("data-level");
     renderBrowse();
   });
@@ -588,6 +590,7 @@
           rubyize(explain || "") +
           (translation ? '<span class="quiz-translation quiz-translation-a">' + esc(translation) + "</span>" : "");
         el("mcqNextBtn").hidden = false;
+        say(correct ? "Benar!" : "Kurang tepat. Jawaban yang benar: " + LETTERS[answerAt] + ".", "mcqNextBtn");
         el("mcqNextBtn").addEventListener("click", () => grade(correct ? "good" : "again"), { once: true });
       });
     });
@@ -662,9 +665,16 @@
           "正しい文 (kalimat yang benar): " + rubyize(b.chunks.join("") + (b.suffix || "")) +
           (b.translation ? '<span class="quiz-translation quiz-translation-a">' + esc(b.translation) + "</span>" : "");
         el("jlptNextBtn").hidden = false;
+        say(correct ? "Benar!" : "Kurang tepat.", "jlptNextBtn");
         el("jlptNextBtn").addEventListener("click", () => grade(correct ? "good" : "again"), { once: true });
       });
     });
+  }
+
+  // Speak the result to a screen reader, then move focus to the Next button.
+  function say(msg, nextId) {
+    if (self.tsumikiAnnounce) self.tsumikiAnnounce(msg);
+    el(nextId).focus();
   }
 
   function renderBuild(it, data) {
@@ -743,6 +753,7 @@
         (b.translation ? '<span class="quiz-translation quiz-translation-a">' + esc(b.translation) + "</span>" : "");
       el("buildCheckBtn").hidden = true;
       el("buildNextBtn").hidden = false;
+      say(correct ? "Benar!" : "Kurang tepat.", "buildNextBtn");
       el("buildNextBtn").addEventListener("click", () => grade(correct ? "good" : "again"), { once: true });
     });
   }
