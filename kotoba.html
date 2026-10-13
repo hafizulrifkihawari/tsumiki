@@ -62,8 +62,11 @@
           <!-- FRONT: hiragana/katakana first — learn it as a word before the kanji -->
           <div class="card-face card-front">
             <div class="card-top">
-              <span class="lesson-badge" id="frontLesson">Pelajaran 26</span>
-              <span class="badge badge-type" id="frontType" hidden></span>
+              <div class="card-top-badges">
+                <span class="lesson-badge" id="frontLesson">Pelajaran 26</span>
+                <span class="badge badge-type" id="frontType" hidden></span>
+              </div>
+              <button class="speak-btn" id="speakFrontBtn" type="button" aria-label="Play pronunciation" title="Play pronunciation (P)"></button>
             </div>
             <div class="card-center">
               <div class="word-display" id="frontKana">みます</div>
@@ -71,7 +74,6 @@
               <div class="kotoba-context" id="frontContext" hidden></div>
               <!-- Reverse mode: the meaning is the prompt, the word is the answer -->
               <div class="kotoba-front-meaning" id="frontMeaning" hidden></div>
-              <button class="speak-btn" id="speakFrontBtn" type="button" aria-label="Play pronunciation" title="Play pronunciation (P)">🔊</button>
             </div>
             <div class="card-bottom">
               <span class="hint-text" id="frontHint">Tap or swipe · Space to flip</span>
@@ -84,6 +86,7 @@
               <div class="card-top-badges">
                 <span class="badge badge-type" id="backType">Kata Benda</span>
               </div>
+              <button class="speak-btn" id="speakBackBtn" type="button" aria-label="Play pronunciation" title="Play pronunciation (P)" hidden></button>
             </div>
             <div class="card-center">
               <div class="reading-row">
@@ -94,7 +97,6 @@
               <div class="meaning-row">
                 <span class="meaning-id" id="backMeaning">melihat, memeriksa</span>
               </div>
-              <button class="speak-btn" id="speakBackBtn" type="button" aria-label="Play pronunciation" title="Play pronunciation (P)" hidden>🔊</button>
             </div>
             <div class="card-bottom">
               <span class="hint-text">Swipe or ← → to move · Grade: Again / Good / Easy</span>

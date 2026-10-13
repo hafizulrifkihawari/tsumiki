@@ -214,7 +214,7 @@ function cardHtml(k) {
       '<div class="kotd-example">' +
         '<div class="kotd-example-top">' +
           '<div class="kotd-example-jp">' + esc(k.example.jp) + "</div>" +
-          '<button class="speak-btn" type="button" data-entry-id="' + esc(k.id) + '" aria-label="Play example sentence" title="Play example sentence">🔊</button>' +
+          '<button class="speak-btn" type="button" data-entry-id="' + esc(k.id) + '" aria-label="Play example sentence" title="Play example sentence"></button>' +
         "</div>" +
         '<div class="kotd-example-reading">' + esc(k.example.reading) + "</div>" +
         '<div class="kotd-example-meaning">' + esc(k.example.meaning) + "</div>" +

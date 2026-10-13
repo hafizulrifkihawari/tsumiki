@@ -283,18 +283,31 @@ input:not([type="checkbox"]):not([type="radio"]), select, textarea { font-size: 
 }
 
 .speak-btn {
-  position: absolute;
-  top: 0; right: 0;
-  width: 38px; height: 38px; border-radius: var(--r-sm);
-  border: var(--bw) solid var(--border); background: var(--surface-2);
-  font-size: 17px; line-height: 1; cursor: pointer;
+  /* Plain icon in the card-top row. The negative margins keep a 40px tap
+   * target without making the badge row taller, and push it to the right edge. */
+  flex-shrink: 0;
+  width: 40px; height: 40px; margin: -6px -10px -6px auto;
+  border: 0; border-radius: var(--r-sm); background: transparent;
+  color: var(--accent); cursor: pointer;
   display: flex; align-items: center; justify-content: center;
-  transition: background 0.18s, transform 0.1s, opacity 0.18s;
+  transition: background 0.18s, color 0.18s, transform 0.1s, opacity 0.18s;
+}
+/* Pixel speaker with two sound waves, drawn with the text colour. */
+.speak-btn::before {
+  content: ""; width: 22px; height: 22px; background: currentColor;
+  -webkit-mask: var(--speaker-icon) center / contain no-repeat;
+  mask: var(--speaker-icon) center / contain no-repeat;
+}
+:root {
+  --speaker-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' shape-rendering='crispEdges'%3E%3Cpath d='M1 6h3v4H1zM4 5h2v6H4zM6 3h2v10H6zM10 5h1v1h-1zM11 6h1v4h-1zM10 10h1v1h-1zM13 3h1v1h-1zM14 4h1v8h-1zM13 12h1v1h-1z'/%3E%3C/svg%3E");
 }
 .speak-btn:hover { background: var(--accent-soft); }
 .speak-btn:active { transform: scale(0.9); }
 .speak-btn[disabled] { opacity: 0.35; cursor: not-allowed; }
-.speak-btn.is-speaking { background: var(--accent); animation: pulse-speak 0.9s ease-in-out infinite; }
+.speak-btn.is-speaking {
+  background: var(--accent-soft); color: var(--accent-2);
+  animation: pulse-speak 0.9s ease-in-out infinite;
+}
 .speak-btn[hidden] { display: none; }
 @keyframes pulse-speak {
   0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 50%, transparent); }
@@ -539,7 +552,9 @@ body { padding-left: calc(var(--sidebar-w) + max(24px, env(safe-area-inset-left)
 
 .sidebar-toggle {
   align-items: center; justify-content: center;
-  position: fixed; z-index: 45;
+  /* Absolute, not fixed: the button scrolls away with the page and never
+   * floats over the content below it. */
+  position: absolute; z-index: 45;
   top: max(14px, env(safe-area-inset-top)); left: max(14px, env(safe-area-inset-left));
   width: 44px; height: 44px; border-radius: var(--r-sm);
   border: var(--bw) solid var(--border); background: var(--surface); color: var(--text);
@@ -555,7 +570,10 @@ body { padding-left: calc(var(--sidebar-w) + max(24px, env(safe-area-inset-left)
 }
 
 @media (max-width: 900px) {
-  body { padding-left: max(16px, env(safe-area-inset-left)); --pad-top: max(72px, env(safe-area-inset-top)); }
+  body { padding-left: max(16px, env(safe-area-inset-left)); --pad-top: max(16px, env(safe-area-inset-top)); }
+  /* The ☰ button sits in the first row of the top bar, left of the brand. */
+  .sidebar-toggle { top: var(--pad-top); left: max(16px, env(safe-area-inset-left)); }
+  .app > .topbar > .brand { margin-left: 56px; min-height: 44px; }
   .sidebar {
     width: min(280px, 84vw);
     transform: translateX(-100%); visibility: hidden;
@@ -1042,9 +1060,9 @@ body[data-page="kanji-manage"] .app { max-width: 1180px; }
   .card, .finished-screen { min-height: 260px; }
   .card-scene.has-answerbar .card { min-height: 320px; }
 }
-/* Narrow screens keep room at the top for the fixed menu button. */
+/* Narrow screens: the menu button shares the top bar row, so no extra room. */
 @media (max-height: 760px) and (max-width: 900px) {
-  body { --pad-top: max(64px, env(safe-area-inset-top)); }
+  body { --pad-top: max(12px, env(safe-area-inset-top)); }
 }
 
 /* ---------- Card text on short cards ----------

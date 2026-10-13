@@ -123,8 +123,11 @@
           <!-- FRONT -->
           <div class="card-face card-front">
             <div class="card-top">
-              <span class="badge badge-type" id="frontType">Noun</span>
-              <span class="badge badge-form" id="frontFormHint" hidden>Basic</span>
+              <div class="card-top-badges">
+                <span class="badge badge-type" id="frontType">Noun</span>
+                <span class="badge badge-form" id="frontFormHint" hidden>Basic</span>
+              </div>
+              <button class="speak-btn" id="speakFrontBtn" type="button" aria-label="Play pronunciation" title="Play pronunciation (P)"></button>
             </div>
             <div class="card-center">
               <div class="word-display" id="frontWord">着物</div>
@@ -132,7 +135,6 @@
               <div class="romaji-line" id="frontRomaji" hidden></div>
               <div class="front-meaning" id="frontMeaning" hidden></div>
               <div class="conjugate-note" id="frontNote"></div>
-              <button class="speak-btn" id="speakFrontBtn" type="button" aria-label="Play pronunciation" title="Play pronunciation (P)">🔊</button>
             </div>
             <div class="card-bottom">
               <span class="hint-text">Tap or swipe · Space to flip</span>
@@ -146,6 +148,7 @@
                 <span class="badge badge-type" id="backType">Noun</span>
                 <span class="badge badge-form" id="backForm">Basic</span>
               </div>
+              <button class="speak-btn" id="speakBackBtn" type="button" aria-label="Play pronunciation" title="Play pronunciation (P)"></button>
             </div>
             <div class="card-center">
               <div class="reading-row">
@@ -167,7 +170,6 @@
                 <div class="example-romaji" id="exRomaji" hidden></div>
                 <div class="example-meaning" id="exMeaning"></div>
               </div>
-              <button class="speak-btn" id="speakBackBtn" type="button" aria-label="Play pronunciation" title="Play pronunciation (P)">🔊</button>
             </div>
             <div class="card-bottom">
               <span class="hint-text">Swipe or ← → to move · Grade: Again / Good / Easy</span>
