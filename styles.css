@@ -46,6 +46,15 @@
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
+/* Never scroll sideways. Clip (not hidden) keeps position: sticky working,
+ * and the text-size-adjust stops iOS from inflating text in landscape. */
+html {
+  -webkit-text-size-adjust: 100%; text-size-adjust: 100%;
+  overflow-x: hidden; overflow-x: clip;
+}
+body { overflow-x: hidden; overflow-x: clip; }
+img, svg, video, canvas { max-width: 100%; }
+
 body {
   --pad-top: max(24px, env(safe-area-inset-top));
   --pad-bottom: calc(var(--ground-h) + 16px + env(safe-area-inset-bottom));
@@ -59,9 +68,14 @@ body {
     var(--pad-bottom) max(16px, env(safe-area-inset-left));
 }
 button, input, select, textarea { font-family: inherit; }
+/* iOS Safari zooms the page when a text field under 16px gets focus, and it
+ * does not zoom back out. That zoom pushes the layout off the side. */
+input:not([type="checkbox"]):not([type="radio"]), select, textarea { font-size: max(16px, 1em); }
 
 .app {
   width: 100%;
+  /* A flex item will not shrink below its content without this. */
+  min-width: 0;
   max-width: 720px;
   display: flex;
   flex-direction: column;
@@ -105,7 +119,7 @@ button, input, select, textarea { font-family: inherit; }
   border-radius: var(--r-sm);
   padding: 12px 16px;
 }
-.control-group { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+.control-group { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; min-width: 0; }
 /* Kanji page: the switches fold into an "Options" row to save height. */
 .controls-more[open] { flex-basis: 100%; }
 .controls-more[open] > .controls-summary { margin-bottom: 10px; }
@@ -136,7 +150,10 @@ button, input, select, textarea { font-family: inherit; }
 .switch input:focus-visible + .switch-track { outline: 2px solid var(--accent); outline-offset: 2px; }
 .switch-label { font-size: 13px; color: var(--text-dim); }
 
-.segmented { display: inline-flex; background: var(--surface-2); border-radius: var(--r-sm); padding: 3px; gap: 2px; }
+.segmented {
+  display: inline-flex; background: var(--surface-2); border-radius: var(--r-sm); padding: 3px; gap: 2px;
+  max-width: 100%; min-width: 0;
+}
 .seg-btn {
   border: 0; background: transparent; color: var(--text-dim);
   font-size: 13px; font-weight: 600; padding: 7px 13px; border-radius: var(--r-sm); cursor: pointer;
@@ -152,7 +169,7 @@ button, input, select, textarea { font-family: inherit; }
 .stage { flex: 1 0 auto; display: flex; align-items: stretch; gap: 10px; }
 .stage > .nav-arrow { align-self: center; }
 .card-scene {
-  flex: 1; perspective: 1600px; position: relative; touch-action: pan-y;
+  flex: 1; min-width: 0; perspective: 1600px; position: relative; touch-action: pan-y;
   display: flex; flex-direction: column; justify-content: center;
 }
 .card-scene > .card { flex: 1 1 auto; max-height: 560px; }
@@ -373,6 +390,7 @@ button, input, select, textarea { font-family: inherit; }
   transform: translateX(-50%);
   z-index: 5;
   display: flex; flex-direction: column; align-items: center; gap: 8px;
+  max-width: calc(100% - 16px);
 }
 .answerbar-stats { display: flex; align-items: center; justify-content: center; gap: 8px; }
 .answerbar-buttons { display: flex; align-items: center; justify-content: center; gap: 8px; }
@@ -584,7 +602,7 @@ body { padding-left: calc(var(--sidebar-w) + max(24px, env(safe-area-inset-left)
 #loginInput {
   flex: 1; min-width: 0; padding: 11px 14px; border-radius: var(--r-sm);
   border: var(--bw) solid var(--border); background: var(--surface-2); color: var(--text);
-  font-size: 15px; font-family: var(--font-jp);
+  font-size: 16px; font-family: var(--font-jp);
 }
 #loginInput:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
 .login-quick { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
@@ -679,6 +697,9 @@ body { padding-left: calc(var(--sidebar-w) + max(24px, env(safe-area-inset-left)
   display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 4px 0 14px;
 }
 .manage-hint { font-size: 12.5px; color: var(--text-faint); }
+.manage-status { font-size: 12.5px; color: var(--text-faint); }
+.manage-status.is-dirty { color: var(--accent); font-weight: 700; }
+#saveBtn:disabled { opacity: 0.5; cursor: default; filter: none; transform: none; }
 /* The manage page is wider than the study pages. Each group of 10 is a grid
  * that wraps to the free width, so the list never scrolls sideways. */
 body[data-page="kanji-manage"] .app { max-width: 1180px; }
@@ -986,9 +1007,12 @@ body[data-page="kanji-manage"] .app { max-width: 1180px; }
 
 /* ---------- Responsive ---------- */
 @media (max-width: 560px) {
-  .controls { flex-direction: column; align-items: stretch; }
+  /* In a column, wrap plus the open panel's 100% basis pushes the filter into
+   * a second column off the right edge. Stack the items in one column. */
+  .controls { flex-direction: column; align-items: stretch; flex-wrap: nowrap; }
+  .controls-more[open] { flex-basis: auto; }
   .segmented { width: 100%; justify-content: space-between; }
-  .seg-btn { flex: 1; }
+  .seg-btn { flex: 1 1 auto; min-width: 0; padding-inline: 6px; overflow-wrap: anywhere; }
   .card { min-height: 300px; }
   .card-scene.has-answerbar .card { min-height: 360px; }
   .nav-arrow { width: 38px; height: 38px; font-size: 22px; }
@@ -996,7 +1020,17 @@ body[data-page="kanji-manage"] .app { max-width: 1180px; }
   .btn-flip span { display: inline !important; }
   .answerbar .btn span { display: inline !important; }
   .btn-again, .btn-good, .btn-easy { padding: 11px 9px; font-size: 12.5px; }
+  /* The three grade buttons share the card width and never stick out of it. */
+  .answerbar { width: calc(100% - 16px); }
+  .answerbar-buttons { width: 100%; }
+  .answerbar-buttons > .btn { flex: 1 1 0; min-width: 0; padding-inline: 6px; gap: 4px; }
+  .stage { gap: 6px; }
   .topbar-actions { flex-wrap: wrap; }
+}
+/* Very narrow phones: drop the grade icons so the labels fit. !important
+ * and the extra specificity beat the "show every span" rule above. */
+@media (max-width: 380px) {
+  .answerbar .answerbar-buttons .btn span.btn-icon { display: none !important; }
 }
 
 /* ---------- Short windows ----------

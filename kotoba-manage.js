@@ -3,7 +3,8 @@
  * Filters by whole lesson, not by individual word: each row is one Pelajaran,
  * and unchecking it excludes every word tagged with that lesson number. The
  * set of *disabled* lesson numbers is stored in localStorage under the same
- * key kotoba-app.js reads at buildDeck time.
+ * key kotoba-app.js reads at buildDeck time. Changes
+ * are written only when the user presses Save.
  */
 (function () {
   "use strict";
@@ -26,6 +27,35 @@
   }
 
   const disabled = loadDisabled();
+
+  // Edits stay in memory until the user presses Save. The saved snapshot tells
+  // us whether the current state differs from what is in localStorage.
+  const saveBtn = document.getElementById("saveBtn");
+  const saveStatus = document.getElementById("saveStatus");
+  function snapshot(set) {
+    return JSON.stringify([...set].sort((a, b) => a - b));
+  }
+  let savedSnapshot = snapshot(disabled);
+  function isDirty() {
+    return snapshot(disabled) !== savedSnapshot;
+  }
+  function markDirty() {
+    const dirty = isDirty();
+    saveBtn.disabled = !dirty;
+    saveStatus.textContent = dirty ? "Unsaved changes" : "All changes saved";
+    saveStatus.classList.toggle("is-dirty", dirty);
+  }
+  saveBtn.addEventListener("click", () => {
+    saveDisabled(disabled);
+    savedSnapshot = snapshot(disabled);
+    markDirty();
+    saveStatus.textContent = "Saved";
+  });
+  window.addEventListener("beforeunload", (ev) => {
+    if (!isDirty()) return;
+    ev.preventDefault();
+    ev.returnValue = "";
+  });
   const total = KOTOBA.length;
 
   // Group word counts by lesson, preserving ascending Pelajaran order.
@@ -73,7 +103,7 @@
     cb.addEventListener("change", () => {
       if (cb.checked) disabled.delete(lesson); else disabled.add(lesson);
       row.classList.toggle("is-off", !cb.checked);
-      saveDisabled(disabled);
+      markDirty();
       updateCount();
     });
 
@@ -87,7 +117,7 @@
   function setAll(enabled) {
     disabled.clear();
     if (!enabled) lessons.forEach((lesson) => disabled.add(lesson));
-    saveDisabled(disabled);
+    markDirty();
     document.querySelectorAll(".lesson-check").forEach((cb) => {
       cb.checked = enabled;
       cb.closest(".lesson-row").classList.toggle("is-off", !enabled);

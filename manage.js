@@ -4,7 +4,8 @@
  * the kanji is enabled (in the deck); unchecking excludes it. Each row also has
  * a left-hand checkbox that toggles all 10 at once (and shows an indeterminate
  * state when the row is partially enabled). The set of *disabled* ids is stored
- * in localStorage under the same key app.js reads at buildDeck time.
+ * in localStorage under the same key app.js reads at buildDeck time. Changes are
+ * written only when the user presses Save.
  */
 (function () {
   "use strict";
@@ -27,6 +28,35 @@
   }
 
   const disabled = loadDisabled();
+
+  // Edits stay in memory until the user presses Save. The saved snapshot tells
+  // us whether the current state differs from what is in localStorage.
+  const saveBtn = document.getElementById("saveBtn");
+  const saveStatus = document.getElementById("saveStatus");
+  function snapshot(set) {
+    return JSON.stringify([...set].sort((a, b) => a - b));
+  }
+  let savedSnapshot = snapshot(disabled);
+  function isDirty() {
+    return snapshot(disabled) !== savedSnapshot;
+  }
+  function markDirty() {
+    const dirty = isDirty();
+    saveBtn.disabled = !dirty;
+    saveStatus.textContent = dirty ? "Unsaved changes" : "All changes saved";
+    saveStatus.classList.toggle("is-dirty", dirty);
+  }
+  saveBtn.addEventListener("click", () => {
+    saveDisabled(disabled);
+    savedSnapshot = snapshot(disabled);
+    markDirty();
+    saveStatus.textContent = "Saved";
+  });
+  window.addEventListener("beforeunload", (ev) => {
+    if (!isDirty()) return;
+    ev.preventDefault();
+    ev.returnValue = "";
+  });
   const total = RAW.length;
 
   function updateCount() {
@@ -73,7 +103,7 @@
         cb.closest(".cell").classList.toggle("is-off", !on);
       });
       rowCheck.indeterminate = false;
-      saveDisabled(disabled);
+      markDirty();
       updateCount();
     });
 
@@ -106,7 +136,7 @@
         setKanji(e.id, cb.checked);
         label.classList.toggle("is-off", !cb.checked);
         syncRowHeader(tr);
-        saveDisabled(disabled);
+        markDirty();
         updateCount();
       });
 
@@ -132,7 +162,7 @@
   function setAll(enabled) {
     disabled.clear();
     if (!enabled) RAW.forEach((e) => disabled.add(e.id));
-    saveDisabled(disabled);
+    markDirty();
     document.querySelectorAll(".cell-check").forEach((cb) => {
       cb.checked = enabled;
       cb.closest(".cell").classList.toggle("is-off", !enabled);
