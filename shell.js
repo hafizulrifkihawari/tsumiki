@@ -382,6 +382,10 @@
       "</div>" +
       leaves +
       '<div class="scene-ground"></div>' +
+    "</div>" +
+    // The animals walk in a second layer in front of the page. It ignores
+    // pointer events, so the buttons under it still take clicks and taps.
+    '<div class="scene scene-front" aria-hidden="true">' +
       critter(SIT_CAT, 3, GREY_CAT, "is-sitting", "--x:82%") +
       critter(SHIBA, 3, null, "", "--dur:34s;--delay:-6s") +
       critter(CAT, 3, BLACK_CAT, "", "--dur:34s;--delay:-3.4s") +

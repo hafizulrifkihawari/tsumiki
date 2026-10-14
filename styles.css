@@ -971,6 +971,10 @@ body[data-page="kanji-manage"] .app { max-width: 1180px; }
     var(--sky-4) 54% 70%, var(--sky-5) 70% 100%);
 }
 .scene svg { display: block; shape-rendering: crispEdges; }
+/* The animal layer sits in front of page content and under the sidebar,
+   sheets, and dialogs (z-index 40 and up). pointer-events: none on .scene
+   lets clicks pass through it. */
+.scene-front { z-index: 30; background: none; }
 /* Left-edge scenery starts after the sidebar when the sidebar is open. */
 .scene { --scene-left: var(--sidebar-w); }
 .sidebar-collapsed .scene { --scene-left: 0px; }
