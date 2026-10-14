@@ -5,3 +5,6 @@ Kotoba Minna no Nihongo II.pdf
 
 # graphify knowledge-graph output (generated; rebuild with `graphify update .`)
 graphify-out/
+
+# Local improvement plan (not published)
+PLAN.md

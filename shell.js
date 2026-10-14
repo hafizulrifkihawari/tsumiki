@@ -123,6 +123,45 @@
     if (e.key === "Escape" && sidebar.classList.contains("is-open")) { e.stopPropagation(); closeDrawer(); }
   }, true);
 
+  // ---------- 9. Manage pages: back link and go-to-top ----------
+  // A sub page (Manage) gets a back link to its parent section in the top
+  // bar. Unsaved changes still trigger the page's own beforeunload prompt.
+  var parentNav = NAV.filter(function (item) {
+    return item.sub && item.sub.page === currentPage;
+  })[0];
+  var brand = document.querySelector(".app > .topbar > .brand");
+  if (parentNav && brand) {
+    brand.insertAdjacentHTML("afterbegin",
+      '<a class="btn btn-ghost back-link" href="' + parentNav.href + '" ' +
+        'aria-label="Back to ' + parentNav.label + '">' +
+        '<span class="btn-icon" aria-hidden="true">←</span>' + parentNav.label + "</a>");
+  }
+
+  // A go-to-top button shows after the user scrolls down past a set point.
+  var TO_TOP_AFTER_PX = 400;
+  if (parentNav) {
+    document.body.insertAdjacentHTML("beforeend",
+      '<button class="to-top" id="toTopBtn" type="button" aria-label="Go to top" ' +
+        'title="Go to top" hidden>↑</button>');
+    var toTop = document.getElementById("toTopBtn");
+    var toTopFrame = 0;
+    var syncToTop = function () {
+      toTopFrame = 0;
+      toTop.hidden = window.scrollY < TO_TOP_AFTER_PX;
+    };
+    window.addEventListener("scroll", function () {
+      if (!toTopFrame) toTopFrame = requestAnimationFrame(syncToTop);
+    }, { passive: true });
+    toTop.addEventListener("click", function () {
+      var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" });
+      // Move focus off the button, which hides at the top.
+      var first = document.querySelector(".back-link") || mainEl;
+      if (first) first.focus({ preventScroll: true });
+    });
+    syncToTop();
+  }
+
   // ---------- 5. Pixel scene ----------
   // A decorative background layer: sky, clouds or stars, trees, ground, and
   // walking animals. CSS shows the day set when data-theme is "day" and the
