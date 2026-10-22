@@ -12,6 +12,7 @@
 
   const DISABLED_KEY = "kanji.disabledIds";
   const PER_ROW = 10;
+  const COLLAPSED_KEY = "kanji.collapsedGroups";
 
   const body = document.getElementById("manageBody");
   const enabledNum = document.getElementById("enabledNum");
@@ -28,6 +29,20 @@
   }
 
   const disabled = loadDisabled();
+
+  // Collapsed groups are a view preference, so they save at once (no Save press).
+  // Each group is keyed by the id of its first kanji.
+  function loadCollapsed() {
+    try {
+      const raw = localStorage.getItem(COLLAPSED_KEY);
+      if (raw) return new Set(JSON.parse(raw));
+    } catch (e) { /* ignore */ }
+    return new Set();
+  }
+  const collapsedGroups = loadCollapsed();
+  function saveCollapsed() {
+    try { localStorage.setItem(COLLAPSED_KEY, JSON.stringify([...collapsedGroups])); } catch (e) { /* ignore */ }
+  }
 
   // Edits stay in memory until the user presses Save. The saved snapshot tells
   // us whether the current state differs from what is in localStorage.
@@ -74,11 +89,15 @@
   }
 
   // A collapsed group hides its 10 cells. Only the header line stays visible.
-  function setCollapsed(rowEl, collapsed) {
+  function setCollapsed(rowEl, collapsed, persist = true) {
     rowEl.classList.toggle("is-collapsed", collapsed);
     const t = rowEl.querySelector(".row-toggle");
     t.textContent = collapsed ? "▸ Show" : "▾ Hide";
     t.setAttribute("aria-expanded", String(!collapsed));
+    if (!persist) return;
+    const key = Number(rowEl.dataset.group);
+    if (collapsed) collapsedGroups.add(key); else collapsedGroups.delete(key);
+    saveCollapsed();
   }
 
   function setKanji(id, enabled) {
@@ -87,6 +106,7 @@
 
   function buildRow(entries) {
     const tr = document.createElement("tr");
+    tr.dataset.group = String(entries[0].id);
 
     // Row toggle
     const th = document.createElement("th");
@@ -167,7 +187,7 @@
 
     body.appendChild(tr);
     syncRowHeader(tr);
-    setCollapsed(tr, false);
+    setCollapsed(tr, collapsedGroups.has(entries[0].id), false);
   }
 
   for (let i = 0; i < RAW.length; i += PER_ROW) {
