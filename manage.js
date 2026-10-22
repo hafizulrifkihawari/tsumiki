@@ -70,6 +70,15 @@
     const head = rowEl.querySelector(".row-check");
     head.checked = on === cells.length;
     head.indeterminate = on > 0 && on < cells.length;
+    rowEl.querySelector(".row-count").textContent = on + "/" + cells.length + " on";
+  }
+
+  // A collapsed group hides its 10 cells. Only the header line stays visible.
+  function setCollapsed(rowEl, collapsed) {
+    rowEl.classList.toggle("is-collapsed", collapsed);
+    const t = rowEl.querySelector(".row-toggle");
+    t.textContent = collapsed ? "▸ Show" : "▾ Hide";
+    t.setAttribute("aria-expanded", String(!collapsed));
   }
 
   function setKanji(id, enabled) {
@@ -92,7 +101,13 @@
     const rowText = document.createElement("span");
     rowText.textContent = "#" + entries[0].id + "–" + entries[entries.length - 1].id;
     rowLabel.append(rowCheck, rowText);
-    th.appendChild(rowLabel);
+    const rowCount = document.createElement("span");
+    rowCount.className = "row-count";
+    const toggle = document.createElement("button");
+    toggle.type = "button";
+    toggle.className = "row-toggle";
+    toggle.addEventListener("click", () => setCollapsed(tr, !tr.classList.contains("is-collapsed")));
+    th.append(rowLabel, rowCount, toggle);
     tr.appendChild(th);
 
     rowCheck.addEventListener("change", () => {
@@ -152,6 +167,7 @@
 
     body.appendChild(tr);
     syncRowHeader(tr);
+    setCollapsed(tr, false);
   }
 
   for (let i = 0; i < RAW.length; i += PER_ROW) {
@@ -172,4 +188,9 @@
   }
   document.getElementById("allOnBtn").addEventListener("click", () => setAll(true));
   document.getElementById("allOffBtn").addEventListener("click", () => setAll(false));
+  function collapseAll(collapsed) {
+    document.querySelectorAll(".manage-table tr").forEach((tr) => setCollapsed(tr, collapsed));
+  }
+  document.getElementById("hideAllBtn").addEventListener("click", () => collapseAll(true));
+  document.getElementById("showAllBtn").addEventListener("click", () => collapseAll(false));
 })();
