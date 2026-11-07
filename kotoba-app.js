@@ -97,6 +97,9 @@
   let sessionCorrect = 0;
   let sessionMissed = 0;
   let againQueue = new Set();
+  // Keys graded good/easy this session. The deck wraps around, so these cards come back,
+  // but they are not scheduled twice in one session.
+  let gradedOk = new Set();
 
   let deck = [];
   let index = 0;
@@ -129,6 +132,7 @@
       order: deck.map((c) => c.key),
       index, sessionCorrect, sessionMissed,
       againQueue: [...againQueue],
+      gradedOk: [...gradedOk],
       disabledLessons: [...disabledLessons].sort((a, b) => a - b)
     };
     ls(false, progressKeyFor(currentUser), JSON.stringify(data));
@@ -156,6 +160,7 @@
     sessionCorrect = saved.sessionCorrect || 0;
     sessionMissed = saved.sessionMissed || 0;
     againQueue = new Set(saved.againQueue || []);
+    gradedOk = new Set(saved.gradedOk || []);
     wordCount.textContent = activeCards().length;
     updateScore();
     updateQueueBadge();
@@ -204,6 +209,7 @@
     sessionCorrect = 0;
     sessionMissed = 0;
     againQueue = new Set();
+    gradedOk = new Set();
     wordCount.textContent = pool.length;
     updateScore();
     updateQueueBadge();
@@ -341,7 +347,10 @@
   // requeue the card later this session ("again") or move on ("good"/"easy").
   function grade(level) {
     if (!deck.length) return;
+    // Grade only after the answer shows: the first press turns the card over.
+    if (!card.classList.contains("is-flipped")) { flip(); return; }
     const c = deck[index];
+    if (gradedOk.has(c.key)) { next(); return; }
     srsMap[c.key] = schedule(srsMap[c.key], level);
     if (self.tsumikiAnnounce) self.tsumikiAnnounce({ again: "Again", good: "Good", easy: "Easy" }[level] + ".");
     saveSrs(srsDeck(), currentUser, srsMap);
@@ -366,6 +375,7 @@
     } else {
       sessionCorrect++;
       againQueue.delete(c.key);
+      gradedOk.add(c.key);
       updateScore();
       updateQueueBadge();
       next();

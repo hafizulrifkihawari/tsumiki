@@ -124,8 +124,12 @@ function savePrefs(prefs) {
 // ---- Daily study streak ----------------------------------------------------
 function streakKey(user) { return "streak." + user; }
 
+// YYYY-MM-DD in the learner's own time zone, so a study day ends at local midnight
+// (a UTC day ends at 09:00 in Japan).
 function todayStamp(now) {
-  return new Date(now || Date.now()).toISOString().slice(0, 10); // YYYY-MM-DD (UTC)
+  const d = new Date(now || Date.now());
+  const pad = (n) => String(n).padStart(2, "0");
+  return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
 }
 
 function loadStreak(user) {
@@ -144,6 +148,8 @@ function bumpStreak(user, now) {
   if (s.lastDate === today) return s;
   if (s.lastDate) {
     const diffDays = Math.round((Date.parse(today + "T00:00:00Z") - Date.parse(s.lastDate + "T00:00:00Z")) / DAY_MS);
+    // A last day in the future (the clock was changed) keeps the streak, as on the same day.
+    if (diffDays < 0) return s;
     s.count = diffDays === 1 ? s.count + 1 : 1;
   } else {
     s.count = 1;

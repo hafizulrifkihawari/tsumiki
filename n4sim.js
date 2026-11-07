@@ -168,7 +168,8 @@
   function stopTimer() { if (timerId) { clearInterval(timerId); timerId = null; } }
   // Guarded hook so choukai.js can pause this exam's timer if the learner
   // switches to 聴解 mode mid-session without exiting cleanly.
-  window.__n4simStop = stopTimer;
+  // Save first: the timer saves only every 15 s, so a pause would lose the time since then.
+  window.__n4simStop = function () { if (exam && timerId) saveProgress(); stopTimer(); };
   function startTimer() {
     stopTimer();
     timerId = setInterval(() => {
@@ -258,6 +259,7 @@
   }
 
   function exitToBrowse() {
+    if (exam && timerId) saveProgress();
     stopTimer();
     showExam(false);
     // Route through bunpou-app.js's own view owner so it can't drift out of
@@ -268,7 +270,10 @@
 
   // ============================ RUN AN EXAM ==================================
   function startExam(setId, resume) {
-    const saved = resume ? loadProgress() : null;
+    // There is one saved exam for each user. Ask before a new exam replaces it.
+    const waiting = loadProgress();
+    if (!resume && waiting && !confirm("「" + waiting.label + "」の途中経過は消えます。新しく始めますか？")) return;
+    const saved = resume ? waiting : null;
     if (resume && saved && saved.setId === setId) {
       exam = {
         setId: saved.setId, label: saved.label, questions: saved.questions,

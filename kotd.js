@@ -120,6 +120,7 @@ let currentUser = "guest";
 let knownSet = new Set();
 let kotdIndex = {};
 let currentPicks = []; // array of entry ids, in on-screen slot order
+let picksDate = ""; // the day that currentPicks belongs to
 
 function todayTodoKey(user) { return "kotd.today." + user; }
 
@@ -181,6 +182,16 @@ function ensureTodayPicks() {
     saveTodayPicks(currentUser, ids);
   }
   currentPicks = ids;
+  picksDate = stamp;
+}
+
+// A page left open past midnight shows yesterday's cards. Before an action changes
+// them, load today's cards instead, so yesterday's picks are not saved as today's.
+function startNewDay() {
+  if (picksDate === todayStamp()) return false;
+  ensureTodayPicks();
+  updateAll();
+  return true;
 }
 
 function cardHtml(k) {
@@ -252,6 +263,7 @@ function updateAll() {
 
 // ---- Actions ----------------------------------------------------------------
 function rerollOne(id) {
+  if (startNewDay()) return;
   const idx = currentPicks.indexOf(id);
   if (idx === -1) return;
   const fresh = drawRandom(1, currentPicks);
@@ -262,12 +274,14 @@ function rerollOne(id) {
 }
 
 function rerollAll() {
+  if (startNewDay()) return;
   currentPicks = drawRandom(KOTD_DAILY_COUNT, currentPicks);
   saveTodayPicks(currentUser, currentPicks);
   updateAll();
 }
 
 function markCardKnown(id) {
+  startNewDay();
   knownSet.add(id);
   saveKnown(KOTD_DECK, currentUser, knownSet);
   const idx = currentPicks.indexOf(id);

@@ -655,6 +655,8 @@
 
   function showToast(mode, msg, btnText) {
     if (!toast) return;
+    // A shown Force Update toast stays: a plain reload would not fetch the newer version.
+    if (!toast.hidden && toastMode === "force" && mode === "reload") return;
     toastMode = mode;
     if (toastMsg) toastMsg.textContent = msg;
     if (toastBtn) toastBtn.textContent = btnText;

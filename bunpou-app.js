@@ -168,8 +168,13 @@
 
   let currentLevelFilter = "all";
   let studyPointId = null;
+  // The grade of the answered quiz item that waits for "Lanjut". It is kept in one place,
+  // so that leaving the quiz cannot lose it and a later render cannot grade it twice.
+  let pendingGrade = null;
 
   function showView(name) {
+    // Leaving the quiz after an answer but before "Lanjut" still grades that answer.
+    if (name !== "quiz") settlePendingGrade();
     browseView.hidden = name !== "browse";
     studyView.hidden = name !== "study";
     quizView.hidden = name !== "quiz";
@@ -439,6 +444,7 @@
   let quizAllKnownEmpty = false;
 
   function buildQueue(pointId, modeKey) {
+    settlePendingGrade(); // the answer belongs to the old queue
     const mode = MODE_BY_KEY.has(modeKey) ? modeKey : "all";
     const now = Date.now();
     let pool = pointId ? ITEM_POOL.filter((it) => it.pointId === pointId) : ITEM_POOL;
@@ -501,6 +507,13 @@
   el("reviewBtn").addEventListener("click", () => showModeSheet(null));
   el("quizBackBtn").addEventListener("click", () => { saveProgress(); showView("browse"); });
   el("quizEmptyBackBtn").addEventListener("click", () => showView("browse"));
+
+  function settlePendingGrade() {
+    if (!pendingGrade) return;
+    const g = pendingGrade;
+    pendingGrade = null;
+    grade(g);
+  }
 
   function next() {
     if (index < queue.length - 1) { index++; renderQuizItem(); saveProgress(); }
@@ -591,7 +604,8 @@
           (translation ? '<span class="quiz-translation quiz-translation-a">' + esc(translation) + "</span>" : "");
         el("mcqNextBtn").hidden = false;
         say(correct ? "Benar!" : "Kurang tepat. Jawaban yang benar: " + LETTERS[answerAt] + ".", "mcqNextBtn");
-        el("mcqNextBtn").addEventListener("click", () => grade(correct ? "good" : "again"), { once: true });
+        pendingGrade = correct ? "good" : "again";
+        el("mcqNextBtn").addEventListener("click", () => settlePendingGrade(), { once: true });
       });
     });
   }
@@ -666,7 +680,8 @@
           (b.translation ? '<span class="quiz-translation quiz-translation-a">' + esc(b.translation) + "</span>" : "");
         el("jlptNextBtn").hidden = false;
         say(correct ? "Benar!" : "Kurang tepat.", "jlptNextBtn");
-        el("jlptNextBtn").addEventListener("click", () => grade(correct ? "good" : "again"), { once: true });
+        pendingGrade = correct ? "good" : "again";
+        el("jlptNextBtn").addEventListener("click", () => settlePendingGrade(), { once: true });
       });
     });
   }
@@ -754,7 +769,8 @@
       el("buildCheckBtn").hidden = true;
       el("buildNextBtn").hidden = false;
       say(correct ? "Benar!" : "Kurang tepat.", "buildNextBtn");
-      el("buildNextBtn").addEventListener("click", () => grade(correct ? "good" : "again"), { once: true });
+      pendingGrade = correct ? "good" : "again";
+        el("buildNextBtn").addEventListener("click", () => settlePendingGrade(), { once: true });
     });
   }
 

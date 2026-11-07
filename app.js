@@ -97,6 +97,7 @@
   let sessionMissed = 0;
   let srsMap = {};             // audioFile -> SRS entry, see srs.js
   let againQueue = new Set();  // audioFile keys graded "again" and not yet resolved this session
+  let gradedOk = new Set();    // audioFile keys graded good/easy this session: Prev can show them again, but they are not scheduled twice
   let kanjiKnown = new Set();  // audioFile keys marked "sudah paham" — excluded from future buildDeck() calls
   let allKnownEmpty = false;   // see buildDeck() — distinguishes the two empty-deck causes for render()
 
@@ -204,7 +205,8 @@
       filter,
       order: deck.map((c) => c.audioFile),
       index, sessionCorrect, sessionMissed, finished,
-      againQueue: [...againQueue]
+      againQueue: [...againQueue],
+      gradedOk: [...gradedOk]
     };
     ls(false, progressKeyFor(currentUser), JSON.stringify(data));
   }
@@ -237,6 +239,7 @@
     sessionCorrect = saved.sessionCorrect || 0;
     sessionMissed = saved.sessionMissed || 0;
     againQueue = new Set(saved.againQueue || []);
+    gradedOk = new Set(saved.gradedOk || []);
     updateScore();
     updateQueueBadge();
     setFinished(!!saved.finished);
@@ -307,6 +310,7 @@
     sessionCorrect = 0;
     sessionMissed = 0;
     againQueue = new Set();
+    gradedOk = new Set();
     updateScore();
     updateQueueBadge();
     setFinished(false);
@@ -617,7 +621,12 @@
   // "Good" / "Easy" -> counts as correct, card is done for this session, move on.
   function grade(level) {
     if (!deck.length || finished) return;
+    // Grade only after the answer shows: the first press turns the card over.
+    if (!card.classList.contains("is-flipped")) { flip(); return; }
     const c = deck[index];
+    // Prev can come back to a card that is already done this session. Move on, but do
+    // not move it up a box again.
+    if (gradedOk.has(c.audioFile)) { next(); return; }
     srsMap[c.audioFile] = schedule(srsMap[c.audioFile], level);
     if (self.tsumikiAnnounce) self.tsumikiAnnounce({ again: "Again", good: "Good", easy: "Easy" }[level] + ".");
     saveSrs("kanji", currentUser, srsMap);
@@ -643,6 +652,7 @@
     } else {
       sessionCorrect++;
       againQueue.delete(c.audioFile);
+      gradedOk.add(c.audioFile);
       updateScore();
       updateQueueBadge();
       next();

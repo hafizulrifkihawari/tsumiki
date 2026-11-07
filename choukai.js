@@ -187,7 +187,8 @@
   // Cross-module coordination with n4sim.js (both live on the same page, own
   // independent timers/audio — guarded global hooks let each pause the other
   // if the learner switches modes mid-session without exiting cleanly).
-  window.__choukaiStop = function () { cancelSpeech(); stopElapsed(); };
+  // Save first: the timer saves only every 20 s, so a pause would lose the time since then.
+  window.__choukaiStop = function () { if (exam) saveProgress(); cancelSpeech(); stopElapsed(); };
 
   function buildAudioLines(q) {
     if (q.type === "task-comprehension" || q.type === "point-comprehension") {
@@ -241,6 +242,7 @@
     window.scrollTo(0, 0);
   }
   function exitToBrowse() {
+    if (exam) saveProgress();
     cancelSpeech();
     stopElapsed();
     showChoukai(false);
@@ -396,7 +398,10 @@
 
   // ============================ RUN AN EXAM ==================================
   function startExam(setId, resume) {
-    const saved = resume ? loadProgress() : null;
+    // There is one saved exam for each user. Ask before a new exam replaces it.
+    const waiting = loadProgress();
+    if (!resume && waiting && !confirm("「" + waiting.label + "」の途中経過は消えます。新しく始めますか？")) return;
+    const saved = resume ? waiting : null;
     if (resume && saved && saved.setId === setId) {
       exam = {
         setId: saved.setId, label: saved.label, questions: saved.questions,
@@ -536,7 +541,8 @@
       const seq = buildAudioLines(q);
       const myGid = q.gid;
       speakSequence(seq).then((completed) => {
-        if (exam.index >= exam.questions.length || exam.questions[exam.index].gid !== myGid) return;
+        // The learner can leave the exam while the audio plays: then exam is null.
+        if (!exam || exam.index >= exam.questions.length || exam.questions[exam.index].gid !== myGid) return;
         btn.classList.remove("is-speaking");
         if (completed) {
           exam.played[myGid] = true;
