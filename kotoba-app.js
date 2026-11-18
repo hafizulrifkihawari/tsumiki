@@ -347,8 +347,6 @@
   // requeue the card later this session ("again") or move on ("good"/"easy").
   function grade(level) {
     if (!deck.length) return;
-    // Grade only after the answer shows: the first press turns the card over.
-    if (!card.classList.contains("is-flipped")) { flip(); return; }
     const c = deck[index];
     if (gradedOk.has(c.key)) { next(); return; }
     srsMap[c.key] = schedule(srsMap[c.key], level);

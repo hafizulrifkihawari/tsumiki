@@ -621,8 +621,6 @@
   // "Good" / "Easy" -> counts as correct, card is done for this session, move on.
   function grade(level) {
     if (!deck.length || finished) return;
-    // Grade only after the answer shows: the first press turns the card over.
-    if (!card.classList.contains("is-flipped")) { flip(); return; }
     const c = deck[index];
     // Prev can come back to a card that is already done this session. Move on, but do
     // not move it up a box again.
