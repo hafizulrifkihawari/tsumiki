@@ -39,7 +39,19 @@
   // Official practice sources (opened in a new tab from the start screen).
   const OFFICIAL_SOURCES = [
     { label: "公式サンプル問題 (jlpt.jp)", url: "https://www.jlpt.jp/e/samples/sampleindex.html" },
-    { label: "公式 N4 Practice Workbook（PDF・音声）", url: "https://jlptbootcamp.com/2012/11/the-official-jlpt-n4-practice-workbook/" }
+    { label: "公式 N4 Practice Workbook（PDF・音声）", url: "https://jlptbootcamp.com/2012/11/the-official-jlpt-n4-practice-workbook/" },
+    { label: "公式 N4 サンプル 文字・語彙（PDF）", url: "https://www.jlpt.jp/samples/sample2018/pdf/N4V.pdf" }
+  ];
+
+  // Free non-official N4 practice tests (also opened in a new tab).
+  const PRACTICE_SOURCES = [
+    { label: "Nihongo Master — N4 練習テスト（聴解あり）", url: "https://www.nihongomaster.com/jlpt-n4-practice-test" },
+    {
+      label: "Coto Academy — N4 語彙 模試",
+      url: "https://cotoacademy.com/jlpt-n4-vocabulary-mock-test-sample-questions-free-online-practice/"
+    },
+    { label: "Coto Academy — N4 漢字 模試", url: "https://cotoacademy.com/jlpt-n4-kanji-mock-test-online-practice/" },
+    { label: "JLPT Sensei — N4 練習テスト（ダウンロード）", url: "https://jlptsensei.com/downloads/jlpt-n4-practice-test" }
   ];
 
   // ---- Bunpou views to hide while the exam is on screen ----------------------
@@ -227,10 +239,13 @@
         "</div>"
       : "";
 
+    const sourceLink = (s) =>
+      '<a class="exam-source-link" href="' + esc(s.url) + '" target="_blank" rel="noopener noreferrer">↗ ' +
+      esc(s.label) + "</a>";
     const sources = '<div class="exam-sources"><h3 class="exam-h3">公式の練習素材</h3>' +
-      OFFICIAL_SOURCES.map((s) =>
-        '<a class="exam-source-link" href="' + esc(s.url) + '" target="_blank" rel="noopener noreferrer">↗ ' + esc(s.label) + "</a>"
-      ).join("") +
+      OFFICIAL_SOURCES.map(sourceLink).join("") +
+      '<h3 class="exam-h3">その他の練習サイト（非公式）</h3>' +
+      PRACTICE_SOURCES.map(sourceLink).join("") +
       '<p class="exam-note">この模試は非公式・オリジナル問題です。実際の過去問は公開されていないため、公式サンプル問題と公式練習ワークブックの形式に合わせて作成しています。聴解は含みません。</p>' +
       "</div>";
 
